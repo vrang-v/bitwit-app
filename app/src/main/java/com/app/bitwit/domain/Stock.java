@@ -2,15 +2,30 @@ package com.app.bitwit.domain;
 
 import lombok.Data;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
-public class Stock
-{
+public class Stock {
+    
     Long id;
     
-    String name;
+    String ticker;
+    
+    String fullName;
+    
+    String koreanName;
+    
+    Double currentPrice;
+    
+    Double realTimeFluctuation;
+    
+    Double fluctuate24h;
+    
+    Double fluctuateRate24h;
+    
+    Double marketCap;
+    
+    List<DailyInfo> dailyInfo;
     
     String createdAt;
     

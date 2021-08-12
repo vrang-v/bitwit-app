@@ -9,7 +9,7 @@ public class Ballot
     
     Account account;
     
-    Vote vote;
+    VoteResponse voteResponse;
     
     VotingOption votingOption;
     

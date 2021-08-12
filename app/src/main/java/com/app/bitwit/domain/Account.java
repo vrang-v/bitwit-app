@@ -1,6 +1,5 @@
 package com.app.bitwit.domain;
 
-import com.app.bitwit.common.BaseTimeEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -11,7 +10,7 @@ import static lombok.AccessLevel.PROTECTED;
 
 @Getter @FieldDefaults(level = PRIVATE)
 @NoArgsConstructor(access = PROTECTED)
-public class Account extends BaseTimeEntity
+public class Account
 {
     Long id;
     
@@ -23,7 +22,7 @@ public class Account extends BaseTimeEntity
     
     public static Account createAccount(String name, String email, String password)
     {
-        var account = new Account( );
+        Account account = new Account( );
         account.name     = name;
         account.email    = email;
         account.password = password;

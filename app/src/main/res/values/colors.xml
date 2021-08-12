@@ -12,4 +12,13 @@
     <color name="light_blue_A200">#FF40C4FF</color>
     <color name="light_blue_A400">#FF00B0FF</color>
     <color name="black_overlay">#66000000</color>
+    <color name="colorAccent">#B1AF</color>
+    <color name="colorAccentLight">#81AF</color>
+    <color name="colorBasic">#FFF</color>
+    <color name="colorContrast">#FFDF00</color>
+    <color name="colorWarning">#DB4455</color>
+    <color name="colorWarningLight">#ff5454</color>
+    <color name="blind">#7000</color>
+    <color name="incrementText">#FF3E3E</color>
+    <color name="decrementText">#1E83F3</color>
 </resources>

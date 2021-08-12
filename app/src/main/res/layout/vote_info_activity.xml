@@ -1,0 +1,485 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="com.app.bitwit.util.TransitionNames" />
+
+        <variable
+            name="activity"
+            type="com.app.bitwit.activity.VoteInfoActivity" />
+
+        <variable
+            name="viewModel"
+            type="com.app.bitwit.viewmodel.VoteInfoViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/root"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FFF"
+        tools:context=".activity.VoteInfoActivity">
+
+        <TextView
+            android:id="@+id/ticker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="16dp"
+            android:text="@{viewModel.voteItem.ticker, default=TICKER}"
+            android:textColor="#000"
+            android:textSize="26dp"
+            android:textStyle="bold"
+            android:transitionName="@{TransitionNames.TICKER}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@{viewModel.voteItem.koreanName, default=한글회사명}"
+            android:textColor="#000"
+            android:textSize="14dp"
+            android:transitionName="@{TransitionNames.KOREAN_NAME}"
+            app:layout_constraintBaseline_toBaselineOf="@id/ticker"
+            app:layout_constraintStart_toEndOf="@id/ticker" />
+
+        <TextView
+            android:id="@+id/participantCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:maxLines="1"
+            android:text="@{String.valueOf(viewModel.voteItem.participantsCount), default=N}"
+            android:textColor="#444"
+            android:textSize="13dp"
+            android:textStyle="bold"
+            android:transitionName="@{TransitionNames.PARTICIPANT_COUNT}"
+            app:layout_constraintBaseline_toBaselineOf="@+id/participantCountBase"
+            app:layout_constraintEnd_toStartOf="@+id/participantCountBase" />
+
+        <TextView
+            android:id="@+id/participantCountBase"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24dp"
+            android:autoSizeTextType="uniform"
+            android:gravity="end"
+            android:maxLines="1"
+            android:text="명 참여 중"
+            android:textColor="#444"
+            android:textSize="13dp"
+            android:textStyle="bold"
+            android:transitionName="@{TransitionNames.PARTICIPANT_COUNT_BASE}"
+            app:layout_constraintBaseline_toBaselineOf="@+id/textBaseline"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideLineY12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent=".12" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideLineY20"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.24" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideLineY14"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.15" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideLineX50"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/barLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:transitionName="@{TransitionNames.VOTE_STATUS_BAR}"
+            app:layout_constraintBottom_toTopOf="@+id/guideLineY12"
+            app:layout_constraintEnd_toStartOf="@+id/guideLineX50"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <View
+                android:id="@+id/incrementBar"
+                bind:layout_constraintHorizontal_weight="@{viewModel.voteItem.incrementBarWeight}"
+                android:layout_width="0dp"
+                android:layout_height="5dp"
+                android:background="@drawable/round_corner_bar_red"
+                app:layout_constraintEnd_toStartOf="@+id/decrementBar"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:id="@+id/decrementBar"
+                bind:layout_constraintHorizontal_weight="@{viewModel.voteItem.decrementBarWeight}"
+                android:layout_width="0dp"
+                android:layout_height="5dp"
+                android:background="@drawable/round_corner_bar_blue"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/incrementBar"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <ImageView
+            android:id="@+id/textBaseline"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:baselineAlignBottom="true"
+            android:contentDescription="USE ONLY AS TEXT BASELINE"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toTopOf="@+id/guideLineY12"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/incrementRate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:maxLines="1"
+            android:text="@{viewModel.voteItem.incrementRateString}"
+            android:textColor="#FF7060"
+            android:textSize="15dp"
+            android:textStyle="bold"
+            android:transitionName="@{TransitionNames.INCREMENT_RATE}"
+            app:layout_constraintBaseline_toBaselineOf="@+id/decrementRate"
+            app:layout_constraintStart_toStartOf="@+id/barLayout" />
+
+        <TextView
+            android:id="@+id/decrementRate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:maxLines="1"
+            android:text="@{viewModel.voteItem.decrementRateString}"
+            android:textColor="#1E83F3"
+            android:textSize="15dp"
+            android:textStyle="bold"
+            android:transitionName="@{TransitionNames.DECREMENT_RATE}"
+            app:layout_constraintBottom_toTopOf="@+id/barLayout"
+            app:layout_constraintEnd_toStartOf="@+id/guideLineX50" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginBottom="2dp"
+            android:background="#000"
+            app:layout_constraintBottom_toTopOf="@+id/guideLineY14"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintWidth_percent=".95" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/selectedCandlestickInfo"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toTopOf="@+id/guideLineY20"
+            app:layout_constraintTop_toTopOf="@+id/guideLineY14">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent=".5" />
+
+            <ImageView
+                android:id="@+id/guideImage"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toTopOf="@+id/guideline"
+                app:layout_constraintStart_toEndOf="parent" />
+
+            <TextView
+                android:id="@+id/textView9"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@{viewModel.selectedCandlestick.yearMonthDay, default=년월일}"
+                android:textColor="#000"
+                android:textSize="16dp"
+                app:layout_constraintBaseline_toBaselineOf="@+id/guideImage"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/textView10"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@{viewModel.selectedCandlestick.hourMinuteSecond, default=시분초}"
+                android:textColor="#000"
+                android:textSize="14dp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/textView9"
+                app:layout_constraintTop_toTopOf="@+id/guideline" />
+
+            <TextView
+                android:id="@+id/textView12"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="24dp"
+                android:text="@{viewModel.selectedCandlestick.priceString}"
+                android:textColor="@{viewModel.selectedCandlestick.wholeFluctuateRateColor}"
+                android:textSize="18dp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textView13"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:text="@{viewModel.selectedCandlestick.wholeFluctuateRateString}"
+                android:textColor="@{viewModel.selectedCandlestick.wholeFluctuateRateColor}"
+                android:textSize="16dp"
+                android:textStyle="bold"
+                app:layout_constraintBaseline_toBaselineOf="@+id/textView12"
+                app:layout_constraintEnd_toStartOf="@+id/textView12" />
+
+            <TextView
+                android:id="@+id/textView14"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:text="@{viewModel.selectedCandlestick.fluctuateRateString}"
+                android:textColor="@{viewModel.selectedCandlestick.fluctuateRateColor}"
+                android:textSize="16dp"
+                android:textStyle="bold"
+                app:layout_constraintBaseline_toBaselineOf="@+id/textView13"
+                app:layout_constraintEnd_toStartOf="@+id/textView13" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/lineChart"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/guideline2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideLineY20"
+            app:layout_constraintWidth_percent="1" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent=".6" />
+
+        <Button
+            android:id="@+id/button1m"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/chart_interval_btn"
+            android:onClick="@{(v) -> activity.onChartIntervalBtnClick(v)}"
+            android:text="1분"
+            android:textColor="@color/chart_interval_text_color"
+            android:textSize="12dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/button1h"
+            app:layout_constraintEnd_toStartOf="@+id/button3m"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/button1h" />
+
+        <Button
+            android:id="@+id/button3m"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/chart_interval_btn"
+            android:onClick="@{(v) -> activity.onChartIntervalBtnClick(v)}"
+            android:text="3분"
+            android:textColor="@color/chart_interval_text_color"
+            android:textSize="12dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/button1h"
+            app:layout_constraintEnd_toStartOf="@+id/button5m"
+            app:layout_constraintStart_toEndOf="@+id/button1m"
+            app:layout_constraintTop_toTopOf="@+id/button1h"
+            app:layout_constraintVertical_bias="1.0" />
+
+        <Button
+            android:id="@+id/button5m"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/chart_interval_btn"
+            android:onClick="@{(v) -> activity.onChartIntervalBtnClick(v)}"
+            android:text="5분"
+            android:textColor="@color/chart_interval_text_color"
+            android:textSize="12dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/button1h"
+            app:layout_constraintEnd_toStartOf="@+id/button10m"
+            app:layout_constraintStart_toEndOf="@+id/button3m"
+            app:layout_constraintTop_toTopOf="@+id/button1h" />
+
+        <Button
+            android:id="@+id/button10m"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/chart_interval_btn"
+            android:onClick="@{(v) -> activity.onChartIntervalBtnClick(v)}"
+            android:text="10분"
+            android:textColor="@color/chart_interval_text_color"
+            android:textSize="12dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/button1h"
+            app:layout_constraintEnd_toStartOf="@+id/button30m"
+            app:layout_constraintStart_toEndOf="@+id/button5m"
+            app:layout_constraintTop_toTopOf="@+id/button1h" />
+
+        <Button
+            android:id="@+id/button30m"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/chart_interval_btn"
+            android:onClick="@{(v) -> activity.onChartIntervalBtnClick(v)}"
+            android:text="30분"
+            android:textColor="@color/chart_interval_text_color"
+            android:textSize="12dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/button1h"
+            app:layout_constraintEnd_toStartOf="@+id/button1h"
+            app:layout_constraintStart_toEndOf="@+id/button10m"
+            app:layout_constraintTop_toTopOf="@+id/button1h" />
+
+        <Button
+            android:id="@+id/button1h"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/chart_interval_btn"
+            android:onClick="@{(v) -> activity.onChartIntervalBtnClick(v)}"
+            android:text="1시간"
+            android:textColor="@color/chart_interval_text_color"
+            android:textSize="12dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/guideline3"
+            app:layout_constraintEnd_toStartOf="@+id/button6h"
+            app:layout_constraintStart_toEndOf="@+id/button30m"
+            app:layout_constraintTop_toTopOf="@+id/guideline2" />
+
+        <Button
+            android:id="@+id/button6h"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/chart_interval_btn"
+            android:onClick="@{(v) -> activity.onChartIntervalBtnClick(v)}"
+            android:text="6시간"
+            android:textColor="@color/chart_interval_text_color"
+            android:textSize="12dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/button1h"
+            app:layout_constraintEnd_toStartOf="@+id/button12h"
+            app:layout_constraintStart_toEndOf="@+id/button1h"
+            app:layout_constraintTop_toTopOf="@+id/button1h" />
+
+        <Button
+            android:id="@+id/button12h"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/chart_interval_btn"
+            android:onClick="@{(v) -> activity.onChartIntervalBtnClick(v)}"
+            android:text="12시간"
+            android:textColor="@color/chart_interval_text_color"
+            android:textSize="12dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/button1h"
+            app:layout_constraintEnd_toStartOf="@+id/button24h"
+            app:layout_constraintStart_toEndOf="@+id/button6h"
+            app:layout_constraintTop_toTopOf="@+id/button1h" />
+
+        <Button
+            android:id="@+id/button24h"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/chart_interval_btn"
+            android:onClick="@{(v) -> activity.onChartIntervalBtnClick(v)}"
+            android:text="1일"
+            android:textColor="@color/chart_interval_text_color"
+            android:textSize="12dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/button1h"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/button12h"
+            app:layout_constraintTop_toTopOf="@+id/button1h" />
+
+        <TextView
+            android:id="@+id/currentPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24dp"
+            android:text="@{viewModel.voteItem.currentStockPriceString, default=현재가}"
+            android:textColor="@{viewModel.voteItem.stockTextColor}"
+            android:textSize="22dp"
+            android:textStyle="bold"
+            app:layout_constraintBaseline_toBaselineOf="@+id/ticker"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/currentFluctuateRate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@{viewModel.voteItem.fluctuateRateString}"
+            android:textColor="@{viewModel.voteItem.stockTextColor}"
+            android:textSize="17dp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@+id/currentPrice"
+            app:layout_constraintTop_toBottomOf="@+id/currentPrice" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent=".65" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="#000"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/guideline2"
+            app:layout_constraintWidth_percent="1" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="#000"
+            app:layout_constraintBottom_toTopOf="@+id/guideline3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintWidth_percent="1" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

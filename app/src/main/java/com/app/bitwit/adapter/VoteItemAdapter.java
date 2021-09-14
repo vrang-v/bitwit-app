@@ -10,7 +10,7 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.RecyclerView.Adapter;
 import com.app.bitwit.R;
-import com.app.bitwit.adapter.VoteAdapter.ViewHolder;
+import com.app.bitwit.adapter.VoteItemAdapter.ViewHolder;
 import com.app.bitwit.data.source.local.entity.VoteItem;
 import com.app.bitwit.databinding.VoteItemBinding;
 import com.app.bitwit.viewmodel.MutableLiveEvent;
@@ -22,11 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static com.app.bitwit.adapter.VoteAdapter.EventType.DECREMENT_BTN;
-import static com.app.bitwit.adapter.VoteAdapter.EventType.INCREMENT_BTN;
-import static com.app.bitwit.adapter.VoteAdapter.EventType.LAYOUT;
+import static com.app.bitwit.adapter.VoteItemAdapter.EventType.DECREMENT_BTN;
+import static com.app.bitwit.adapter.VoteItemAdapter.EventType.INCREMENT_BTN;
+import static com.app.bitwit.adapter.VoteItemAdapter.EventType.LAYOUT;
 
-public class VoteAdapter extends Adapter<ViewHolder> {
+public class VoteItemAdapter extends Adapter<ViewHolder> {
     
     private final List<VoteItem> voteItems = new ArrayList<>( );
     
@@ -70,10 +70,10 @@ public class VoteAdapter extends Adapter<ViewHolder> {
     @Data
     @AllArgsConstructor
     public static class VoteItemClick {
-        EventType eventType;
-        VoteItem  voteItem;
-        View      view;
-        int       position;
+        private EventType eventType;
+        private VoteItem  voteItem;
+        private View      view;
+        private int       position;
     }
     
     class ViewHolder extends RecyclerView.ViewHolder {

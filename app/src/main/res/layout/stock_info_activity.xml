@@ -5,15 +5,17 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <import type="com.app.bitwit.util.TransitionNames" />
 
         <variable
             name="activity"
-            type="com.app.bitwit.activity.VoteInfoActivity" />
+            type="com.app.bitwit.activity.StockInfoActivity" />
 
         <variable
             name="viewModel"
-            type="com.app.bitwit.viewmodel.VoteInfoViewModel" />
+            type="com.app.bitwit.viewmodel.StockInfoViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -21,7 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#FFF"
-        tools:context=".activity.VoteInfoActivity">
+        tools:context=".activity.StockInfoActivity">
 
         <TextView
             android:id="@+id/ticker"
@@ -259,7 +261,7 @@
                 app:layout_constraintEnd_toStartOf="@+id/textView12" />
 
             <TextView
-                android:id="@+id/textView14"
+                android:id="@+id/participants"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
@@ -273,6 +275,7 @@
 
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/lineChart"
+            android:visibility="invisible"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toTopOf="@+id/guideline2"
@@ -434,6 +437,7 @@
             app:layout_constraintTop_toTopOf="@+id/button1h" />
 
         <TextView
+            android:visibility="invisible"
             android:id="@+id/currentPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -446,6 +450,7 @@
             app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
+            android:visibility="invisible"
             android:id="@+id/currentFluctuateRate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -465,6 +470,7 @@
             app:layout_constraintGuide_percent=".65" />
 
         <View
+            android:id="@+id/view"
             android:layout_width="0dp"
             android:layout_height="1dp"
             android:background="#000"
@@ -474,6 +480,7 @@
             app:layout_constraintWidth_percent="1" />
 
         <View
+            android:id="@+id/view2"
             android:layout_width="0dp"
             android:layout_height="1dp"
             android:background="#000"
@@ -481,5 +488,45 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintWidth_percent="1" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent=".675" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@+id/guideline7"
+            android:visibility="@{viewModel.postPreviewItems.empty ? View.GONE : View.VISIBLE}">
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="인기글"
+                android:textColor="@color/black"
+                android:textSize="17dp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/postRecyclerview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="6dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView5"
+                app:layout_constraintVertical_bias="0.0"
+                bind:postPreivewItems="@{viewModel.postPreviewItems}" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

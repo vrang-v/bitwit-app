@@ -1,7 +1,9 @@
 package com.app.bitwit.module;
 
+import android.annotation.SuppressLint;
 import com.app.bitwit.data.source.remote.*;
 import com.app.bitwit.util.AuthenticationInterceptor;
+import com.app.bitwit.util.LocalDateTimeSerializer;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dagger.Module;
@@ -14,14 +16,20 @@ import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import javax.inject.Singleton;
+import java.time.LocalDateTime;
 
 @Module
 @InstallIn(SingletonComponent.class)
 public class WebClientProvider {
+    
+    @SuppressLint("NewApi")
     @Provides
     @Singleton
     public Gson gson( ) {
-        return new GsonBuilder( ).setLenient( ).create( );
+        return new GsonBuilder( )
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeSerializer( ))
+                .setLenient( )
+                .create( );
     }
     
     @Provides
@@ -65,6 +73,12 @@ public class WebClientProvider {
     @Singleton
     public StockServiceClient stockServiceClient(Retrofit retrofit) {
         return retrofit.create(StockServiceClient.class);
+    }
+    
+    @Provides
+    @Singleton
+    public PostServiceClient postServiceClient(Retrofit retrofit) {
+        return retrofit.create(PostServiceClient.class);
     }
     
     @Provides

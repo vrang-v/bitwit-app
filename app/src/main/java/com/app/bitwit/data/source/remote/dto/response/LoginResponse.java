@@ -1,15 +1,21 @@
 package com.app.bitwit.data.source.remote.dto.response;
 
+import com.google.gson.annotations.SerializedName;
 import lombok.Data;
+import lombok.experimental.FieldDefaults;
+
+import static lombok.AccessLevel.PRIVATE;
 
 @Data
+@FieldDefaults(level = PRIVATE)
 public class LoginResponse {
     
-    private String jwt;
+    String jwt;
     
-    private Long id;
+    @SerializedName("accountId")
+    Long id;
     
-    private String email;
+    String email;
     
-    private String name;
+    String name;
 }

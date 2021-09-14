@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class AccountResponse {
     
-    @SerializedName("id")
+    @SerializedName("accountId")
     Long id;
     
     @SerializedName("name")

@@ -10,13 +10,16 @@ import retrofit2.http.*;
 import java.util.List;
 
 public interface StockServiceClient {
-    @POST("/api/v1/stocks")
+    @POST("/api/stocks")
     Single<Response<Stock>> createStock(@Body StockRequest stockRequest);
     
-    @GET("/api/v1/stocks/{stockId}")
+    @GET("/api/stocks/{stockId}")
     Single<Response<Stock>> getStock(@Path("stockId") Long stockId);
     
-    @GET("/api/v1/stocks/{ticker}/bithumb/chart/24h")
+    @GET("/api/stocks/search")
+    Single<Response<List<Stock>>> searchStock(@Query("keyword") String keyword);
+    
+    @GET("/api/stocks/{ticker}/bithumb/chart/24h")
     Single<Response<List<Candlestick_>>> getCandleSticks(
             @Path("ticker") String ticker,
             @Query("page") int page,

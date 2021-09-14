@@ -1,5 +1,6 @@
 package com.app.bitwit.domain;
 
+import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.List;
 @Data
 public class Stock {
     
+    @SerializedName("stockId")
     Long id;
     
     String ticker;

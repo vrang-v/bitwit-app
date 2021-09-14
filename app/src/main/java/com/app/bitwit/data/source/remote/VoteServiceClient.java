@@ -1,30 +1,30 @@
 package com.app.bitwit.data.source.remote;
 
-import com.app.bitwit.domain.VoteResponse;
+import com.app.bitwit.domain.Vote;
 import io.reactivex.rxjava3.core.Single;
 import retrofit2.Call;
 import retrofit2.Response;
-import retrofit2.http.Body;
-import retrofit2.http.GET;
-import retrofit2.http.POST;
-import retrofit2.http.Path;
+import retrofit2.http.*;
 
 import java.util.List;
 
-public interface VoteServiceClient
-{
-    @POST("/api/v1/votes")
-    Call<Void> createVote(@Body VoteResponse voteResponse);
+public interface VoteServiceClient {
     
-    @GET("/api/v1/votes/{voteId}")
-    Single<Response<VoteResponse>> getVote(@Path("voteId") Long voteId);
+    @POST("/api/votes")
+    Call<Void> createVote(@Body Vote vote);
     
-    @GET("/api/v1/votes/{voteId}/type/{responseType}")
-    Single<Response<VoteResponse>> getVote(@Path("voteId") Long voteId, @Path("responseType") String responseType);
+    @GET("/api/votes/{voteId}")
+    Single<Response<Vote>> getVote(@Path("voteId") Long voteId);
     
-    @GET("/api/v1/votes")
-    Single<Response<List<VoteResponse>>> getVotes( );
+    @GET("/api/votes/{voteId}/type/{responseType}")
+    Single<Response<Vote>> getVote(@Path("voteId") Long voteId, @Path("responseType") String responseType);
     
-    @GET("/api/v1/votes/type/{responseType}")
-    Single<Response<List<VoteResponse>>> getVotes(@Path("responseType") String responseType);
+    @GET("/api/votes")
+    Single<Response<List<Vote>>> getVotes( );
+    
+    @GET("/api/votes/type/{responseType}")
+    Single<Response<List<Vote>>> getVotes(@Path("responseType") String responseType);
+    
+    @GET("/api/votes/search/type/{responseType}")
+    Single<Response<List<Vote>>> searchVotes(@Path("responseType") String responseType, @Query("ticker") List<String> tickers);
 }

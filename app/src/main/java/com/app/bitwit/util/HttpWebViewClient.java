@@ -20,4 +20,10 @@ public class HttpWebViewClient extends WebViewClient {
         Log.i("URL", request.getUrl( ).toString( ));
         return true;
     }
+    
+    @Override
+    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+        view.loadUrl(url);
+        return true;
+    }
 }

@@ -2,13 +2,14 @@ package com.app.bitwit.data.source.local.entity;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
-import com.app.bitwit.domain.VoteResponse;
+import com.app.bitwit.domain.Vote;
 import com.app.bitwit.domain.VotingOption;
 import com.app.bitwit.util.Colors;
 import lombok.Data;
 import lombok.var;
 
 import java.text.DecimalFormat;
+import java.time.LocalDateTime;
 import java.util.Locale;
 
 @Data
@@ -32,9 +33,9 @@ public class VoteItem {
     
     Double fluctuateRate;
     
-    String startAt;
+    LocalDateTime startAt;
     
-    String endedAt;
+    LocalDateTime endedAt;
     
     int participantsCount;
     
@@ -44,27 +45,27 @@ public class VoteItem {
     
     int decrementChoiceCount;
     
-    public static VoteItem fromVoteResponse(VoteResponse response) {
+    public static VoteItem fromVote(Vote vote) {
         VoteItem voteItem = new VoteItem( );
         voteItem.applyAnim           = false;
-        voteItem.id                  = response.getId( );
-        voteItem.ticker              = response.getStock( ).getTicker( );
-        voteItem.koreanName          = response.getStock( ).getKoreanName( );
-        voteItem.description         = response.getDescription( );
-        voteItem.currentStockPrice   = response.getStock( ).getCurrentPrice( );
-        voteItem.realTimeFluctuation = response.getStock( ).getRealTimeFluctuation( );
-        voteItem.fluctuateRate       = response.getStock( ).getFluctuateRate24h( );
-        voteItem.startAt             = response.getStartAt( );
-        voteItem.endedAt             = response.getEndedAt( );
-        voteItem.participantsCount   = response.getParticipantCount( );
+        voteItem.id                  = vote.getId( );
+        voteItem.ticker              = vote.getStock( ).getTicker( );
+        voteItem.koreanName          = vote.getStock( ).getKoreanName( );
+        voteItem.description         = vote.getDescription( );
+        voteItem.currentStockPrice   = vote.getStock( ).getCurrentPrice( );
+        voteItem.realTimeFluctuation = vote.getStock( ).getRealTimeFluctuation( );
+        voteItem.fluctuateRate       = vote.getStock( ).getFluctuateRate24h( );
+        voteItem.startAt             = vote.getStartAt( );
+        voteItem.endedAt             = vote.getEndedAt( );
+        voteItem.participantsCount   = vote.getParticipantsCount( );
         
-        voteItem.participated = response.getSelectionCount( ) != null;
+        voteItem.participated = vote.getSelectionCount( ) != null;
         
         if (voteItem.participated) {
-            var incrementChoiceCount = response.getSelectionCount( ).get(VotingOption.INCREMENT);
+            var incrementChoiceCount = vote.getSelectionCount( ).get(VotingOption.INCREMENT);
             voteItem.incrementChoiceCount = incrementChoiceCount == null ? 0 : incrementChoiceCount;
             
-            var decrementChoiceCount = response.getSelectionCount( ).get(VotingOption.DECREMENT);
+            var decrementChoiceCount = vote.getSelectionCount( ).get(VotingOption.DECREMENT);
             voteItem.decrementChoiceCount = decrementChoiceCount == null ? 0 : decrementChoiceCount;
         }
         else {
@@ -92,7 +93,7 @@ public class VoteItem {
     }
     
     public String getDecrementRateString( ) {
-        return String.format("%.2f%%", (1 - getIncrementBarWeight( )) * 100);
+        return String.format(Locale.getDefault( ), "%.2f%%", (1 - getIncrementBarWeight( )) * 100);
     }
     
     public String getCurrentStockPriceString( ) {

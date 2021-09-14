@@ -13,13 +13,12 @@ import java.io.IOException;
 import static com.app.bitwit.util.HttpHeaders.AUTHORIZATION;
 
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class AuthenticationInterceptor implements Interceptor
-{
+public class AuthenticationInterceptor implements Interceptor {
+    
     private final LocalStorage localStorage;
     
     @Override
-    public Response intercept(@NotNull Chain chain) throws IOException
-    {
+    public Response intercept(@NotNull Chain chain) throws IOException {
         Builder builder = chain.request( ).newBuilder( );
         localStorage.load("jwt")
                     .ifPresent(jwt -> builder.header(AUTHORIZATION, jwt.startsWith("Bearer ") ? jwt : "Bearer " + jwt));

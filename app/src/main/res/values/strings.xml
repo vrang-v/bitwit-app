@@ -1,4 +1,5 @@
 <resources>
+    <string name="blank"></string>
     <string name="app_name">bitwit</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
@@ -9,9 +10,10 @@
     <string name="findPasswordHint">&#160;&#160;이메일</string>
     <string name="findPasswordButton">메일 보내기</string>
     <string name="loginTitle">로그인</string>
-    <string name="loginMessage">Bitwit에 오신걸 환영해요</string>
-    <string name="loginEmailHint">&#160;&#160;이메일</string>
-    <string name="loginPasswordHint">&#160;&#160;비밀번호</string>
+    <string name="loginMessage">비트윗에 오신걸 환영해요</string>
+    <string name="loginEmailHint"><font size="12">&#160;&#160;이메일</font></string>
+    <string name="loginPasswordHint"><font size="12">&#160;&#160;비밀번호</font></string>
+    <string name="signUpPasswordCheckHint"><font size="12">&#160;&#160;비밀번호 확인</font></string>
     <string name="loginButton">로그인</string>
     <string name="loginTextButton_signIn">새 계정이 필요하신가요?</string>
     <string name="loginTextButtonParser">|</string>
@@ -19,8 +21,8 @@
     <string name="signInTitle">회원가입</string>
     <string name="signInMessage1">회원가입을 통해 서비스를 정상적으로 이용하실 수 있습니다</string>
     <string name="signInMessage2">이메일로 계정을 등록해주세요</string>
-    <string name="signInEmailHint">&#160;&#160;이메일</string>
-    <string name="signInPasswordHint">&#160;&#160;비밀번호</string>
+    <string name="signInEmailHint"><font size="12">&#160;&#160;이메일</font></string>
+    <string name="signInPasswordHint"><font size="12">&#160;&#160;비밀번호</font></string>
     <string name="signInButton">회원가입</string>
     <string name="signInTextButton_sub">이미 계정을 보유하고 있다면</string>
     <string name="signInTextButton_left">여기에서</string>
@@ -43,4 +45,6 @@
     <string name="previous">Previous</string>
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="edittext_hint"><font size="14">무엇이든 검색해보세요</font></string>
+    <string name="sort_default_message">원하는 정렬 방식을 선택하세요</string>
 </resources>

@@ -9,10 +9,12 @@ import android.view.animation.Animation.AnimationListener;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import com.app.bitwit.R;
-import com.app.bitwit.databinding.VoteInfoActivityBinding;
+import com.app.bitwit.adapter.PostPreviewAdapter;
+import com.app.bitwit.databinding.StockInfoActivityBinding;
 import com.app.bitwit.util.Colors;
-import com.app.bitwit.viewmodel.VoteInfoViewModel;
+import com.app.bitwit.viewmodel.StockInfoViewModel;
 import com.github.mikephil.charting.components.YAxis.YAxisLabelPosition;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
@@ -20,22 +22,26 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.data.LineDataSet.Mode;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.google.android.material.snackbar.Snackbar;
 import dagger.hilt.android.AndroidEntryPoint;
 import lombok.var;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static android.view.animation.AnimationUtils.loadAnimation;
-import static com.app.bitwit.util.IntentKeys.VOTE_ID;
+import static com.app.bitwit.util.IntentKeys.STOCK_TICKER;
+import static com.app.bitwit.util.LiveDataUtils.observeAllNotNull;
 import static com.app.bitwit.util.LiveDataUtils.observeNotEmpty;
-import static com.app.bitwit.util.LiveDataUtils.observeUntilNotNull;
+import static com.app.bitwit.util.LiveDataUtils.observeNotNull;
+import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT;
 
 @AndroidEntryPoint
-public class VoteInfoActivity extends AppCompatActivity implements OnTouchListener {
+public class StockInfoActivity extends AppCompatActivity implements OnTouchListener {
     
-    private VoteInfoActivityBinding binding;
-    private VoteInfoViewModel       viewModel;
+    private StockInfoActivityBinding binding;
+    private StockInfoViewModel       viewModel;
     
     private LineDataSet       lineDataSet;
     private Map<View, String> intervalMap;
@@ -48,20 +54,34 @@ public class VoteInfoActivity extends AppCompatActivity implements OnTouchListen
         initLineDataSet( );
         initIntervalMap( );
         
+        observeNotNull(this, viewModel.getTicker( ), viewModel::loadVoteItem);
+        observeNotNull(this, viewModel.getTicker( ), viewModel::loadPosts);
+        observeAllNotNull(this, viewModel.getTicker( ), viewModel.getChartInterval( ), viewModel::loadChart);
+        observeAllNotNull(this, viewModel.getTicker( ), viewModel.getChartInterval( ), viewModel::refreshChart);
+        observeNotEmpty(this, viewModel.getEntries( ), this::drawChart);
+        
         viewModel.getVoteItem( ).observe(this, voteItem -> {
             binding.participantCount.startAnimation(loadAnimation(this, R.anim.anim_fade));
             binding.currentPrice.startAnimation(loadAnimation(this, R.anim.anim_fade));
             binding.currentFluctuateRate.startAnimation(loadAnimation(this, R.anim.anim_fade));
         });
         
-        observeNotEmpty(viewModel.getEntries( ), this, entries -> {
-            float dy = entries.get(entries.size( ) - 1).getY( ) - entries.get(0).getY( );
-            lineDataSet.setValues(entries);
-            lineDataSet.setColor(dy >= 0 ? Colors.PRIMARY_RED : Colors.PRIMARY_BLUE);
-            lineDataSet.setFillColor(dy >= 0 ? Colors.PRIMARY_RED_LIGHT : Colors.PRIMARY_BLUE_LIGHT);
-            binding.lineChart.setData(new LineData(lineDataSet));
-            binding.lineChart.invalidate( );
-        });
+        var adapter = new PostPreviewAdapter( );
+        adapter.setOnItemClickListener(this, itemClick ->
+                Snackbar.make(binding.root, itemClick.getPostPreviewItem( ).getId( ) + "로 이동", LENGTH_SHORT).show( )
+        );
+    
+        binding.postRecyclerview.setAdapter(adapter);
+        binding.postRecyclerview.setLayoutManager(new LinearLayoutManager(this));
+    }
+    
+    private void drawChart(List<Entry> entries) {
+        float dy = entries.get(entries.size( ) - 1).getY( ) - entries.get(0).getY( );
+        lineDataSet.setValues(entries);
+        lineDataSet.setColor(dy >= 0 ? Colors.PRIMARY_RED : Colors.PRIMARY_BLUE);
+        lineDataSet.setFillColor(dy >= 0 ? Colors.PRIMARY_RED_LIGHT : Colors.PRIMARY_BLUE_LIGHT);
+        binding.lineChart.setData(new LineData(lineDataSet));
+        binding.lineChart.invalidate( );
     }
     
     public void onChartIntervalBtnClick(View view) {
@@ -76,24 +96,16 @@ public class VoteInfoActivity extends AppCompatActivity implements OnTouchListen
         binding.button24h.setSelected(false);
         view.setSelected(true);
         var interval = intervalMap.get(view);
-        viewModel.loadCandlestick(interval);
-        viewModel.refreshCandlestick(interval);
+        viewModel.setChartInterval(interval);
     }
-    
-    private void loadVoteInfo(Long voteId) {
-        viewModel.loadVoteItem(voteId);
-        observeUntilNotNull(viewModel.getVoteItem( ), voteItem -> {
-            viewModel.loadCandlestick("1m");
-            viewModel.refreshCandlestick("1m");
-            binding.button1m.setSelected(true);
-        });
-    }
-    
     
     private void init( ) {
-        binding   = DataBindingUtil.setContentView(this, R.layout.vote_info_activity);
-        viewModel = new ViewModelProvider(this).get(VoteInfoViewModel.class);
-        loadVoteInfo(getIntent( ).getLongExtra(VOTE_ID, - 1));
+        binding   = DataBindingUtil.setContentView(this, R.layout.stock_info_activity);
+        viewModel = new ViewModelProvider(this).get(StockInfoViewModel.class);
+        viewModel.setTicker(getIntent( ).getStringExtra(STOCK_TICKER));
+        viewModel.setChartInterval("1m");
+        
+        binding.button1m.setSelected(true);
         binding.setActivity(this);
         binding.setLifecycleOwner(this);
         binding.setViewModel(viewModel);
@@ -124,7 +136,7 @@ public class VoteInfoActivity extends AppCompatActivity implements OnTouchListen
             @Override
             public void onValueSelected(Entry entry, Highlight highlight) {
                 binding.selectedCandlestickInfo.setVisibility(View.VISIBLE);
-                viewModel.postSelectedCandlestick((int)entry.getX( ));
+                viewModel.setSelectedCandlestick((int)entry.getX( ));
             }
             
             @Override
@@ -159,6 +171,14 @@ public class VoteInfoActivity extends AppCompatActivity implements OnTouchListen
         intervalMap.put(binding.button6h, "6h");
         intervalMap.put(binding.button12h, "12h");
         intervalMap.put(binding.button24h, "24h");
+    }
+    
+    @Override
+    public void onEnterAnimationComplete( ) {
+        binding.currentPrice.setVisibility(View.VISIBLE);
+        binding.currentFluctuateRate.setVisibility(View.VISIBLE);
+        binding.lineChart.setVisibility(View.VISIBLE);
+        super.onEnterAnimationComplete( );
     }
     
     @Override

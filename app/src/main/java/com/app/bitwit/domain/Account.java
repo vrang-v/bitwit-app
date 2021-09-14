@@ -1,17 +1,20 @@
 package com.app.bitwit.domain;
 
-import lombok.Getter;
+import com.google.gson.annotations.SerializedName;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.var;
 
 import static lombok.AccessLevel.PRIVATE;
-import static lombok.AccessLevel.PROTECTED;
 
-@Getter @FieldDefaults(level = PRIVATE)
-@NoArgsConstructor(access = PROTECTED)
-public class Account
-{
+@Data
+@FieldDefaults(level = PRIVATE)
+@NoArgsConstructor
+@AllArgsConstructor
+public class Account {
+    
+    @SerializedName("accountId")
     Long id;
     
     String name;
@@ -19,13 +22,4 @@ public class Account
     String email;
     
     String password;
-    
-    public static Account createAccount(String name, String email, String password)
-    {
-        Account account = new Account( );
-        account.name     = name;
-        account.email    = email;
-        account.password = password;
-        return account;
-    }
 }

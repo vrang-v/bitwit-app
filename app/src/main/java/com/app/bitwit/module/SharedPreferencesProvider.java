@@ -10,11 +10,11 @@ import dagger.hilt.components.SingletonComponent;
 
 @Module
 @InstallIn(SingletonComponent.class)
-public class SharedPreferencesProvider
-{
+public class SharedPreferencesProvider {
+    
     @Provides
-    public SharedPreferences sharedPreferences(@ApplicationContext Context context)
-    {
+    public SharedPreferences sharedPreferences(@ApplicationContext Context context) {
         return context.getSharedPreferences("bitwit", Context.MODE_PRIVATE);
     }
+    
 }

@@ -31,4 +31,5 @@
         <item name="android:windowSharedElementEnterTransition">@transition/explode</item>
         <item name="android:windowSharedElementExitTransition">@transition/explode</item>
     </style>
+
 </resources>

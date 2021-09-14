@@ -1,8 +1,10 @@
 package com.app.bitwit.domain;
 
+import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -10,23 +12,24 @@ import static lombok.AccessLevel.PRIVATE;
 
 @Data
 @FieldDefaults(level = PRIVATE)
-public class VoteResponse {
+public class Vote {
     
+    @SerializedName("voteId")
     Long id;
     
     Stock stock;
     
     String description;
     
-    String startAt;
+    LocalDateTime startAt;
     
-    String endedAt;
+    LocalDateTime endedAt;
     
     String createdAt;
     
     String updatedAt;
     
-    int participantCount;
+    int participantsCount;
     
     Map<VotingOption, Integer> selectionCount;
     

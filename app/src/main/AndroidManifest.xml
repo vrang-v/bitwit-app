@@ -15,11 +15,15 @@
         android:theme="@style/Bitwit"
         android:usesCleartextTraffic="true"
         tools:replace="android:appComponentFactory">
+        <activity android:name=".activity.WebViewActivity"></activity>
+        <activity android:name=".activity.auth.SignUpProcessActivity" />
+        <activity android:name=".activity.auth.PasswordRetrievalActivity" />
+        <activity android:name=".activity.PostActivity" />
         <activity
             android:name=".activity.SearchActivity"
             android:label="@string/title_activity_search"
-            android:theme="@style/Bitwit.NoActionBar"></activity>
-        <activity android:name=".activity.VoteInfoActivity" />
+            android:theme="@style/Bitwit.NoActionBar" />
+        <activity android:name=".activity.StockInfoActivity" />
         <activity
             android:name=".activity.auth.NaverLoginActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -34,5 +38,6 @@
         <activity android:name=".activity.MainActivity" />
         <activity android:name=".activity.auth.SignUpActivity" />
         <activity android:name=".activity.auth.LoginActivity" />
+        <activity android:name=".activity.auth.GoogleLoginActivity" />
     </application>
 </manifest>

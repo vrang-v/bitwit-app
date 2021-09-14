@@ -4,12 +4,15 @@ import android.content.Context;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.TypeConverters;
 import com.app.bitwit.data.source.local.CandlestickDao;
 import com.app.bitwit.data.source.local.VoteItemDao;
 import com.app.bitwit.data.source.local.entity.VoteItem;
+import com.app.bitwit.data.source.local.support.Converters;
 
 import java.util.Objects;
 
+@TypeConverters(Converters.class)
 @Database(entities = {VoteItem.class, com.app.bitwit.data.source.local.entity.Candlestick.class}, version = 1)
 public abstract class AppDatabase extends RoomDatabase {
     

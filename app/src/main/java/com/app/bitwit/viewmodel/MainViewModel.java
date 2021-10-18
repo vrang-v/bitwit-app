@@ -9,7 +9,7 @@ import com.app.bitwit.data.source.local.entity.VoteItem;
 import com.app.bitwit.data.source.remote.dto.request.CreateOrChangeBallotRequest;
 import com.app.bitwit.domain.Ballot;
 import com.app.bitwit.util.LoginAccount;
-import com.app.bitwit.util.MutableObserver;
+import com.app.bitwit.util.ObserveDelegate;
 import dagger.hilt.android.lifecycle.HiltViewModel;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
@@ -30,7 +30,7 @@ import static lombok.AccessLevel.PRIVATE;
 
 @Getter
 @HiltViewModel
-public class MainViewModel extends DisposableViewModel {
+public class MainViewModel extends RxJavaViewModelSupport {
     
     private final AccountRepository accountRepository;
     private final VoteRepository    voteRepository;
@@ -44,25 +44,24 @@ public class MainViewModel extends DisposableViewModel {
     
     private final MutableLiveData<List<VoteItem>> voteItems = new MutableLiveData<>( );
     
-    private final MutableObserver<List<VoteItem>> voteItemsObserver = new MutableObserver<>(voteItems::postValue);
-    
+    private final ObserveDelegate<List<VoteItem>> voteItemsObserveDelegate = new ObserveDelegate<>(voteItems);
     
     @Inject
     public MainViewModel(VoteRepository voteRepository, AccountRepository accountRepository, BallotRepository ballotRepository) {
         this.voteRepository    = voteRepository;
         this.accountRepository = accountRepository;
         this.ballotRepository  = ballotRepository;
-        voteItemsObserver.observe(voteRepository.loadVoteItems( ));
+        voteItemsObserveDelegate.observe(voteRepository.loadVoteItems( ));
     }
     
     public void refreshVoteItem(int position) {
         var voteId = voteItems.getValue( ).get(position).getId( );
         addDisposable(
                 voteRepository
-                        .refreshVoteItem(voteId)
+                        .getVoteItem(voteId)
                         .subscribeOn(Schedulers.io( ))
                         .observeOn(AndroidSchedulers.mainThread( ))
-                        .subscribe(( ) -> { }, e -> Log.e("ERROR", "refreshVoteItem", e))
+                        .subscribe(( ) -> { }, e -> Log.e("ERROR", "getVoteItem", e))
         );
     }
     
@@ -91,7 +90,7 @@ public class MainViewModel extends DisposableViewModel {
         if (sortOption * sortDirection < 0) {
             return;
         }
-        voteItemsObserver.observe(voteRepository.loadVoteItems(sortOption, sortDirection));
+        voteItemsObserveDelegate.observe(voteRepository.loadVoteItems(sortOption, sortDirection));
     }
     
     public void loadAccount( ) {
@@ -109,7 +108,7 @@ public class MainViewModel extends DisposableViewModel {
     }
     
     public void changeFilterViewVisibility( ) {
-        filterViewVisible.postValue(FALSE.equals(filterViewVisible.getValue( )));
+        filterViewVisible.postValue(Boolean.FALSE.equals(filterViewVisible.getValue( )));
     }
     
     public void setSortStatus(int sortOption, int sortDirection) {
@@ -143,7 +142,7 @@ public class MainViewModel extends DisposableViewModel {
         sortStatus.postValue(status.toString( ));
     }
     
-    public void postSortOption(int option) {
+    public void setSortOption(int option) {
         if (Objects.equals(sortOption.getValue( ), option)) {
             sortOption.postValue(NONE);
             return;
@@ -151,7 +150,7 @@ public class MainViewModel extends DisposableViewModel {
         sortOption.postValue(option);
     }
     
-    public void postSortDirection(int direction) {
+    public void setSortDirection(int direction) {
         if (Objects.equals(sortDirection.getValue( ), direction)) {
             sortDirection.postValue(NONE);
             return;
@@ -159,9 +158,13 @@ public class MainViewModel extends DisposableViewModel {
         sortDirection.postValue(direction);
     }
     
+    public void invertSortDirection( ) {
+        sortDirection.postValue(sortDirection.getValue( ) == ASC ? DESC : ASC);
+    }
+    
     @Override
     protected void onCleared( ) {
-        voteItemsObserver.dispose( );
+        voteItemsObserveDelegate.dispose( );
         super.onCleared( );
     }
     

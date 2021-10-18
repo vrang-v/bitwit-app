@@ -4,6 +4,7 @@ import com.app.bitwit.data.source.remote.AccountServiceClient;
 import com.app.bitwit.data.source.remote.dto.request.CreateAccountRequest;
 import com.app.bitwit.data.source.remote.dto.request.GoogleLoginRequest;
 import com.app.bitwit.data.source.remote.dto.request.LoginRequest;
+import com.app.bitwit.data.source.remote.dto.request.UpdateAccountRequest;
 import com.app.bitwit.data.source.remote.dto.response.DuplicateCheckResponse;
 import com.app.bitwit.data.source.remote.dto.response.LoginResponse;
 import com.app.bitwit.data.source.remote.dto.response.SimpleIdResponse;
@@ -31,6 +32,16 @@ public class AccountRepository {
                 .map(HttpUtils::get2xxBody);
     }
     
+    public Single<Account> updateAccount(UpdateAccountRequest request) {
+        return accountServiceClient
+                .updateAccount(request)
+                .map(HttpUtils::get2xxBody)
+                .doOnSuccess(account -> {
+                    var loginAccount = new LoginAccount(account.getId( ), account.getEmail( ), account.getName( ));
+                    localStorage.save(LocalStorageKey.ACCOUNT, loginAccount);
+                });
+    }
+    
     public Single<LoginResponse> login(LoginRequest request) {
         return accountServiceClient
                 .login(request)
@@ -53,7 +64,7 @@ public class AccountRepository {
                 });
     }
     
-    public Single<SimpleIdResponse> jwtLogin(LoginAccount loginAccount) {
+    public Single<LoginResponse> jwtLogin(LoginAccount loginAccount) {
         Long accountId = loginAccount.getId( );
         return accountServiceClient
                 .jwtLogin( )
@@ -62,12 +73,23 @@ public class AccountRepository {
                     if (! response.getId( ).equals(accountId)) {
                         throw new IllegalStateException( );
                     }
+                    localStorage.save(LocalStorageKey.ACCOUNT,
+                                        new LoginAccount(response.getId( ), response.getEmail( ), response.getName( ))
+                                )
+                                .save(LocalStorageKey.JWT, response.getJwt( ));
                 });
     }
     
     public Single<Boolean> isDuplicateEmail(String email) {
         return accountServiceClient
                 .checkForDuplicateEmail(email)
+                .map(HttpUtils::get2xxBody)
+                .map(DuplicateCheckResponse::isDuplicate);
+    }
+    
+    public Single<Boolean> isDuplicateNickname(String nickname) {
+        return accountServiceClient
+                .checkForDuplicateNickname(nickname)
                 .map(HttpUtils::get2xxBody)
                 .map(DuplicateCheckResponse::isDuplicate);
     }

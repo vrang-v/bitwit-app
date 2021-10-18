@@ -7,5 +7,7 @@ public class DuplicateCheckResponse {
     
     String email;
     
+    String name;
+    
     boolean duplicate;
 }

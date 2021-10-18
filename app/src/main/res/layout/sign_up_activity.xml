@@ -7,7 +7,7 @@
 
         <variable
             name="activity"
-            type="com.app.bitwit.activity.auth.SignUpActivity" />
+            type="com.app.bitwit.view.activity.auth.SignUpActivity" />
 
         <variable
             name="viewModel"
@@ -16,7 +16,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/white">
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guidelineY20"
@@ -90,6 +91,7 @@
             android:gravity="center_horizontal"
             android:textColor="@color/colorWarning"
             android:textSize="13dp"
+            android:text="@{viewModel.warning}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView20"
@@ -144,7 +146,6 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="32dp"
             android:backgroundTint="@color/colorAccentContrast"
-            android:onClick="@{() -> viewModel.publishCompleteBtnClick()}"
             android:stateListAnimator="@null"
             android:text="@string/signInButton"
             android:textColor="@color/colorBasic"
@@ -182,11 +183,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:onClick="@{() -> viewModel.publishNavigateLoginBtnClick()}"
             android:text="@string/signInTextButton"
             android:textAlignment="center"
             android:textColor="@color/colorAccentContrast"
             android:textSize="15dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="@+id/textView21"
             app:layout_constraintStart_toStartOf="@+id/textView21"

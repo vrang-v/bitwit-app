@@ -7,7 +7,7 @@
 
         <variable
             name="activity"
-            type="com.app.bitwit.activity.SearchActivity" />
+            type="com.app.bitwit.view.activity.SearchActivity" />
 
         <variable
             name="viewModel"
@@ -18,7 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#FFF"
-        tools:context=".activity.SearchActivity">
+        tools:context=".view.activity.SearchActivity">
 
         <EditText
             android:id="@+id/editText"

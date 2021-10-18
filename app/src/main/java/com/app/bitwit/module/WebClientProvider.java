@@ -3,6 +3,7 @@ package com.app.bitwit.module;
 import android.annotation.SuppressLint;
 import com.app.bitwit.data.source.remote.*;
 import com.app.bitwit.util.AuthenticationInterceptor;
+import com.app.bitwit.util.InstantSerializer;
 import com.app.bitwit.util.LocalDateTimeSerializer;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -16,6 +17,7 @@ import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import javax.inject.Singleton;
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Module
@@ -28,6 +30,7 @@ public class WebClientProvider {
     public Gson gson( ) {
         return new GsonBuilder( )
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeSerializer( ))
+                .registerTypeAdapter(Instant.class, new InstantSerializer( ))
                 .setLenient( )
                 .create( );
     }
@@ -44,7 +47,7 @@ public class WebClientProvider {
     @Singleton
     public Retrofit retrofit(OkHttpClient okHttpClient, Gson gson) {
         return new Retrofit.Builder( )
-                .baseUrl("http://bitwit.site/")
+                .baseUrl("http://bitwit.site")
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJava3CallAdapterFactory.create( ))
                 .client(okHttpClient)

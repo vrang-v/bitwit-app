@@ -10,4 +10,5 @@ public interface BithumbServiceClient {
     
     @GET("/public/candlestick/{ticker}_krw/{interval}")
     Single<Response<BithumbCandlestickResponse>> getCandlestick(@Path("ticker") String ticker, @Path("interval") String interval);
+    
 }

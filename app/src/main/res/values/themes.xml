@@ -2,6 +2,7 @@
 
     <style name="Bitwit" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/colorAccent</item>
+        <item name="android:windowBackground">@color/white</item>
         <item name="colorPrimaryDark">@color/colorBasic</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="windowNoTitle">true</item>

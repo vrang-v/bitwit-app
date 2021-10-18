@@ -7,7 +7,7 @@
 
         <variable
             name="activity"
-            type="com.app.bitwit.activity.auth.LoginActivity" />
+            type="com.app.bitwit.view.activity.auth.LoginActivity" />
 
         <variable
             name="viewModel"
@@ -16,7 +16,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/white">
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guidelineY20"
@@ -139,7 +140,6 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="32dp"
             android:backgroundTint="@color/colorAccent"
-            android:onClick="@{() -> viewModel.loginBtnClick()}"
             android:stateListAnimator="@null"
             android:text="@string/loginButton"
             android:textColor="@color/colorBasic"
@@ -155,10 +155,12 @@
             android:layout_marginEnd="16dp"
             android:layout_weight="1"
             android:gravity="right"
-            android:onClick="@{() -> viewModel.navigateSignUp()}"
             android:text="@string/loginTextButton_signIn"
             android:textColor="#606060"
             android:textSize="13dp"
+            android:paddingStart="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
             app:layout_constraintBaseline_toBaselineOf="@+id/textView15"
             app:layout_constraintEnd_toStartOf="@+id/textView15"
             tools:ignore="RtlHardcoded,SmallSp" />
@@ -184,6 +186,9 @@
             android:text="@string/loginTextButton_findPassword"
             android:textColor="#606060"
             android:textSize="13dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:paddingEnd="16dp"
             app:layout_constraintBaseline_toBaselineOf="@+id/textView15"
             app:layout_constraintStart_toEndOf="@+id/textView15"
             tools:ignore="SmallSp" />

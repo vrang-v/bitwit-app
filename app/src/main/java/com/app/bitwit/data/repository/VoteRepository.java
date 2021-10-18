@@ -44,7 +44,7 @@ public class VoteRepository {
                 .map(HttpUtils::get2xxBody);
     }
     
-    public Completable refreshVoteItem(Long voteId) {
+    public Completable getVoteItem(Long voteId) {
         return getVote(voteId, "vote-item")
                 .map(VoteItem::fromVote)
                 .map(VoteItem::enableAnim)

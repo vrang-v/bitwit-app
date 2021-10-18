@@ -3,16 +3,13 @@ package com.app.bitwit.data.source.remote;
 import com.app.bitwit.data.source.remote.dto.request.CreateAccountRequest;
 import com.app.bitwit.data.source.remote.dto.request.GoogleLoginRequest;
 import com.app.bitwit.data.source.remote.dto.request.LoginRequest;
+import com.app.bitwit.data.source.remote.dto.request.UpdateAccountRequest;
 import com.app.bitwit.data.source.remote.dto.response.DuplicateCheckResponse;
 import com.app.bitwit.data.source.remote.dto.response.LoginResponse;
-import com.app.bitwit.data.source.remote.dto.response.SimpleIdResponse;
 import com.app.bitwit.domain.Account;
 import io.reactivex.rxjava3.core.Single;
 import retrofit2.Response;
-import retrofit2.http.Body;
-import retrofit2.http.GET;
-import retrofit2.http.POST;
-import retrofit2.http.Query;
+import retrofit2.http.*;
 
 public interface AccountServiceClient {
     
@@ -22,15 +19,21 @@ public interface AccountServiceClient {
     @GET("/api/accounts/me")
     Single<Response<Account>> getAccount( );
     
+    @PATCH("/api/accounts")
+    Single<Response<Account>> updateAccount(@Body UpdateAccountRequest request);
+    
     @POST("/api/login")
     Single<Response<LoginResponse>> login(@Body LoginRequest request);
     
     @POST("/api/login/jwt")
-    Single<Response<SimpleIdResponse>> jwtLogin( );
+    Single<Response<LoginResponse>> jwtLogin( );
     
     @POST("/api/login/google")
     Single<Response<LoginResponse>> googleLogin(@Body GoogleLoginRequest request);
     
-    @GET("/api/accounts/duplicate-check/email")
+    @GET("/api/accounts/duplicate-check")
     Single<Response<DuplicateCheckResponse>> checkForDuplicateEmail(@Query("email") String email);
+    
+    @GET("/api/accounts/duplicate-check")
+    Single<Response<DuplicateCheckResponse>> checkForDuplicateNickname(@Query("name") String nickname);
 }

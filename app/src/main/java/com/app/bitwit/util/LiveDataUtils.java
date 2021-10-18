@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.Collection;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LiveDataUtils {
@@ -41,9 +42,9 @@ public class LiveDataUtils {
     }
     
     public static void observeHasText(final LifecycleOwner lifecycleOwner, final LiveData<String> liveData, final Observer<String> observer) {
-        liveData.observe(lifecycleOwner, t -> {
-            if (! t.isEmpty( )) {
-                observer.onChanged(t);
+        liveData.observe(lifecycleOwner, s -> {
+            if (StringUtils.hasText(s)) {
+                observer.onChanged(s);
             }
         });
     }
@@ -54,6 +55,15 @@ public class LiveDataUtils {
                 observer.onChanged(t);
             }
         });
+    }
+    
+    public static <T1> void observe(final LifecycleOwner lifecycleOwner, final LiveData<T1> liveData1, final Consumer<T1> consumer) {
+        liveData1.observe(lifecycleOwner, consumer::accept);
+    }
+    
+    public static <T1, T2> void observeAll(final LifecycleOwner lifecycleOwner, final LiveData<T1> liveData1, final LiveData<T2> liveData2, final BiConsumer<T1, T2> consumer) {
+        liveData1.observe(lifecycleOwner, t1 -> consumer.accept(t1, liveData2.getValue( )));
+        liveData2.observe(lifecycleOwner, t2 -> consumer.accept(liveData1.getValue( ), t2));
     }
     
     public static <T1, T2> void observeAllNotNull(final LifecycleOwner lifecycleOwner, final LiveData<T1> liveData1, final LiveData<T2> liveData2, final BiConsumer<T1, T2> consumer) {
@@ -82,9 +92,9 @@ public class LiveDataUtils {
                 consumer.consume(liveData1.getValue( ), t2, liveData3.getValue( ));
             }
         });
-    
+        
         liveData3.observe(lifecycleOwner, t3 -> {
-            if (liveData1.getValue() != null && liveData2.getValue( ) != null && t3 != null) {
+            if (liveData1.getValue( ) != null && liveData2.getValue( ) != null && t3 != null) {
                 consumer.consume(liveData1.getValue( ), liveData2.getValue( ), t3);
             }
         });

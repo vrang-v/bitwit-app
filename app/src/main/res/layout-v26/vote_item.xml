@@ -11,7 +11,7 @@
 
         <variable
             name="viewModel"
-            type="com.app.bitwit.adapter.VoteItemViewModel" />
+            type="com.app.bitwit.view.adapter.VoteItemViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

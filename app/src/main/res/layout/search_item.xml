@@ -14,7 +14,7 @@
 
         <variable
             name="searchItem"
-            type="com.app.bitwit.adapter.SearchItem" />
+            type="com.app.bitwit.view.adapter.SearchItem" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

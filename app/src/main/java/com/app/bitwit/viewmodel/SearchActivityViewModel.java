@@ -3,7 +3,7 @@ package com.app.bitwit.viewmodel;
 import android.annotation.SuppressLint;
 import android.util.Log;
 import androidx.lifecycle.MutableLiveData;
-import com.app.bitwit.adapter.SearchItem;
+import com.app.bitwit.view.adapter.SearchItem;
 import com.app.bitwit.data.repository.BallotRepository;
 import com.app.bitwit.data.repository.StockRepository;
 import com.app.bitwit.data.repository.VoteRepository;
@@ -26,7 +26,7 @@ import java.util.List;
 
 @Getter
 @HiltViewModel
-public class SearchActivityViewModel extends DisposableViewModel {
+public class SearchActivityViewModel extends RxJavaViewModelSupport {
     
     private final VoteRepository   voteRepository;
     private final StockRepository  stockRepository;

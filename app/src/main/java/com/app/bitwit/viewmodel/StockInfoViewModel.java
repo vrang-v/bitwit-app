@@ -3,14 +3,14 @@ package com.app.bitwit.viewmodel;
 import android.annotation.SuppressLint;
 import android.util.Log;
 import androidx.lifecycle.MutableLiveData;
-import com.app.bitwit.adapter.PostPreviewItem;
 import com.app.bitwit.data.repository.CandlestickRepository;
 import com.app.bitwit.data.repository.PostRepository;
 import com.app.bitwit.data.repository.VoteRepository;
 import com.app.bitwit.data.source.local.entity.Candlestick;
 import com.app.bitwit.data.source.local.entity.VoteItem;
 import com.app.bitwit.domain.SelectedCandlestick;
-import com.app.bitwit.util.MutableObserver;
+import com.app.bitwit.util.ObserveDelegate;
+import com.app.bitwit.view.adapter.PostPreviewItem;
 import com.github.mikephil.charting.data.Entry;
 import dagger.hilt.android.lifecycle.HiltViewModel;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -32,7 +32,7 @@ import static com.app.bitwit.util.LiveDataUtils.observeUntilNotEmpty;
 
 @Getter
 @HiltViewModel
-public class StockInfoViewModel extends DisposableViewModel {
+public class StockInfoViewModel extends RxJavaViewModelSupport {
     
     private final VoteRepository        voteRepository;
     private final CandlestickRepository candlestickRepository;
@@ -47,7 +47,7 @@ public class StockInfoViewModel extends DisposableViewModel {
     private final MutableLiveData<VoteItem>    voteItem = new MutableLiveData<>( );
     private final MutableLiveData<List<Entry>> entries  = new MutableLiveData<>( );
     
-    private final MutableObserver<VoteItem> voteItemObserver = new MutableObserver<>(voteItem::postValue);
+    private final ObserveDelegate<VoteItem> voteItemObserver = new ObserveDelegate<>(voteItem);
     
     private final List<Candlestick> chartData = new ArrayList<>( );
     
@@ -137,11 +137,11 @@ public class StockInfoViewModel extends DisposableViewModel {
     
     public void loadPosts(String ticker) {
         addDisposable(
-                postRepository.searchPostByTickers(Collections.singletonList(ticker))
+                postRepository.searchPostByTickers(Collections.singletonList(ticker), 5)
                               .map(posts -> posts.stream( ).map(PostPreviewItem::new).collect(Collectors.toList( )))
                               .subscribeOn(Schedulers.io( ))
                               .observeOn(AndroidSchedulers.mainThread( ))
-                              .subscribe(postPreviewItems::postValue, e -> Log.e("ERROR", "loadPosts", e)));
+                              .subscribe(postPreviewItems::postValue, e -> Log.e("ERROR", "loadMostViewedPosts", e)));
     }
     
     @SuppressLint("NewApi")

@@ -1,7 +1,13 @@
 package com.app.bitwit.domain;
 
+import android.annotation.SuppressLint;
+import com.app.bitwit.util.TimeUtils;
 import com.google.gson.annotations.SerializedName;
 import lombok.Data;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.Set;
 
 @Data
 public class Post {
@@ -11,13 +17,27 @@ public class Post {
     
     String title;
     
-    String contents;
+    String content;
     
     Account writer;
     
     int viewCount;
     
-    int starCount;
+    int commentCount;
     
-    boolean star;
+    int likeCount;
+    
+    boolean like;
+    
+    Instant createdAt;
+    
+    List<Comment> comments;
+    
+    Set<Stock> stocks;
+    
+    @SuppressLint("NewApi")
+    public String getTimeString( ) {
+        return TimeUtils.formatTimeString(createdAt.getEpochSecond( ));
+    }
+    
 }

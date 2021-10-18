@@ -5,7 +5,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".activity.WebViewActivity">
+        tools:context=".view.activity.WebViewActivity"
+        android:background="@color/white">
 
         <WebView
             android:id="@+id/web_view"

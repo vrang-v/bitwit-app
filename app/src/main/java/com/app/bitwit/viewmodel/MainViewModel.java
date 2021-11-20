@@ -10,6 +10,7 @@ import com.app.bitwit.data.source.remote.dto.request.CreateOrChangeBallotRequest
 import com.app.bitwit.domain.Ballot;
 import com.app.bitwit.util.LoginAccount;
 import com.app.bitwit.util.ObserveDelegate;
+import com.app.bitwit.util.SnackbarViewModel;
 import dagger.hilt.android.lifecycle.HiltViewModel;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
@@ -30,7 +31,7 @@ import static lombok.AccessLevel.PRIVATE;
 
 @Getter
 @HiltViewModel
-public class MainViewModel extends RxJavaViewModelSupport {
+public class MainViewModel extends RxJavaViewModelSupport implements SnackbarViewModel {
     
     private final AccountRepository accountRepository;
     private final VoteRepository    voteRepository;

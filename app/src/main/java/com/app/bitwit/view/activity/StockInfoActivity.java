@@ -70,7 +70,7 @@ public class StockInfoActivity extends AppCompatActivity implements OnTouchListe
             Intent intent = new Intent(this, PostActivity.class)
                     .putExtra("postId", itemClick.getPostPreviewItem( ).getId( ));
             startActivity(intent);
-            overridePendingTransition(R.anim.anim_slide_right_to_left_enter, R.anim.anim_slide_right_to_left_exit);
+            overridePendingTransition(R.anim.slide_right_to_left_enter, R.anim.slide_right_to_left_exit);
         });
         
         binding.postRecyclerview.setAdapter(adapter);

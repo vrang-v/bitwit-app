@@ -19,7 +19,6 @@ import androidx.recyclerview.widget.RecyclerView.OnScrollListener;
 import com.app.bitwit.R;
 import com.app.bitwit.data.source.remote.dto.request.CreateOrChangeBallotRequest;
 import com.app.bitwit.databinding.FragmentMainBinding;
-import com.app.bitwit.view.activity.FrameActivity;
 import com.app.bitwit.view.activity.SearchActivity;
 import com.app.bitwit.view.activity.StockInfoActivity;
 import com.app.bitwit.view.adapter.VoteItemAdapter;
@@ -38,7 +37,6 @@ import static com.app.bitwit.util.TransitionNames.*;
 @AndroidEntryPoint
 public class MainFragment extends Fragment {
     
-    private FrameActivity       frameActivity;
     private FragmentMainBinding binding;
     private MainViewModel       viewModel;
     
@@ -88,7 +86,6 @@ public class MainFragment extends Fragment {
         );
         
         observeAllNotNull(this, viewModel.getSortOption( ), viewModel.getSortDirection( ), viewModel::loadVote);
-        
         observeAllNotNull(this, viewModel.getSortOption( ), viewModel.getSortDirection( ), viewModel::setSortStatus);
         
         var adapter = new VoteItemAdapter( );
@@ -103,7 +100,7 @@ public class MainFragment extends Fragment {
                         startActivity(intent, activityOptions.toBundle( ));
                     }
                     else {
-                        frameActivity.makeSnackbar("먼저 투표에 참여해주세요");
+                        viewModel.setSnackbar("먼저 투표에 참여해주세요");
                     }
                     break;
                 
@@ -162,9 +159,8 @@ public class MainFragment extends Fragment {
     }
     
     private void init(LayoutInflater inflater, ViewGroup container) {
-        frameActivity = ((FrameActivity)getActivity( ));
-        binding       = DataBindingUtil.inflate(inflater, R.layout.fragment_main, container, false);
-        viewModel     = new ViewModelProvider(this).get(MainViewModel.class);
+        binding   = DataBindingUtil.inflate(inflater, R.layout.fragment_main, container, false);
+        viewModel = new ViewModelProvider(this).get(MainViewModel.class);
         viewModel.refreshVoteItemsSchedule(3L);
         viewModel.loadAccount( );
         

@@ -1,7 +1,13 @@
 package com.app.bitwit.view.activity.auth;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkInfo;
+import android.net.NetworkRequest;
 import android.os.Bundle;
+import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import com.app.bitwit.R;
@@ -14,6 +20,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import lombok.var;
 
 import javax.inject.Inject;
 
@@ -59,11 +66,12 @@ public class SignUpProcessActivity extends AppCompatActivity {
                         .createAccount(new CreateAccountRequest("test", email, password))
                         .subscribeOn(Schedulers.io( ))
                         .observeOn(AndroidSchedulers.mainThread( ))
-                        .subscribe(unused -> {
+                        .subscribe(
+                                unused -> {
                                     String emailSiteURL = getEmailSiteLink(email);
                                     if (emailSiteURL != null) {
-                                        Intent intent = new Intent(getApplicationContext( ), WebViewActivity.class)
-                                                .putExtra("url", emailSiteURL);
+                                        var intent = new Intent(getApplicationContext( ), WebViewActivity.class)
+                                                .putExtra(WebViewActivity.URL, emailSiteURL);
                                         startActivity(intent);
                                         setResult(RESULT_SUCCESS);
                                         finish( );
@@ -78,7 +86,7 @@ public class SignUpProcessActivity extends AppCompatActivity {
     }
     
     private String getEmailSiteLink(String email) {
-        String domain = email.split("@")[1];
+        var domain = email.split("@")[1];
         if (domain.equals("naver.com")) {
             return "https://mail.naver.com";
         }

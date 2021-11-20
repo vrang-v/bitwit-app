@@ -26,7 +26,6 @@ import lombok.var;
 
 import static com.app.bitwit.util.Callback.callback;
 import static com.app.bitwit.util.LiveDataUtils.observe;
-import static com.app.bitwit.util.LiveDataUtils.observeHasText;
 import static com.app.bitwit.util.StringUtils.isEmailFormat;
 import static com.app.bitwit.view.activity.auth.SignUpProcessActivity.RESULT_FAILURE;
 import static com.app.bitwit.view.activity.auth.SignUpProcessActivity.RESULT_SUCCESS;
@@ -169,7 +168,7 @@ public class SignUpActivity extends AppCompatActivity {
     @Override
     protected void onPause( ) {
         super.onPause( );
-        overridePendingTransition(R.anim.anim_slide_right_to_left_enter, R.anim.anim_slide_right_to_left_exit);
+        overridePendingTransition(R.anim.slide_right_to_left_enter, R.anim.slide_right_to_left_exit);
     }
     
     @Override

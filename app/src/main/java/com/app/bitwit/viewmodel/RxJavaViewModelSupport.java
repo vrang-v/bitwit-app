@@ -25,6 +25,10 @@ public class RxJavaViewModelSupport extends ViewModel {
     }
     
     public <T> void subscribe(Callback<T> callback, Single<T> single) {
+        if (callback == null) {
+            subscribe(single);
+            return;
+        }
         addDisposable(
                 single.subscribeOn(Schedulers.io( ))
                       .observeOn(AndroidSchedulers.mainThread( ))

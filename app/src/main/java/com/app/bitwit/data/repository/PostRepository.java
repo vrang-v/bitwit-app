@@ -32,6 +32,12 @@ public class PostRepository {
                 .map(HttpUtils::get2xxBody);
     }
     
+    public Single<List<Post>> searchPostPageByKeyword(String keyword, int page, int size) {
+        return postServiceClient
+                .searchPostPageByKeyword(keyword, page, size)
+                .map(HttpUtils::get2xxBody);
+    }
+    
     public Single<Post> getPost(Long postId) {
         return postServiceClient
                 .getPost(postId)
@@ -98,21 +104,9 @@ public class PostRepository {
                 .map(HttpUtils::get2xxBody);
     }
     
-    public Single<List<Post>> getMostRecentlyPosts( ) {
-        return postServiceClient
-                .getPostsOrderByCreatedAtDesc( )
-                .map(HttpUtils::get2xxBody);
-    }
-    
     public Single<List<Post>> getMostRecentlyPostPage(int page, int size) {
         return postServiceClient
                 .getPostPageOrderByCreatedAtDesc(page, size)
-                .map(HttpUtils::get2xxBody);
-    }
-    
-    public Single<List<Post>> getMostViewedPosts( ) {
-        return postServiceClient
-                .getPostsOrderByViewCountDesc( )
                 .map(HttpUtils::get2xxBody);
     }
     

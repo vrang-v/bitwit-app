@@ -23,6 +23,8 @@ import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH
 @AndroidEntryPoint
 public class PostingActivity extends AppCompatActivity {
     
+    public static final int RESULT_SUCCESS = 10;
+    
     private ActivityPostingBinding binding;
     private PostingViewModel       viewModel;
     
@@ -39,7 +41,7 @@ public class PostingActivity extends AppCompatActivity {
                 binding.confirm.setEnabled(hasText(title) && hasText(content))
         );
         
-        observe(this, viewModel.getInputTag(), tag ->
+        observe(this, viewModel.getInputTag( ), tag ->
                 binding.addTagBtn.setEnabled(hasText(tag))
         );
         
@@ -48,13 +50,19 @@ public class PostingActivity extends AppCompatActivity {
         );
         
         binding.confirm.setOnClickListener(v ->
-                viewModel.createPost(callback(post -> finish( ), e -> viewModel.setSnackbar("게시글 작성 도중 오류가 발생했어요")))
+                viewModel.createPost(callback(
+                        post -> {
+                            setResult(RESULT_SUCCESS);
+                            finish( );
+                        },
+                        e -> viewModel.setSnackbar("게시글 작성 도중 오류가 발생했어요")
+                ))
         );
         
         binding.addTagBtn.setOnClickListener(v ->
                 viewModel.addTag( )
         );
-    
+        
         var editableTickerAdapter = new EditableTickerAdapter(viewModel.getTags( ));
         viewModel.getTags( ).observe(this, strings -> editableTickerAdapter.notifyDataSetChanged( ));
         binding.tagRecycler.setAdapter(editableTickerAdapter);

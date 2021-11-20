@@ -82,6 +82,10 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         this.lastPage = true;
     }
     
+    public void init( ) {
+        this.lastPage = false;
+    }
+    
     public enum EventType {
         CLICK, HEART, NEXT_PAGE
     }

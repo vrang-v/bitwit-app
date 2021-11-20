@@ -25,7 +25,6 @@ import dagger.hilt.android.AndroidEntryPoint;
 import lombok.var;
 
 import static com.app.bitwit.util.Callback.callback;
-import static com.app.bitwit.util.LiveDataUtils.observeHasText;
 import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT;
 
 @AndroidEntryPoint
@@ -58,7 +57,7 @@ public class LoginActivity extends AppCompatActivity {
                     .putExtra(ExtraKey.EMAIL, "");
             startActivity(intent);
             finish( );
-            overridePendingTransition(R.anim.anim_slide_left_to_right_enter, R.anim.anim_slide_left_to_right_exit);
+            overridePendingTransition(R.anim.slide_left_to_right_enter, R.anim.slide_left_to_right_exit);
         });
         
         binding.forgotPasswordText.setOnClickListener(v -> {
@@ -66,7 +65,7 @@ public class LoginActivity extends AppCompatActivity {
                     .putExtra(ExtraKey.EMAIL, viewModel.getEmail( ).getValue( ));
             startActivity(intent);
             finish( );
-            overridePendingTransition(R.anim.anim_slide_right_to_left_enter, R.anim.anim_slide_right_to_left_exit);
+            overridePendingTransition(R.anim.slide_right_to_left_enter, R.anim.slide_right_to_left_exit);
         });
         
         binding.googleLogin.setOnClickListener(

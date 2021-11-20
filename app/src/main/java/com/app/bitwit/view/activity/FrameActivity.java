@@ -1,22 +1,30 @@
 package com.app.bitwit.view.activity;
 
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.View;
+import android.view.ViewGroup;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.transition.Slide;
+import androidx.transition.Transition;
+import androidx.transition.TransitionManager;
 import com.app.bitwit.R;
 import com.app.bitwit.databinding.ActivityFrameBinding;
+import com.app.bitwit.util.SnackbarViewModel;
 import com.app.bitwit.view.fragment.HotPostFragment;
 import com.app.bitwit.view.fragment.MainFragment;
 import com.app.bitwit.view.fragment.PostFragment;
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior;
 import com.google.android.material.snackbar.Snackbar;
 import dagger.hilt.android.AndroidEntryPoint;
-import lombok.var;
 
+import static com.app.bitwit.util.LiveDataUtils.observeHasText;
 import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT;
 
 @AndroidEntryPoint
@@ -30,7 +38,7 @@ public class FrameActivity extends AppCompatActivity {
     
     private ActivityFrameBinding binding;
     
-    private long backButtonKeyDownTime;
+    private long lastBackKeydownTimeMillis;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,33 +46,34 @@ public class FrameActivity extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_frame);
         binding.setActivity(this);
         binding.executePendingBindings( );
+        setOnKeyboardStatusChangeEvent( );
         
-        var transaction = fragmentManager.beginTransaction( );
-        transaction.replace(R.id.frameLayout, mainFragment).commitNowAllowingStateLoss( );
+        observeHasText(this, SnackbarViewModel.MESSAGE, this::makeSnackbar);
+        
+        changeFragment(mainFragment);
         
         binding.navigationView.setOnNavigationItemSelectedListener(item -> {
-                    switch (item.getItemId( )) {
-                        case R.id.home:
-                            changeFragment(mainFragment);
-                            ((CoordinatorLayout.LayoutParams)binding.navigationView.getLayoutParams( ))
-                                    .setBehavior(new HideBottomViewOnScrollBehavior<>( ));
-                            break;
-                        case R.id.post:
-                            changeFragment(postFragment);
-                            ((CoordinatorLayout.LayoutParams)binding.navigationView.getLayoutParams( ))
-                                    .setBehavior(null);
-                            break;
-                        case R.id.account:
-                            changeFragment(hotPostFragment);
-                            ((CoordinatorLayout.LayoutParams)binding.navigationView.getLayoutParams( ))
-                                    .setBehavior(null);
-                            break;
-                        default:
-                            break;
-                    }
-                    return true;
-                }
-        );
+            switch (item.getItemId( )) {
+                case R.id.home:
+                    fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    changeFragment(mainFragment);
+                    setNavigationViewBehavior(new HideBottomViewOnScrollBehavior<>( ));
+                    break;
+                case R.id.post:
+                    changeFragment(postFragment);
+                    setNavigationViewBehavior(null);
+                    break;
+                case R.id.account:
+                    fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    changeFragment(hotPostFragment);
+                    setNavigationViewBehavior(null);
+                    break;
+                default:
+                    break;
+            }
+            return true;
+        });
+        
         binding.navigationView.setOnNavigationItemReselectedListener(item -> {
             switch (item.getItemId( )) {
                 case R.id.home:
@@ -84,35 +93,56 @@ public class FrameActivity extends AppCompatActivity {
         findViewById(R.id.account).setOnLongClickListener(v -> true);
     }
     
+    private void setNavigationViewBehavior(Behavior behavior) {
+        ((CoordinatorLayout.LayoutParams)binding.navigationView.getLayoutParams( ))
+                .setBehavior(behavior);
+    }
+    
     private void changeFragment(Fragment fragment) {
-        getSupportFragmentManager( ).beginTransaction( ).replace(R.id.frameLayout, fragment).commit( );
+        fragmentManager.beginTransaction( )
+                       .replace(R.id.frameLayout, fragment)
+                       .commit( );
     }
     
-    public void makeSnackbar(Snackbar snackbar) {
-        snackbar.setAnchorView(binding.navigationView).show( );
-    }
-    
-    public void makeSnackbar(String message) {
+    private void makeSnackbar(String message) {
         Snackbar.make(binding.getRoot( ), message, LENGTH_SHORT)
                 .setAnchorView(binding.navigationView)
                 .show( );
     }
     
+    private void setOnKeyboardStatusChangeEvent( ) {
+        binding.getRoot( ).getViewTreeObserver( ).addOnGlobalLayoutListener(( ) -> {
+            int     rootHeight = binding.getRoot( ).getRootView( ).getHeight( );
+            int     height     = binding.getRoot( ).getHeight( );
+            boolean keyboardOn = (double)height / rootHeight < 0.8;
+            if (! keyboardOn) {
+                Transition transition = new Slide(Gravity.BOTTOM);
+                transition.setDuration(300L);
+                transition.addTarget(binding.navigationView);
+                TransitionManager.beginDelayedTransition((ViewGroup)binding.getRoot( ), transition);
+            }
+            binding.navigationView.setVisibility(keyboardOn ? View.GONE : View.VISIBLE);
+        });
+    }
+    
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        boolean result = true;
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (System.currentTimeMillis( ) - backButtonKeyDownTime > 2000) {
-                makeSnackbar("뒤로가기 버튼을 누르면 앱이 종료됩니다");
-                backButtonKeyDownTime = System.currentTimeMillis( );
-            }
-            else {
-                finish( );
-            }
+        if (keyCode != KeyEvent.KEYCODE_BACK) {
+            return super.onKeyDown(keyCode, event);
+        }
+        
+        if (fragmentManager.getBackStackEntryCount( ) > 0) {
+            fragmentManager.popBackStack( );
+            return true;
+        }
+        
+        if (System.currentTimeMillis( ) - lastBackKeydownTimeMillis > 2000) {
+            makeSnackbar("뒤로가기 버튼을 누르면 앱이 종료됩니다");
+            lastBackKeydownTimeMillis = System.currentTimeMillis( );
         }
         else {
-            result = super.onKeyDown(keyCode, event);
+            finish( );
         }
-        return result;
+        return true;
     }
 }

@@ -26,7 +26,6 @@ import dagger.hilt.android.AndroidEntryPoint;
 import lombok.var;
 
 import static com.app.bitwit.util.Callback.callback;
-import static com.app.bitwit.util.LiveDataUtils.observeHasText;
 
 @AndroidEntryPoint
 public class HotPostFragment extends Fragment {
@@ -36,15 +35,19 @@ public class HotPostFragment extends Fragment {
     
     private PostsAdapter adapter;
     
-    private ActivityResultLauncher<Intent> activityResultLauncher;
+    private ActivityResultLauncher<Intent> launcher;
+    
+    private long lastClickedPostId;
+    
     
     @Override
-    public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        activityResultLauncher = registerForActivityResult(new StartActivityForResult( ),
+        launcher = registerForActivityResult(new StartActivityForResult( ),
                 result -> {
-                    if (result.getResultCode( ) == 10) {
+                    if (result.getResultCode( ) == PostActivity.RESULT_DELETED) {
                         viewModel.setSnackbar("게시글을 삭제했어요");
+                        viewModel.removePost(lastClickedPostId);
                     }
                 }
         );
@@ -56,10 +59,6 @@ public class HotPostFragment extends Fragment {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_hot_post, container, false);
         init( );
         
-        observeHasText(this, viewModel.getSnackbar( ), s ->
-                ((PostFragment)getParentFragment( )).makeSnackbar(s)
-        );
-        
         adapter = new PostsAdapter( );
         adapter.setHasStableIds(true);
         adapter.addEventListener(this, event -> {
@@ -67,10 +66,10 @@ public class HotPostFragment extends Fragment {
                 case CLICK:
                     var intent = new Intent(getContext( ), PostActivity.class)
                             .putExtra(ExtraKey.POST_ID, event.getPost( ).getId( ));
-//                    startActivity(intent);
-                    activityResultLauncher.launch(intent);
+                    lastClickedPostId = event.getPost( ).getId( );
+                    launcher.launch(intent);
                     getActivity( ).overridePendingTransition(
-                            R.anim.anim_slide_right_to_left_enter, R.anim.anim_slide_right_to_left_exit
+                            R.anim.slide_right_to_left_enter, R.anim.slide_right_to_left_exit
                     );
                     break;
                 case HEART:
@@ -88,16 +87,14 @@ public class HotPostFragment extends Fragment {
                     }
                     break;
                 case NEXT_PAGE:
-                    viewModel.loadMostViewedPostNextPage(
-                            callback(
-                                    posts -> {
-                                        if (posts.isEmpty( )) {
-                                            adapter.lastPage( );
-                                        }
-                                    },
-                                    e -> viewModel.setSnackbar("게시물을 불러오는 도중 문제가 발생했어요")
-                            )
-                    );
+                    viewModel.loadMostViewedPostNextPage(callback(
+                            posts -> {
+                                if (posts.size( ) < 20) {
+                                    adapter.lastPage( );
+                                }
+                            },
+                            e -> viewModel.setSnackbar("게시물을 불러오는 도중 문제가 발생했어요")
+                    ));
                     break;
                 default:
                     break;
@@ -106,10 +103,21 @@ public class HotPostFragment extends Fragment {
         });
         binding.postRecyclerview.setAdapter(adapter);
         binding.postRecyclerview.setLayoutManager(new LinearLayoutManager(getActivity( )));
-        binding.swipeLayout.setOnRefreshListener(( ) -> viewModel.refreshPage(
-                callback(posts -> binding.swipeLayout.setRefreshing(false), null)
-        ));
+        binding.swipeLayout.setOnRefreshListener(( ) -> {
+            adapter.init( );
+            viewModel.refreshPage(callback(
+                    posts -> {
+                        if (posts.size( ) < 20) {
+                            adapter.lastPage( );
+                        }
+                        binding.swipeLayout.setRefreshing(false);
+                    }, null));
+        });
         return binding.getRoot( );
+    }
+    
+    public void refreshPosts( ) {
+        viewModel.refreshPage(callback(null, e -> viewModel.setSnackbar("게시물 새로고침 도중 문제가 발생했어요")));
     }
     
     public void initRecyclerViewPosition( ) {
@@ -125,7 +133,7 @@ public class HotPostFragment extends Fragment {
         viewModel.loadMostViewedPostNextPage(
                 callback(
                         posts -> {
-                            if (posts.isEmpty( )) {
+                            if (posts.size( ) < 20) {
                                 adapter.lastPage( );
                             }
                         },

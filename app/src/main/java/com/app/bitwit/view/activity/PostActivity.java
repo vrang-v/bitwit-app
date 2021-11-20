@@ -1,6 +1,5 @@
 package com.app.bitwit.view.activity;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -33,6 +32,8 @@ import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH
 
 @AndroidEntryPoint
 public class PostActivity extends AppCompatActivity {
+    
+    public static final int RESULT_DELETED = 10;
     
     private ActivityPostBinding binding;
     private PostViewModel       viewModel;
@@ -83,7 +84,7 @@ public class PostActivity extends AppCompatActivity {
         binding.delete.setOnClickListener(v ->
                 viewModel.deletePost(callback(
                         empty -> {
-                            setResult(10);
+                            setResult(RESULT_DELETED);
                             finish( );
                         },
                         e -> viewModel.setSnackbar("게시글을 삭제하는 도중 문제가 발생했어요")
@@ -214,7 +215,7 @@ public class PostActivity extends AppCompatActivity {
     protected void onPause( ) {
         super.onPause( );
         viewModel.commitLike( );
-        overridePendingTransition(R.anim.anim_slide_left_to_right_enter, R.anim.anim_slide_left_to_right_exit);
+        overridePendingTransition(R.anim.slide_left_to_right_enter, R.anim.slide_left_to_right_exit);
     }
     
     private void showSoftKeyboard( ) {

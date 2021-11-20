@@ -9,15 +9,17 @@ import com.app.bitwit.util.MutableLiveList;
 import com.app.bitwit.util.SnackbarViewModel;
 import dagger.hilt.android.lifecycle.HiltViewModel;
 import lombok.Getter;
+import lombok.var;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @HiltViewModel
 public class HotPostViewModel extends RxJavaViewModelSupport implements SnackbarViewModel {
     
-    private static final int PAGE_SIZE = 15;
+    private static final int PAGE_SIZE = 20;
     
     private final MutableLiveList<Post> posts = new MutableLiveList<>( );
     private final PostRepository        postRepository;
@@ -56,5 +58,12 @@ public class HotPostViewModel extends RxJavaViewModelSupport implements Snackbar
     
     public void unlike(long postId, Callback<Like> callback) {
         subscribe(callback, postRepository.unlike(postId));
+    }
+    
+    public void removePost(Long postId) {
+        var removed = posts.stream( )
+                           .filter(post -> post.getId( ).equals(postId))
+                           .collect(Collectors.toList( ));
+        posts.removeAll(removed);
     }
 }

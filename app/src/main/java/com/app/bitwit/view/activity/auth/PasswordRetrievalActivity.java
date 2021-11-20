@@ -51,7 +51,7 @@ public class PasswordRetrievalActivity extends AppCompatActivity {
     @Override
     protected void onPause( ) {
         super.onPause( );
-        overridePendingTransition(R.anim.anim_slide_left_to_right_enter, R.anim.anim_slide_left_to_right_exit);
+        overridePendingTransition(R.anim.slide_left_to_right_enter, R.anim.slide_left_to_right_exit);
     }
     
     @Override

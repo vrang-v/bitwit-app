@@ -11,7 +11,9 @@ import com.app.bitwit.util.HttpWebViewClient;
 
 public class WebViewActivity extends AppCompatActivity {
     
-    ActivityWebViewBinding binding;
+    public static final String URL = "URL";
+    
+    private ActivityWebViewBinding binding;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,7 +22,7 @@ public class WebViewActivity extends AppCompatActivity {
         
         Bundle extras = getIntent( ).getExtras( );
         
-        String url = extras.getString("url");
+        String url = extras.getString(URL);
         
         loadWebView(url);
     }
@@ -48,5 +50,14 @@ public class WebViewActivity extends AppCompatActivity {
         binding.webView.clearCache(true);
         
         binding.webView.loadUrl(url);
+    }
+    
+    @Override
+    public void onBackPressed( ) {
+        if (binding.webView.canGoBack( )) {
+            binding.webView.goBack( );
+            return;
+        }
+        super.onBackPressed( );
     }
 }

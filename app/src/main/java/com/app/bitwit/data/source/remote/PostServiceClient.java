@@ -20,14 +20,11 @@ public interface PostServiceClient {
     @GET("/api/posts/search")
     Single<Response<List<Post>>> searchPostsByTickers(@Query("ticker") List<String> tickers, @Query("size") int size);
     
-    @GET("/api/posts/search?sort=createdAt,desc")
-    Single<Response<List<Post>>> getPostsOrderByCreatedAtDesc( );
+    @GET("/api/posts/search")
+    Single<Response<List<Post>>> searchPostPageByKeyword(@Query("keyword") String keyword, @Query("page") int page, @Query("size") int size);
     
     @GET("/api/posts/search?sort=createdAt,desc")
     Single<Response<List<Post>>> getPostPageOrderByCreatedAtDesc(@Query("page") int page, @Query("size") int size);
-    
-    @GET("/api/posts/search?sort=viewCount,desc")
-    Single<Response<List<Post>>> getPostsOrderByViewCountDesc( );
     
     @GET("/api/posts/search?sort=viewCount,desc")
     Single<Response<List<Post>>> getPostPageOrderByViewCountDesc(@Query("page") int page, @Query("size") int size);

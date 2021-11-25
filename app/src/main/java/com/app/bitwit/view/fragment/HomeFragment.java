@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Pair;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
@@ -23,19 +24,21 @@ import com.app.bitwit.view.activity.StockInfoActivity;
 import com.app.bitwit.view.adapter.VoteItemAdapter;
 import com.app.bitwit.viewmodel.HomeViewModel;
 import com.app.bitwit.viewmodel.HomeViewModel.Const;
+import com.google.android.material.bottomnavigation.BottomNavigationView.OnNavigationItemReselectedListener;
 import dagger.hilt.android.AndroidEntryPoint;
 import lombok.var;
+import org.jetbrains.annotations.NotNull;
 
 import static android.view.View.VISIBLE;
+import static com.app.bitwit.constant.IntentKeys.STOCK_TICKER;
+import static com.app.bitwit.constant.TransitionNames.*;
 import static com.app.bitwit.domain.VotingOption.DECREMENT;
 import static com.app.bitwit.domain.VotingOption.INCREMENT;
-import static com.app.bitwit.constant.IntentKeys.STOCK_TICKER;
 import static com.app.bitwit.util.livedata.LiveDataUtils.observeAllNotNull;
-import static com.app.bitwit.constant.TransitionNames.*;
 import static com.app.bitwit.view.adapter.VoteItemAdapter.VoteItemAdapterEvent.INCREMENT_BTN_CLICK;
 
 @AndroidEntryPoint
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements OnNavigationItemReselectedListener {
     
     private FragmentHomeBinding binding;
     private HomeViewModel       viewModel;
@@ -132,7 +135,7 @@ public class HomeFragment extends Fragment {
         return binding.getRoot( );
     }
     
-    public void initRecyclerViewPosition( ) {
+    private void initRecyclerViewPosition( ) {
         binding.recyclerView.smoothScrollToPosition(0);
     }
     
@@ -166,5 +169,10 @@ public class HomeFragment extends Fragment {
         binding.setLifecycleOwner(this);
         binding.setViewModel(viewModel);
         binding.executePendingBindings( );
+    }
+    
+    @Override
+    public void onNavigationItemReselected(@NonNull @NotNull MenuItem item) {
+        initRecyclerViewPosition( );
     }
 }

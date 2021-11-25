@@ -76,7 +76,7 @@ public class FrameActivity extends AppCompatActivity {
         binding.navigationView.setOnNavigationItemReselectedListener(item -> {
             switch (item.getItemId( )) {
                 case R.id.home:
-                    homeFragment.initRecyclerViewPosition( );
+                    homeFragment.onNavigationItemReselected(item);
                     break;
                 case R.id.post:
                     postFragment.onNavigationItemReselected(item);
@@ -87,7 +87,7 @@ public class FrameActivity extends AppCompatActivity {
                     break;
             }
         });
-        binding.navigationView.setOnNavigationItemReselectedListener(postFragment);
+        
         findViewById(R.id.home).setOnLongClickListener(v -> true);
         findViewById(R.id.post).setOnLongClickListener(v -> true);
         findViewById(R.id.account).setOnLongClickListener(v -> true);

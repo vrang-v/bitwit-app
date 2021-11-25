@@ -1,4 +1,4 @@
-package com.app.bitwit.util;
+package com.app.bitwit.constant;
 
 public interface TransitionNames {
     
@@ -9,4 +9,5 @@ public interface TransitionNames {
     String VOTE_STATUS_BAR        = "voteStatusBar";
     String INCREMENT_RATE         = "incrementRate";
     String DECREMENT_RATE         = "decrementRate";
+    
 }

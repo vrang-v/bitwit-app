@@ -1,4 +1,4 @@
-package com.app.bitwit.util;
+package com.app.bitwit.util.livedata;
 
 import android.util.Log;
 import androidx.annotation.MainThread;

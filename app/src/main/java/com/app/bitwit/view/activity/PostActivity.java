@@ -11,7 +11,7 @@ import com.app.bitwit.R;
 import com.app.bitwit.constant.ExtraKey;
 import com.app.bitwit.databinding.ActivityPostBinding;
 import com.app.bitwit.domain.Comment;
-import com.app.bitwit.util.LoginAccount;
+import com.app.bitwit.dto.LoginAccount;
 import com.app.bitwit.view.adapter.CommentAdapter;
 import com.app.bitwit.view.adapter.TickerAdapter;
 import com.app.bitwit.view.dialog.NicknameSettingDialog;
@@ -21,9 +21,9 @@ import com.google.android.material.snackbar.Snackbar;
 import dagger.hilt.android.AndroidEntryPoint;
 import lombok.var;
 
-import static com.app.bitwit.util.LiveDataUtils.observe;
-import static com.app.bitwit.util.LiveDataUtils.observeAll;
-import static com.app.bitwit.util.LiveDataUtils.observeHasText;
+import static com.app.bitwit.util.livedata.LiveDataUtils.observe;
+import static com.app.bitwit.util.livedata.LiveDataUtils.observeAll;
+import static com.app.bitwit.util.livedata.LiveDataUtils.observeHasText;
 import static com.app.bitwit.util.StringUtils.hasText;
 import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT;
 

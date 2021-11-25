@@ -1,6 +1,7 @@
-package com.app.bitwit.util;
+package com.app.bitwit.viewmodel.common;
 
 import androidx.lifecycle.LiveData;
+import com.app.bitwit.util.livedata.MutableLiveEvent;
 
 public interface SnackbarViewModel {
     

@@ -6,7 +6,7 @@
 
         <import type="android.view.View" />
 
-        <import type="com.app.bitwit.util.TransitionNames" />
+        <import type="com.app.bitwit.constant.TransitionNames" />
 
         <variable
             name="searchItem"

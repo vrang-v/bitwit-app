@@ -3,8 +3,8 @@ package com.app.bitwit.module;
 import android.annotation.SuppressLint;
 import com.app.bitwit.data.source.remote.*;
 import com.app.bitwit.common.interceptor.AuthenticationInterceptor;
-import com.app.bitwit.util.InstantSerializer;
-import com.app.bitwit.util.LocalDateTimeSerializer;
+import com.app.bitwit.common.serializer.InstantSerializer;
+import com.app.bitwit.common.serializer.LocalDateTimeSerializer;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dagger.Module;
@@ -19,7 +19,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import javax.inject.Singleton;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.concurrent.Executor;
 
 @Module
 @InstallIn(SingletonComponent.class)

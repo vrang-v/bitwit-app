@@ -5,7 +5,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.RecyclerView.Adapter;
-import com.app.bitwit.util.MutableLiveEvent;
+import com.app.bitwit.util.livedata.MutableLiveEvent;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -1,7 +1,7 @@
 package com.app.bitwit.dto;
 
 import com.app.bitwit.domain.Stock;
-import com.app.bitwit.util.Colors;
+import com.app.bitwit.constant.Colors;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

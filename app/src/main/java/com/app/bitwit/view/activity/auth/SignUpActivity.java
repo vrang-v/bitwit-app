@@ -20,7 +20,7 @@ import com.google.android.material.snackbar.Snackbar;
 import dagger.hilt.android.AndroidEntryPoint;
 import lombok.var;
 
-import static com.app.bitwit.util.LiveDataUtils.observe;
+import static com.app.bitwit.util.livedata.LiveDataUtils.observe;
 import static com.app.bitwit.util.StringUtils.isEmailFormat;
 import static com.app.bitwit.util.google.GoogleSignInUtils.getGoogleSignInAccount;
 import static com.app.bitwit.view.activity.auth.SignUpProcessActivity.RESULT_FAILURE;

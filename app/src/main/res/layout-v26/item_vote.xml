@@ -5,7 +5,7 @@
 
     <data>
 
-        <import type="com.app.bitwit.util.TransitionNames" />
+        <import type="com.app.bitwit.constant.TransitionNames" />
 
         <import type="android.view.View" />
 

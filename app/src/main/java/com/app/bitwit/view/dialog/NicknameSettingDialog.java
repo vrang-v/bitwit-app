@@ -19,7 +19,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.functions.Consumer;
 import lombok.var;
 
-import static com.app.bitwit.util.LiveDataUtils.observe;
+import static com.app.bitwit.util.livedata.LiveDataUtils.observe;
 import static java.lang.Boolean.TRUE;
 
 @AndroidEntryPoint

@@ -16,14 +16,14 @@ import androidx.transition.Transition;
 import androidx.transition.TransitionManager;
 import com.app.bitwit.R;
 import com.app.bitwit.databinding.ActivityFrameBinding;
-import com.app.bitwit.util.SnackbarViewModel;
+import com.app.bitwit.viewmodel.common.SnackbarViewModel;
 import com.app.bitwit.view.fragment.HomeFragment;
 import com.app.bitwit.view.fragment.PostFragment;
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior;
 import com.google.android.material.snackbar.Snackbar;
 import dagger.hilt.android.AndroidEntryPoint;
 
-import static com.app.bitwit.util.LiveDataUtils.observeHasText;
+import static com.app.bitwit.util.livedata.LiveDataUtils.observeHasText;
 import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT;
 
 @AndroidEntryPoint

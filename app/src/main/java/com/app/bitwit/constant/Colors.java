@@ -1,4 +1,4 @@
-package com.app.bitwit.util;
+package com.app.bitwit.constant;
 
 import android.graphics.Color;
 

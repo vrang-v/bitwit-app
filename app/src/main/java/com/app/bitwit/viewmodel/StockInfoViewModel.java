@@ -8,9 +8,9 @@ import com.app.bitwit.data.repository.VoteRepository;
 import com.app.bitwit.data.source.local.entity.Candlestick;
 import com.app.bitwit.data.source.local.entity.VoteItem;
 import com.app.bitwit.domain.SelectedCandlestick;
-import com.app.bitwit.util.ChangeableLiveData;
-import com.app.bitwit.util.MutableLiveList;
-import com.app.bitwit.util.SnackbarViewModel;
+import com.app.bitwit.util.livedata.ChangeableLiveData;
+import com.app.bitwit.util.livedata.MutableLiveList;
+import com.app.bitwit.viewmodel.common.SnackbarViewModel;
 import com.app.bitwit.util.subscription.Subscription;
 import com.app.bitwit.dto.PostPreviewItem;
 import com.app.bitwit.viewmodel.common.RxJavaViewModelSupport;
@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static com.app.bitwit.util.LiveDataUtils.observeUntilNotEmpty;
+import static com.app.bitwit.util.livedata.LiveDataUtils.observeUntilNotEmpty;
 
 @Getter
 @HiltViewModel

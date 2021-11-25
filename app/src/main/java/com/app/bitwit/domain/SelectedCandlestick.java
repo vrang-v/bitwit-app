@@ -2,7 +2,7 @@ package com.app.bitwit.domain;
 
 import android.annotation.SuppressLint;
 import com.app.bitwit.data.source.local.entity.Candlestick;
-import com.app.bitwit.util.Colors;
+import com.app.bitwit.constant.Colors;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.var;

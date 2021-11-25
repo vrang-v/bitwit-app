@@ -1,4 +1,4 @@
-package com.app.bitwit.util;
+package com.app.bitwit.common;
 
 import lombok.Getter;
 import retrofit2.Response;

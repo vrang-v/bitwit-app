@@ -1,8 +1,10 @@
-package com.app.bitwit.util;
+package com.app.bitwit.util.livedata;
 
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
+import com.app.bitwit.util.StringUtils;
+import com.app.bitwit.util.livedata.Consumer3;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

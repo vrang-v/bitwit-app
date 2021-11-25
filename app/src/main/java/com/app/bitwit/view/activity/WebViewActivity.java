@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import com.app.bitwit.R;
 import com.app.bitwit.databinding.ActivityWebViewBinding;
-import com.app.bitwit.util.HttpWebViewClient;
+import com.app.bitwit.common.HttpWebViewClient;
 
 public class WebViewActivity extends AppCompatActivity {
     

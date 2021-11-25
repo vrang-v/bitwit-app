@@ -1,4 +1,4 @@
-package com.app.bitwit.util;
+package com.app.bitwit.util.livedata;
 
 @FunctionalInterface
 public interface Consumer3<T1, T2, T3> {

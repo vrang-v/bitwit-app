@@ -13,7 +13,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import com.app.bitwit.R;
 import com.app.bitwit.databinding.FragmentPostBinding;
-import com.app.bitwit.util.SnackbarViewModel;
+import com.app.bitwit.viewmodel.common.SnackbarViewModel;
 import com.app.bitwit.view.activity.PostingActivity;
 import com.app.bitwit.view.adapter.PostFragmentAdapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView.OnNavigationItemReselectedListener;

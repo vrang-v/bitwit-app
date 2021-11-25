@@ -20,10 +20,10 @@ import lombok.var;
 
 import static com.app.bitwit.domain.VotingOption.DECREMENT;
 import static com.app.bitwit.domain.VotingOption.INCREMENT;
-import static com.app.bitwit.util.IntentKeys.STOCK_TICKER;
-import static com.app.bitwit.util.LiveDataUtils.observeNotNull;
-import static com.app.bitwit.util.TransitionNames.KOREAN_NAME;
-import static com.app.bitwit.util.TransitionNames.TICKER;
+import static com.app.bitwit.constant.IntentKeys.STOCK_TICKER;
+import static com.app.bitwit.util.livedata.LiveDataUtils.observeNotNull;
+import static com.app.bitwit.constant.TransitionNames.KOREAN_NAME;
+import static com.app.bitwit.constant.TransitionNames.TICKER;
 import static com.app.bitwit.view.adapter.StockSearchAdapter.StockSearchEvent.INCREMENT_BTN;
 
 @AndroidEntryPoint

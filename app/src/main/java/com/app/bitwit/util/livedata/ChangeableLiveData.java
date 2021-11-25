@@ -1,4 +1,4 @@
-package com.app.bitwit.util;
+package com.app.bitwit.util.livedata;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

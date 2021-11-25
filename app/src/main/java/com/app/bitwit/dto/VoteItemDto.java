@@ -4,7 +4,7 @@ import android.graphics.Color;
 import android.util.AndroidRuntimeException;
 import com.app.bitwit.R;
 import com.app.bitwit.data.source.local.entity.VoteItem;
-import com.app.bitwit.util.Colors;
+import com.app.bitwit.constant.Colors;
 import lombok.Data;
 import lombok.experimental.Accessors;
 

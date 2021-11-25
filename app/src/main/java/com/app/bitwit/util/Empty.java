@@ -1,11 +1,14 @@
 package com.app.bitwit.util;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Empty {
     
-    public static final Empty INSTANCE = new Empty( );
+    private Empty( ) { /* private constructor for singleton pattern */ }
     
+    public static Empty getInstance( ) {
+        return InstanceHolder.instance;
+    }
+    
+    private static class InstanceHolder {
+        private static final Empty instance = new Empty( );
+    }
 }

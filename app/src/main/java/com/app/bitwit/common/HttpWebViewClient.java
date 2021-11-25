@@ -1,4 +1,4 @@
-package com.app.bitwit.util;
+package com.app.bitwit.common;
 
 import android.net.http.SslError;
 import android.webkit.SslErrorHandler;

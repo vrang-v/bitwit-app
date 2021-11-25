@@ -9,7 +9,7 @@ import okhttp3.Response;
 import javax.inject.Inject;
 import java.io.IOException;
 
-import static com.app.bitwit.util.HttpHeaders.AUTHORIZATION;
+import static com.app.bitwit.constant.HttpHeaders.AUTHORIZATION;
 
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class AuthenticationInterceptor implements Interceptor {

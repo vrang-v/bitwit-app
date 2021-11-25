@@ -15,6 +15,7 @@ import javax.inject.Singleton;
 @Module
 @InstallIn(SingletonComponent.class)
 public class AppDatabaseProvider {
+    
     @Provides
     @Singleton
     public AppDatabase appDatabase(@ApplicationContext Context context) {
@@ -32,4 +33,5 @@ public class AppDatabaseProvider {
     public CandlestickDao chartDao(AppDatabase appDatabase) {
         return appDatabase.chartDao( );
     }
+    
 }

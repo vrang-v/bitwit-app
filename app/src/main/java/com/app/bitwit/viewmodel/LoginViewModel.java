@@ -5,7 +5,7 @@ import com.app.bitwit.data.repository.AccountRepository;
 import com.app.bitwit.data.source.remote.dto.request.GoogleLoginRequest;
 import com.app.bitwit.data.source.remote.dto.request.LoginRequest;
 import com.app.bitwit.data.source.remote.dto.response.LoginResponse;
-import com.app.bitwit.util.SnackbarViewModel;
+import com.app.bitwit.viewmodel.common.SnackbarViewModel;
 import com.app.bitwit.util.StringUtils;
 import com.app.bitwit.util.subscription.Subscription;
 import com.app.bitwit.viewmodel.common.RxJavaViewModelSupport;

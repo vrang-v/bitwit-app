@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import com.app.bitwit.R;
 import com.app.bitwit.databinding.ActivityStockInfoBinding;
-import com.app.bitwit.util.Colors;
+import com.app.bitwit.constant.Colors;
 import com.app.bitwit.view.adapter.PostPreviewAdapter;
 import com.app.bitwit.viewmodel.StockInfoViewModel;
 import com.github.mikephil.charting.components.YAxis.YAxisLabelPosition;
@@ -31,11 +31,11 @@ import java.util.List;
 import java.util.Map;
 
 import static android.view.animation.AnimationUtils.loadAnimation;
-import static com.app.bitwit.util.IntentKeys.STOCK_TICKER;
-import static com.app.bitwit.util.LiveDataUtils.observe;
-import static com.app.bitwit.util.LiveDataUtils.observeAllNotNull;
-import static com.app.bitwit.util.LiveDataUtils.observeNotEmpty;
-import static com.app.bitwit.util.LiveDataUtils.observeNotNull;
+import static com.app.bitwit.constant.IntentKeys.STOCK_TICKER;
+import static com.app.bitwit.util.livedata.LiveDataUtils.observe;
+import static com.app.bitwit.util.livedata.LiveDataUtils.observeAllNotNull;
+import static com.app.bitwit.util.livedata.LiveDataUtils.observeNotEmpty;
+import static com.app.bitwit.util.livedata.LiveDataUtils.observeNotNull;
 
 @AndroidEntryPoint
 public class StockInfoActivity extends AppCompatActivity implements OnTouchListener {

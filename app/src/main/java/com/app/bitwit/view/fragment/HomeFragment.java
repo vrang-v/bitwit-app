@@ -3,7 +3,6 @@ package com.app.bitwit.view.fragment;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.AndroidRuntimeException;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,9 +29,9 @@ import lombok.var;
 import static android.view.View.VISIBLE;
 import static com.app.bitwit.domain.VotingOption.DECREMENT;
 import static com.app.bitwit.domain.VotingOption.INCREMENT;
-import static com.app.bitwit.util.IntentKeys.STOCK_TICKER;
-import static com.app.bitwit.util.LiveDataUtils.observeAllNotNull;
-import static com.app.bitwit.util.TransitionNames.*;
+import static com.app.bitwit.constant.IntentKeys.STOCK_TICKER;
+import static com.app.bitwit.util.livedata.LiveDataUtils.observeAllNotNull;
+import static com.app.bitwit.constant.TransitionNames.*;
 import static com.app.bitwit.view.adapter.VoteItemAdapter.VoteItemAdapterEvent.INCREMENT_BTN_CLICK;
 
 @AndroidEntryPoint

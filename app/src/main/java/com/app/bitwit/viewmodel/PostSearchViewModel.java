@@ -1,7 +1,7 @@
 package com.app.bitwit.viewmodel;
 
 import androidx.lifecycle.MutableLiveData;
-import com.app.bitwit.util.SnackbarViewModel;
+import com.app.bitwit.viewmodel.common.SnackbarViewModel;
 import com.app.bitwit.viewmodel.common.RxJavaViewModelSupport;
 import dagger.hilt.android.lifecycle.HiltViewModel;
 import lombok.Getter;

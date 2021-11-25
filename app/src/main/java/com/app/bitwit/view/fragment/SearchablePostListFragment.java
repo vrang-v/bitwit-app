@@ -10,7 +10,7 @@ import com.app.bitwit.viewmodel.SearchablePostListViewModel;
 import dagger.hilt.android.AndroidEntryPoint;
 import lombok.var;
 
-import static com.app.bitwit.util.LiveDataUtils.observeAll;
+import static com.app.bitwit.util.livedata.LiveDataUtils.observeAll;
 
 @AndroidEntryPoint
 public class SearchablePostListFragment extends PostListFragment {

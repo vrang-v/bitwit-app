@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.app.bitwit.R;
 import com.app.bitwit.databinding.ActivityPostingBinding;
-import com.app.bitwit.util.LoginAccount;
+import com.app.bitwit.dto.LoginAccount;
 import com.app.bitwit.view.adapter.TagAdapter;
 import com.app.bitwit.view.dialog.NicknameSettingDialog;
 import com.app.bitwit.viewmodel.PostingViewModel;
@@ -16,8 +16,8 @@ import com.google.android.material.snackbar.Snackbar;
 import dagger.hilt.android.AndroidEntryPoint;
 import lombok.var;
 
-import static com.app.bitwit.util.LiveDataUtils.observe;
-import static com.app.bitwit.util.LiveDataUtils.observeAll;
+import static com.app.bitwit.util.livedata.LiveDataUtils.observe;
+import static com.app.bitwit.util.livedata.LiveDataUtils.observeAll;
 import static com.app.bitwit.util.StringUtils.hasText;
 import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT;
 

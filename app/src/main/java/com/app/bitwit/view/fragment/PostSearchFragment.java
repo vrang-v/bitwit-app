@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
-import static com.app.bitwit.util.LiveDataUtils.observe;
+import static com.app.bitwit.util.livedata.LiveDataUtils.observe;
 import static com.app.bitwit.util.StringUtils.hasText;
 
 @AndroidEntryPoint

@@ -1,4 +1,4 @@
-package com.app.bitwit.util;
+package com.app.bitwit.dto;
 
 import lombok.Value;
 

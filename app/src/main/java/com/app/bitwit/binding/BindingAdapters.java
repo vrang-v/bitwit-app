@@ -27,7 +27,6 @@ public class BindingAdapters {
         }
     }
     
-    
     @BindingAdapter("bind:posts")
     public static void bindPosts(RecyclerView recyclerView, LiveData<List<Post>> posts) {
         PostsAdapter adapter = (PostsAdapter)recyclerView.getAdapter( );

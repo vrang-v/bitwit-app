@@ -1,4 +1,4 @@
-package com.app.bitwit.util;
+package com.app.bitwit.common.serializer;
 
 import android.annotation.SuppressLint;
 import com.google.gson.*;

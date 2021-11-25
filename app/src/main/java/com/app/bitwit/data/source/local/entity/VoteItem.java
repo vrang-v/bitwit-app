@@ -4,7 +4,7 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import com.app.bitwit.domain.Vote;
 import com.app.bitwit.domain.VotingOption;
-import com.app.bitwit.util.Colors;
+import com.app.bitwit.constant.Colors;
 import lombok.Data;
 import lombok.var;
 

@@ -1,13 +1,12 @@
 package com.app.bitwit.util;
 
 import android.util.AndroidRuntimeException;
-import io.reactivex.rxjava3.core.Completable;
+import com.app.bitwit.common.BitwitHttpException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import retrofit2.Response;
 
 import java.io.IOException;
-import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class HttpUtils {
@@ -26,6 +25,6 @@ public class HttpUtils {
         if (! response.isSuccessful( )) {
             throw new BitwitHttpException(response);
         }
-        return Empty.INSTANCE;
+        return Empty.getInstance( );
     }
 }

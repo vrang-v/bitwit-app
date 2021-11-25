@@ -12,11 +12,11 @@
         android:background="@color/white">
 
         <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guidelineY06"
+            android:id="@+id/guidelineTopBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent=".06" />
+            app:layout_constraintGuide_begin="@dimen/top_bar_height" />
 
         <TextView
             android:id="@+id/logo"
@@ -27,7 +27,7 @@
             android:textColor="@color/black"
             android:textSize="18dp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@+id/guidelineY06"
+            app:layout_constraintBottom_toTopOf="@+id/guidelineTopBar"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -37,7 +37,7 @@
             android:layout_height="27dp"
             android:layout_marginEnd="24dp"
             android:background="@drawable/baseline_search_24"
-            app:layout_constraintBottom_toTopOf="@id/guidelineY06"
+            app:layout_constraintBottom_toTopOf="@id/guidelineTopBar"
             style="@style/Widget.AppCompat.Button.Borderless"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -49,7 +49,7 @@
             android:layout_height="27dp"
             android:layout_marginEnd="16dp"
             android:background="@drawable/outline_create_24"
-            app:layout_constraintBottom_toTopOf="@+id/guidelineY06"
+            app:layout_constraintBottom_toTopOf="@+id/guidelineTopBar"
             app:layout_constraintEnd_toStartOf="@+id/search"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -59,7 +59,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toTopOf="@+id/viewPager"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/guidelineY06"
+            app:layout_constraintTop_toTopOf="@+id/guidelineTopBar"
             app:tabIndicatorColor="@color/black"
             app:tabSelectedTextColor="@color/black"
             app:tabTextAppearance="@style/tab_text" />

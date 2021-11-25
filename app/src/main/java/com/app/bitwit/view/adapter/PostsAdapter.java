@@ -12,18 +12,22 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.app.bitwit.databinding.ItemPostBinding;
 import com.app.bitwit.databinding.ProgressBarBinding;
 import com.app.bitwit.domain.Post;
+import com.app.bitwit.view.adapter.common.AdapterEvent;
+import com.app.bitwit.view.adapter.common.RecyclerViewEvent;
 import com.app.bitwit.view.holder.ProgressBar;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.var;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL;
+import static com.app.bitwit.view.adapter.PostsAdapter.PostsAdapterEvent.NEXT_PAGE;
 
 public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     
     private final List<Post> posts = new ArrayList<>( );
     
-    private final MutableLiveData<PostMainAdapterEvent> event = new MutableLiveData<>( );
+    private final MutableLiveData<AdapterEvent<Post, PostsAdapterEvent>> event = new MutableLiveData<>( );
     
     private boolean lastPage = false;
     
@@ -74,7 +78,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         notifyDataSetChanged( );
     }
     
-    public void addEventListener(LifecycleOwner lifecycleOwner, Observer<PostMainAdapterEvent> eventConsumer) {
+    public void addEventListener(LifecycleOwner lifecycleOwner, Observer<AdapterEvent<Post, PostsAdapterEvent>> eventConsumer) {
         event.observe(lifecycleOwner, eventConsumer);
     }
     
@@ -86,17 +90,8 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         this.lastPage = false;
     }
     
-    public enum EventType {
+    public enum PostsAdapterEvent implements RecyclerViewEvent {
         CLICK, HEART, NEXT_PAGE
-    }
-    
-    @Getter
-    @AllArgsConstructor
-    public static class PostMainAdapterEvent {
-        private EventType eventType;
-        private Post      post;
-        private View      view;
-        private int       position;
     }
     
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -108,27 +103,23 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         public ViewHolder(@NonNull ItemPostBinding binding) {
             super(binding.getRoot( ));
             this.binding = binding;
-            binding.root.setOnClickListener(v -> publishEvent(EventType.CLICK, v));
-            binding.heartBtn.setOnClickListener(v -> publishEvent(EventType.HEART, v));
+            binding.root.setOnClickListener(v -> publishEvent(PostsAdapterEvent.CLICK, v));
+            binding.heartBtn.setOnClickListener(v -> publishEvent(PostsAdapterEvent.HEART, v));
         }
         
         public void publishNextPageEvent( ) {
-            event.postValue(
-                    new PostMainAdapterEvent(EventType.NEXT_PAGE, null, binding.getRoot( ), getAdapterPosition( ))
-            );
+            event.postValue(new AdapterEvent<>(null, NEXT_PAGE, binding.getRoot( ), getAdapterPosition( )));
         }
         
-        private void publishEvent(EventType eventType, View view) {
-            event.postValue(new PostMainAdapterEvent(eventType, post, view, getAdapterPosition( )));
+        private void publishEvent(PostsAdapterEvent type, View view) {
+            event.postValue(new AdapterEvent<>(post, type, view, getAdapterPosition( )));
         }
         
         public void bind(Post post) {
             this.post = post;
-            TickerAdapter adapter = new TickerAdapter( );
-            binding.tickerRecycler.setLayoutManager(
-                    new LinearLayoutManager(itemView.getContext( ), LinearLayoutManager.HORIZONTAL, true)
-            );
+            var adapter = new TickerAdapter( );
             binding.tickerRecycler.setAdapter(adapter);
+            binding.tickerRecycler.setLayoutManager(new LinearLayoutManager(itemView.getContext( ), HORIZONTAL, true));
             binding.setPost(post);
             binding.executePendingBindings( );
         }

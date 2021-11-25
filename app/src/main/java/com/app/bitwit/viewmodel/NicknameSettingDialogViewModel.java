@@ -4,14 +4,15 @@ import androidx.lifecycle.MutableLiveData;
 import com.app.bitwit.data.repository.AccountRepository;
 import com.app.bitwit.data.source.remote.dto.request.UpdateAccountRequest;
 import com.app.bitwit.domain.Account;
+import com.app.bitwit.util.subscription.SingleSubscription;
+import com.app.bitwit.util.subscription.Subscription;
+import com.app.bitwit.viewmodel.common.RxJavaViewModelSupport;
 import dagger.hilt.android.lifecycle.HiltViewModel;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.functions.Consumer;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 import lombok.Getter;
 import lombok.var;
 
 import javax.inject.Inject;
+import java.util.Objects;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
@@ -31,41 +32,35 @@ public class NicknameSettingDialogViewModel extends RxJavaViewModelSupport {
         this.accountRepository = accountRepository;
     }
     
-    public void checkForDuplicateNickname(String nickname) {
-        addDisposable(
+    public SingleSubscription<Boolean> checkForDuplicateNickname(String nickname) {
+        return subscribe(
                 accountRepository
                         .isDuplicateNickname(nickname)
-                        .subscribeOn(Schedulers.io( ))
-                        .observeOn(AndroidSchedulers.mainThread( ))
-                        .subscribe(isDuplicate -> {
-                            valid.postValue(! isDuplicate);
-                            infoMessage.postValue(isDuplicate.equals(TRUE) ? "중복된 닉네임입니다" : "사용 가능한 닉네임입니다");
-                        })
+                        .doOnSuccess(isDuplicate -> valid.postValue(! isDuplicate))
         );
     }
     
-    public void changeNickname(Consumer<Account> onSuccess, Consumer<Throwable> onError, Runnable onNotValid) {
-        if (! valid.getValue( ).equals(TRUE)) {
-            onNotValid.run( );
-            return;
+    public Subscription<Account> changeNickname( ) {
+        if (! Objects.equals(valid.getValue( ), TRUE)) {
+            return unsubscribe( );
         }
         var request = new UpdateAccountRequest( );
         request.setNickname(nickname.getValue( ));
-        addDisposable(
-                accountRepository
-                        .updateAccount(request)
-                        .subscribeOn(Schedulers.io( ))
-                        .observeOn(AndroidSchedulers.mainThread( ))
-                        .subscribe(onSuccess, onError)
-        );
+        
+        return subscribe(accountRepository.updateAccount(request));
     }
     
     public boolean isValidFormat(String nickname) {
-        boolean valid = 2 <= nickname.trim( ).length( ) && nickname.trim( ).length( ) < 10;
-        if (! valid) {
+        int     nicknameLength = nickname.trim( ).length( );
+        boolean isValid        = 2 <= nicknameLength && nicknameLength < 10;
+        if (! isValid) {
             this.valid.postValue(FALSE);
-            infoMessage.postValue("닉네임은 2~9글자로 설정해주세요");
+            this.infoMessage.postValue("닉네임은 2~9글자로 설정해주세요");
         }
-        return valid;
+        return isValid;
+    }
+    
+    public void setInfoMessage(String message) {
+        this.infoMessage.postValue(message);
     }
 }

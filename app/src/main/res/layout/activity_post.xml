@@ -21,45 +21,45 @@
         android:animateLayoutChanges="true">
 
         <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guidelineY06"
+            android:id="@+id/topBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent=".06" />
+            app:layout_constraintGuide_begin="@dimen/top_bar_height"/>
 
         <Button
-            android:id="@+id/back"
+            android:id="@+id/backBtn"
             style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="27dp"
-            android:layout_height="27dp"
-            android:layout_marginStart="16dp"
+            android:layout_width="@dimen/top_bar_back_btn"
+            android:layout_height="@dimen/top_bar_back_btn"
+            android:layout_marginStart="@dimen/top_bar_margin"
             android:background="@drawable/outline_arrow_back_24"
-            app:layout_constraintBottom_toTopOf="@+id/guidelineY06"
+            app:layout_constraintBottom_toTopOf="@+id/topBar"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
             android:id="@+id/board"
             style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_marginStart="16dp"
+            android:layout_width="@dimen/top_bar_btn"
+            android:layout_height="@dimen/top_bar_btn"
+            android:layout_marginStart="@dimen/top_bar_margin"
             android:background="@drawable/outline_question_answer_24"
-            app:layout_constraintBottom_toBottomOf="@id/back"
-            app:layout_constraintStart_toEndOf="@id/back"
-            app:layout_constraintTop_toTopOf="@id/back" />
+            app:layout_constraintBottom_toBottomOf="@id/backBtn"
+            app:layout_constraintStart_toEndOf="@id/backBtn"
+            app:layout_constraintTop_toTopOf="@id/backBtn" />
 
         <Button
-            android:id="@+id/delete"
+            android:id="@+id/deleteBtn"
             style="@style/Widget.AppCompat.Button.Borderless"
             android:visibility="@{viewModel.post.writer.id.equals(viewModel.account.id) ? View.VISIBLE : View.GONE}"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_marginEnd="16dp"
+            android:layout_width="@dimen/top_bar_btn"
+            android:layout_height="@dimen/top_bar_btn"
+            android:layout_marginEnd="@dimen/top_bar_margin"
             android:background="@drawable/outline_delete_24"
-            app:layout_constraintBottom_toBottomOf="@id/back"
+            app:layout_constraintBottom_toBottomOf="@id/backBtn"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/back" />
+            app:layout_constraintTop_toTopOf="@id/backBtn" />
 
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
@@ -68,7 +68,7 @@
             app:layout_constraintBottom_toTopOf="@+id/commentInputArea"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/guidelineY06">
+            app:layout_constraintTop_toTopOf="@+id/topBar">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -98,16 +98,6 @@
                     app:layout_constraintTop_toBottomOf="@+id/textView14" />
 
                 <TextView
-                    android:id="@+id/textView25"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:text="@{viewModel.post.timeString}"
-                    android:textSize="12dp"
-                    app:layout_constraintBaseline_toBaselineOf="@+id/textView23"
-                    app:layout_constraintStart_toEndOf="@+id/textView26" />
-
-                <TextView
                     android:id="@+id/textView26"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -116,6 +106,16 @@
                     android:textSize="12dp"
                     app:layout_constraintBaseline_toBaselineOf="@+id/textView23"
                     app:layout_constraintStart_toEndOf="@+id/textView23" />
+
+                <TextView
+                    android:id="@+id/textView25"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:text="@{viewModel.post.timeString}"
+                    android:textSize="12dp"
+                    app:layout_constraintBaseline_toBaselineOf="@+id/textView23"
+                    app:layout_constraintStart_toEndOf="@+id/textView26" />
 
                 <TextView
                     android:id="@+id/textView24"
@@ -134,8 +134,8 @@
                 <Button
                     android:id="@+id/viewIcon"
                     style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
+                    android:layout_width="@dimen/post_activity_icon"
+                    android:layout_height="@dimen/post_activity_icon"
                     android:layout_marginEnd="8dp"
                     android:background="@drawable/ic_eye_regular"
                     app:layout_constraintBottom_toBottomOf="@+id/viewCount"
@@ -148,14 +148,14 @@
                     android:layout_height="wrap_content"
                     android:text="@{String.valueOf(viewModel.post.viewCount)}"
                     android:textColor="#5EC5C5"
-                    android:textSize="14dp"
+                    android:textSize="@dimen/post_activity_icon_text"
                     android:textStyle="bold"
                     app:layout_constraintBaseline_toBaselineOf="@+id/textView25"
                     app:layout_constraintEnd_toEndOf="@+id/textView24" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/tickerRecycler"
-                    bind:tickers="@{viewModel.post.stocks}"
+                    bind:adapter="@{viewModel.post.stocks}"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -175,8 +175,8 @@
                     <Button
                         android:id="@+id/comment"
                         style="@style/Widget.AppCompat.Button.Borderless"
-                        android:layout_width="14dp"
-                        android:layout_height="14dp"
+                        android:layout_width="@dimen/post_activity_icon"
+                        android:layout_height="@dimen/post_activity_icon"
                         android:layout_marginEnd="8dp"
                         android:background="@drawable/ic_comment_regular"
                         app:layout_constraintBottom_toBottomOf="@+id/commentCount"
@@ -189,7 +189,7 @@
                         android:layout_height="wrap_content"
                         android:text="@{String.valueOf(viewModel.flattenComments.size())}"
                         android:textColor="@color/black"
-                        android:textSize="14dp"
+                        android:textSize="@dimen/post_activity_icon_text"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -208,8 +208,8 @@
                     <Button
                         android:id="@+id/heart"
                         style="@style/Widget.AppCompat.Button.Borderless"
-                        android:layout_width="14dp"
-                        android:layout_height="14dp"
+                        android:layout_width="@dimen/post_activity_icon"
+                        android:layout_height="@dimen/post_activity_icon"
                         android:layout_marginStart="8dp"
                         android:layout_marginEnd="8dp"
                         android:background="@{viewModel.post.like ? @drawable/ic_heart_solid : @drawable/ic_heart_regular}"
@@ -227,7 +227,7 @@
                         android:layout_marginBottom="5dp"
                         android:text="@{String.valueOf(viewModel.post.likeCount)}"
                         android:textColor="#E4FF7474"
-                        android:textSize="14dp"
+                        android:textSize="@dimen/post_activity_icon_text"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -245,7 +245,7 @@
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/commentRecyclerView"
-                    bind:comments="@{viewModel.flattenComments}"
+                    bind:adapter="@{viewModel.flattenComments}"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:overScrollMode="never"
@@ -328,8 +328,9 @@
                 android:textSize="13dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/commentConfirm"
-                app:layout_constraintHorizontal_weight=".9"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintHorizontal_weight=".95"
+                app:layout_constraintStart_toStartOf="parent"
+                android:inputType="text" />
 
             <Button
                 android:id="@+id/commentConfirm"

@@ -19,11 +19,8 @@ import com.app.bitwit.viewmodel.PostViewModel;
 import com.app.bitwit.viewmodel.PostViewModel.CommentType;
 import com.google.android.material.snackbar.Snackbar;
 import dagger.hilt.android.AndroidEntryPoint;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import lombok.var;
 
-import static com.app.bitwit.util.Callback.callback;
 import static com.app.bitwit.util.LiveDataUtils.observe;
 import static com.app.bitwit.util.LiveDataUtils.observeAll;
 import static com.app.bitwit.util.LiveDataUtils.observeHasText;
@@ -35,121 +32,130 @@ public class PostActivity extends AppCompatActivity {
     
     public static final int RESULT_DELETED = 10;
     
+    private InputMethodManager inputMethodManager;
+    
     private ActivityPostBinding binding;
     private PostViewModel       viewModel;
-    
-    private InputMethodManager inputMethodManager;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         init( );
-        inputMethodManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
-        
-        var postId = getIntent( ).getExtras( ).getLong(ExtraKey.POST_ID);
-        
-        viewModel.loadPost(postId);
         
         observeHasText(this, viewModel.getSnackbar( ), s ->
                 Snackbar.make(binding.getRoot( ), s, LENGTH_SHORT).show( )
         );
+        
         observe(this, viewModel.getCommentContent( ), s -> {
             viewModel.setCommentLengthInfo(s.trim( ).length( ) + "/100");
             binding.commentConfirm.setEnabled(hasText(s));
         });
-        observeAll(this, viewModel.getCommentType( ), viewModel.getCommentDetail( ), (type, detail) -> {
-            Comment selected = viewModel.getCommentSelected( ).getValue( );
-            boolean hasText  = hasText(detail);
+        
+        observeAll(this, viewModel.getCommentContent( ), viewModel.getCommentType( ), (comment, type) -> {
+            Comment selected            = viewModel.getCommentSelected( ).getValue( );
+            boolean hasText             = hasText(comment);
+            String  blackCommentMessage = "공백 댓글은 작성할 수 없어요";
             switch (type) {
                 case COMMENT:
-                    viewModel.setCommentDetail(hasText ? "댓글을 작성하고 있어요" : "공백 댓글은 작성할 수 없어요");
+                    viewModel.setCommentDetail(hasText ? "댓글을 작성하고 있어요" : blackCommentMessage);
                     break;
-                case REPLY_REPLY:
                 case COMMENT_REPLY:
+                case REPLY_REPLY:
                     String toName = selected.getWriter( ).getName( );
-                    viewModel.setCommentDetail(hasText ? toName + " 님에게 남길 답글을 작성하고 있어요" : "공백 댓글은 작성할 수 없어요");
+                    String myName = viewModel.getAccount( ).getName( );
+                    if (toName.equals(myName)) {
+                        viewModel.setCommentDetail(hasText ? "나에게 남길 답글을 작성하고 있어요" : blackCommentMessage);
+                    }
+                    else {
+                        viewModel.setCommentDetail(hasText ? toName + " 님에게 남길 답글을 작성하고 있어요" : blackCommentMessage);
+                    }
                     break;
                 case EDIT:
                     viewModel.setCommentDetail(hasText ? "댓글을 수정하고 있어요" : "공백 댓글로 수정할 수 없어요");
                     break;
-                default:
-                    viewModel.setCommentDetail("");
-                    break;
             }
-            
         });
-        binding.back.setOnClickListener(v ->
+        
+        binding.backBtn.setOnClickListener(v ->
                 finish( )
         );
-        binding.delete.setOnClickListener(v ->
-                viewModel.deletePost(callback(
-                        empty -> {
-                            setResult(RESULT_DELETED);
-                            finish( );
-                        },
-                        e -> viewModel.setSnackbar("게시글을 삭제하는 도중 문제가 발생했어요")
-                ))
+        
+        binding.deleteBtn.setOnClickListener(v ->
+                viewModel.deletePost( )
+                         .onSuccess(empty -> {
+                             setResult(RESULT_DELETED);
+                             finish( );
+                         })
+                         .subscribe( )
         );
+        
         binding.heartBtn.setOnClickListener(v ->
                 viewModel.invertLike( )
         );
+        
         binding.commentConfirm.setOnClickListener(v -> {
             hideSoftKeyboard( );
-            if (! hasAccountName( )) {
+            if (! hasAccountName(viewModel.getAccount( ))) {
+                showNicknameSettingDialog( );
                 return;
             }
             if (viewModel.getCommentType( ).getValue( ) == CommentType.EDIT) {
-                viewModel.updateComment(
-                        empty -> viewModel.reloadComments( ),
-                        e -> viewModel.setSnackbar("댓글을 수정하지 못했어요")
-                );
+                viewModel.updateComment( )
+                         .then(empty -> viewModel.reloadComments( ))
+                         .subscribe( );
             }
             else {
-                viewModel.createComment(
-                        comment -> viewModel.reloadComments( ),
-                        e -> viewModel.getSnackbar( ).postValue("댓글을 등록하지 못했어요")
-                );
+                viewModel.createComment( )
+                         .then(empty -> viewModel.reloadComments( ))
+                         .subscribe( );
             }
         });
         
         var tickerAdapter = new TickerAdapter( );
-        tickerAdapter.setTickerSize(13);
-        binding.tickerRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        tickerAdapter.setTickerFontSize(13);
         binding.tickerRecycler.setAdapter(tickerAdapter);
+        binding.tickerRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         
         var commentAdapter = new CommentAdapter( );
-        commentAdapter.addEventListener(this, event -> {
-            if (event.getComment( ).isDeleted( )) {
+        commentAdapter.addAdapterEventListener(this, event -> {
+            var comment = event.getItem( );
+            if (comment.isDeleted( )) {
                 return;
             }
-            switch (event.getEventType( )) {
+            switch (event.getEvent( )) {
                 case CLICK_COMMENT:
                     showSoftKeyboard( );
                     viewModel.setCommentContent("");
-                    viewModel.setCommentSelected(event.getComment( ));
+                    viewModel.setCommentSelected(comment);
                     viewModel.setCommentType(CommentType.COMMENT_REPLY);
                     break;
                 case CLICK_REPLY:
                     showSoftKeyboard( );
                     viewModel.setCommentContent("");
-                    viewModel.setCommentSelected(event.getComment( ));
+                    viewModel.setCommentSelected(comment);
                     viewModel.setCommentType(CommentType.REPLY_REPLY);
                     break;
                 case EDIT:
                     showSoftKeyboard( );
-                    viewModel.setCommentContent(event.getComment( ).getContent( ));
-                    viewModel.setCommentSelected(event.getComment( ));
+                    viewModel.setCommentContent(comment.getContent( ));
+                    viewModel.setCommentSelected(comment);
                     viewModel.setCommentType(CommentType.EDIT);
                     break;
                 case DELETE:
-                    viewModel.deleteComment(event.getComment( ).getId( ));
+                    viewModel.deleteComment(comment.getId( ))
+                             .then(empty -> viewModel.reloadComments( ))
+                             .subscribe( );
                     break;
                 case HEART:
-                    if (event.getComment( ).isLike( )) {
-                        viewModel.unlikeComment(event.getComment( ).getId( ), like -> viewModel.reloadComments( ));
+                    if (comment.isLike( )) {
+                        viewModel.unlikeComment(comment.getId( ))
+                                 .then(empty -> viewModel.reloadComments( ))
+                                 .subscribe( );
                     }
                     else {
-                        viewModel.likeComment(event.getComment( ).getId( ), like -> viewModel.reloadComments( ));
+                        viewModel.likeComment(comment.getId( ))
+                                 .then(empty -> viewModel.reloadComments( ))
+                                 .subscribe( );
                     }
                     break;
                 default:
@@ -157,33 +163,24 @@ public class PostActivity extends AppCompatActivity {
         });
         binding.commentRecyclerView.setAdapter(commentAdapter);
         binding.commentRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        
-        setOnKeyboardStatusChangeEvent( );
     }
     
-    private boolean hasAccountName( ) {
-        LoginAccount account = viewModel.getAccount( );
-        if (account == null || ! hasText(account.getName( ))) {
-            createNicknameSettingDialog( );
-            return false;
-        }
-        return true;
+    private boolean hasAccountName(LoginAccount account) {
+        return account != null && hasText(account.getName( ));
     }
     
-    private void createNicknameSettingDialog( ) {
+    private void showNicknameSettingDialog( ) {
         NicknameSettingDialog
                 .builder(this)
                 .doOnSuccess(unused -> {
-                    viewModel.loadAccount( );
                     hideSoftKeyboard( );
                     viewModel.setSnackbar("닉네임을 설정했어요");
-                    viewModel.createComment(
-                            comment -> viewModel.reloadComments( ),
-                            throwable -> viewModel.getSnackbar( ).postValue("댓글을 등록하던 도중 문제가 발생했어요")
-                    );
+                    viewModel.loadAccount( )
+                             .then(loginAccount -> viewModel.createComment( ))
+                             .then(comment -> viewModel.reloadComments( ))
+                             .subscribe( );
                 })
                 .doOnError(e -> viewModel.setSnackbar("닉네임을 설정하는 도중 문제가 발생했어요"))
-                .doOnNotValid(( ) -> viewModel.setSnackbar("닉네임을 확인해주세요"))
                 .build( )
                 .show( );
     }
@@ -207,6 +204,14 @@ public class PostActivity extends AppCompatActivity {
         binding.setLifecycleOwner(this);
         binding.setViewModel(viewModel);
         binding.executePendingBindings( );
+        inputMethodManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+        setOnKeyboardStatusChangeEvent( );
+        
+        var postId = getIntent( ).getExtras( ).getLong(ExtraKey.POST_ID);
+        viewModel.loadPost(postId)
+                 .onError(e -> viewModel.setSnackbar("게시물을 불러오는 도중 문제가 발생했어요"))
+                 .subscribe( );
+        
         var boardVisible = getIntent( ).getExtras( ).getBoolean("boardVisible");
         binding.board.setVisibility(boardVisible ? View.VISIBLE : View.GONE);
     }
@@ -227,10 +232,5 @@ public class PostActivity extends AppCompatActivity {
     
     private void hideSoftKeyboard( ) {
         inputMethodManager.hideSoftInputFromWindow(binding.commentInput.getWindowToken( ), 0);
-    }
-    
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class Const {
-        public static final String POST_ID = "postId";
     }
 }

@@ -1,82 +1,50 @@
 package com.app.bitwit.view.adapter;
 
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.RecyclerView.Adapter;
-import com.app.bitwit.view.adapter.PostPreviewAdapter.ViewHolder;
-import com.app.bitwit.databinding.PostPreviewItemBinding;
-import com.app.bitwit.viewmodel.MutableLiveEvent;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import androidx.annotation.NonNull;
+import com.app.bitwit.R;
+import com.app.bitwit.databinding.ItemPostPreviewBinding;
+import com.app.bitwit.dto.PostPreviewItem;
+import com.app.bitwit.view.adapter.PostPreviewAdapter.PostPreviewAdapterEvent;
+import com.app.bitwit.view.adapter.common.EventAdapter;
+import com.app.bitwit.view.adapter.common.RecyclerViewEvent;
 import lombok.var;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
+import static android.view.animation.AnimationUtils.loadAnimation;
 
-public class PostPreviewAdapter extends Adapter<ViewHolder> {
+public class PostPreviewAdapter extends EventAdapter<PostPreviewItem, PostPreviewAdapterEvent> {
     
-    private final List<PostPreviewItem> postPreviewItems = new ArrayList<>( );
-    
-    private final MutableLiveEvent<PostPreviewItemClick> itemClick = new MutableLiveEvent<>( );
-    
+    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
-        var binding = PostPreviewItemBinding.inflate(LayoutInflater.from(parent.getContext( )), parent, false);
-        return new PostPreviewAdapter.ViewHolder(binding);
+    public EventAdapter<PostPreviewItem, PostPreviewAdapterEvent>.EventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        var binding = ItemPostPreviewBinding.inflate(LayoutInflater.from(parent.getContext( )), parent, false);
+        return new PostPreviewAdapter.PostPreviewAdapterViewHolder(binding);
     }
     
-    @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.bind(postPreviewItems.get(position));
+    public enum PostPreviewAdapterEvent implements RecyclerViewEvent {
+        CLICK
     }
     
-    @Override
-    public int getItemCount( ) {
-        return postPreviewItems.size( );
-    }
-    
-    public void updateVoteViews(List<PostPreviewItem> postPreviewItems) {
-        this.postPreviewItems.clear( );
-        this.postPreviewItems.addAll(postPreviewItems);
-        notifyDataSetChanged( );
-    }
-    
-    public void setOnItemClickListener(LifecycleOwner lifecycleOwner, Consumer<PostPreviewItemClick> onItemClick) {
-        itemClick.observe(lifecycleOwner, onItemClick::accept);
-    }
-    
-    @Data
-    @AllArgsConstructor
-    public static class PostPreviewItemClick {
-        private PostPreviewItem postPreviewItem;
-        private View            view;
-        private int             position;
-    }
-    
-    class ViewHolder extends RecyclerView.ViewHolder {
+    class PostPreviewAdapterViewHolder extends EventAdapter<PostPreviewItem, PostPreviewAdapterEvent>.EventViewHolder {
         
-        private PostPreviewItemBinding binding;
-        private PostPreviewItem        item;
+        private final ItemPostPreviewBinding binding;
         
-        public ViewHolder(PostPreviewItemBinding binding) {
+        public PostPreviewAdapterViewHolder(ItemPostPreviewBinding binding) {
             super(binding.getRoot( ));
             this.binding = binding;
-            this.binding.root.setOnClickListener(this::publishEvent);
+            this.binding.root.setOnClickListener(v -> publishEvent(PostPreviewAdapterEvent.CLICK, v));
         }
         
-        private void publishEvent(View view) {
-            itemClick.postValue(new PostPreviewItemClick(item, view, getAdapterPosition( )));
-        }
-        
-        public void bind(PostPreviewItem item) {
-            this.item = item;
+        @Override
+        public void bind( ) {
             binding.setItem(item);
             binding.executePendingBindings( );
+            setAnimation( );
+        }
+        
+        private void setAnimation( ) {
+            binding.getRoot( ).startAnimation(loadAnimation(itemView.getContext( ), R.anim.anim_fade));
         }
     }
 }

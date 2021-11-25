@@ -3,64 +3,48 @@ package com.app.bitwit.view.adapter;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.RecyclerView.Adapter;
 import com.app.bitwit.databinding.ItemTickerBinding;
+import com.app.bitwit.domain.Stock;
+import com.app.bitwit.view.adapter.TickerAdapter.TickerAdapterEvent;
+import com.app.bitwit.view.adapter.common.EventAdapter;
+import com.app.bitwit.view.adapter.common.RecyclerViewEvent;
 import lombok.var;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static android.util.TypedValue.COMPLEX_UNIT_DIP;
 
-public class TickerAdapter extends Adapter<TickerAdapter.ViewHolder> {
+public class TickerAdapter extends EventAdapter<Stock, TickerAdapterEvent> {
     
-    private final List<String> tickers = new ArrayList<>( );
-    
-    private Float tickerSize;
+    private Float tickerFontSize;
     
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public EventAdapter<Stock, TickerAdapterEvent>.EventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         var binding = ItemTickerBinding.inflate(LayoutInflater.from(parent.getContext( )), parent, false);
         return new ViewHolder(binding);
     }
     
-    @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.bind(tickers.get(position));
+    public void setTickerFontSize(float tickerFontSize) {
+        this.tickerFontSize = tickerFontSize;
     }
     
-    @Override
-    public int getItemCount( ) {
-        return tickers.size( );
-    }
+    public enum TickerAdapterEvent implements RecyclerViewEvent { }
     
-    public void updateTickers(List<String> tickers) {
-        this.tickers.clear( );
-        this.tickers.addAll(tickers);
-        notifyDataSetChanged( );
-    }
-    
-    public void setTickerSize(float size) {
-        this.tickerSize = size;
-    }
-    
-    class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends EventAdapter<Stock, TickerAdapterEvent>.EventViewHolder {
         
-        private ItemTickerBinding binding;
+        ItemTickerBinding binding;
         
         public ViewHolder(ItemTickerBinding binding) {
             super(binding.getRoot( ));
             this.binding = binding;
         }
         
-        public void bind(String ticker) {
-            binding.setTicker(ticker);
+        @Override
+        public void bind( ) {
+            binding.setTicker(item.getTicker( ));
             binding.executePendingBindings( );
             
-            if (tickerSize != null) {
-                binding.ticker.setTextSize(COMPLEX_UNIT_DIP, tickerSize);
+            if (tickerFontSize != null) {
+                binding.ticker.setTextSize(COMPLEX_UNIT_DIP, tickerFontSize);
             }
         }
     }

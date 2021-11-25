@@ -32,9 +32,9 @@ public class VoteRepository {
                 .map(HttpUtils::get2xxBody);
     }
     
-    public Single<List<Vote>> getVotesByTicker(String ticker) {
+    public Single<List<Vote>> getVotesByTicker(String type, String ticker) {
         return voteServiceClient
-                .searchVotes("vote-item", Collections.singletonList(ticker))
+                .searchVotes(type, Collections.singletonList(ticker))
                 .map(HttpUtils::get2xxBody);
     }
     
@@ -44,8 +44,8 @@ public class VoteRepository {
                 .map(HttpUtils::get2xxBody);
     }
     
-    public Completable getVoteItem(Long voteId) {
-        return getVote(voteId, "vote-item")
+    public Completable getVoteItem(Long voteId, String type) {
+        return getVote(voteId, type)
                 .map(VoteItem::fromVote)
                 .map(VoteItem::enableAnim)
                 .flatMapCompletable(voteItemDao::insertVote);
@@ -74,31 +74,32 @@ public class VoteRepository {
     
     @SuppressLint("NewApi")
     public LiveData<List<VoteItem>> loadVoteItems(int sortOption, int sortDirection) {
+        LocalDateTime now = LocalDateTime.now( );
         if (sortOption == Const.PRICE_FLUCTUATION) {
             if (sortDirection == Const.ASC) {
-                return voteItemDao.loadAllBeforeEndedAtOrderByFluctuateRateAsc(LocalDateTime.now( ));
+                return voteItemDao.loadAllBeforeEndedAtOrderByFluctuateRateAsc(now);
             }
             else if (sortDirection == Const.DESC) {
-                return voteItemDao.loadAllBeforeEndedAtOrderByFluctuateRateDesc(LocalDateTime.now( ));
+                return voteItemDao.loadAllBeforeEndedAtOrderByFluctuateRateDesc(now);
             }
         }
         else if (sortOption == Const.PRICE) {
             if (sortDirection == Const.ASC) {
-                return voteItemDao.loadAllBeforeEndedAtOrderByPriceAsc(LocalDateTime.now( ));
+                return voteItemDao.loadAllBeforeEndedAtOrderByPriceAsc(now);
             }
             else if (sortDirection == Const.DESC) {
-                return voteItemDao.loadAllBeforeEndedAtOrderByPriceDesc(LocalDateTime.now( ));
+                return voteItemDao.loadAllBeforeEndedAtOrderByPriceDesc(now);
             }
         }
         else if (sortOption == Const.PARTICIPANTS) {
             if (sortDirection == Const.ASC) {
-                return voteItemDao.loadAllBeforeEndedAtOrderByParticipantsCountAsc(LocalDateTime.now( ));
+                return voteItemDao.loadAllBeforeEndedAtOrderByParticipantsCountAsc(now);
             }
             else if (sortDirection == Const.DESC) {
-                return voteItemDao.loadAllBeforeEndedAtOrderByParticipantsCountDesc(LocalDateTime.now( ));
+                return voteItemDao.loadAllBeforeEndedAtOrderByParticipantsCountDesc(now);
             }
         }
-        return voteItemDao.loadAllBeforeEndedAt(LocalDateTime.now( ));
+        return voteItemDao.loadAllBeforeEndedAt(now);
     }
     
     @Getter

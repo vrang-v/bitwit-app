@@ -5,6 +5,7 @@
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".BitwitApplication"
         android:allowBackup="true"
@@ -16,18 +17,24 @@
         android:theme="@style/Bitwit"
         android:usesCleartextTraffic="true"
         tools:replace="android:appComponentFactory">
-        <activity android:name=".view.activity.PostingActivity"></activity>
-        <activity android:name=".view.activity.EntryPointActivity">
+        <activity
+            android:name=".view.activity.EntryPointActivity"
+            android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".view.activity.PostingActivity"></activity>
         <activity android:name=".view.activity.FrameActivity" />
         <activity android:name=".view.activity.auth.SignUpActivity" />
-        <activity android:name=".view.activity.auth.LoginActivity" />
         <activity android:name=".view.activity.auth.SignUpProcessActivity" />
-        <activity android:name=".view.activity.auth.PasswordRetrievalActivity" />
+        <activity
+            android:name=".view.activity.auth.LoginActivity"
+            android:noHistory="true" />
+        <activity
+            android:name=".view.activity.auth.PasswordRetrievalActivity"
+            android:noHistory="true" />
         <activity android:name=".view.activity.PostActivity" />
         <activity
             android:name=".view.activity.SearchActivity"

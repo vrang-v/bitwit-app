@@ -3,9 +3,9 @@ package com.app.bitwit.view.adapter;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
-import com.app.bitwit.view.fragment.HotPostFragment;
-import com.app.bitwit.view.fragment.MainFragment;
-import com.app.bitwit.view.fragment.RecentPostFragment;
+import com.app.bitwit.view.fragment.PostListFragment;
+import com.app.bitwit.viewmodel.HotPostListViewModel;
+import com.app.bitwit.viewmodel.RecentPostListViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,9 +16,11 @@ public class PostFragmentAdapter extends FragmentStateAdapter {
     
     public PostFragmentAdapter(@NonNull Fragment fragment) {
         super(fragment);
-        fragments.add(new HotPostFragment( ));
-        fragments.add(new RecentPostFragment( ));
-        fragments.add(new MainFragment( ));
+        fragments.add(new PostListFragment(HotPostListViewModel.class));
+        fragments.add(new PostListFragment(RecentPostListViewModel.class));
+        
+        // TODO 종목토론방으로 교체
+        fragments.add(new PostListFragment(HotPostListViewModel.class));
     }
     
     public Fragment getFragment(int index) {

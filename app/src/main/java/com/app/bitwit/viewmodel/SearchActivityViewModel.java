@@ -1,22 +1,21 @@
 package com.app.bitwit.viewmodel;
 
 import android.annotation.SuppressLint;
-import android.util.Log;
 import androidx.lifecycle.MutableLiveData;
-import com.app.bitwit.view.adapter.SearchItem;
 import com.app.bitwit.data.repository.BallotRepository;
 import com.app.bitwit.data.repository.StockRepository;
 import com.app.bitwit.data.repository.VoteRepository;
 import com.app.bitwit.data.source.local.entity.VoteItem;
-import com.app.bitwit.data.source.remote.dto.request.CreateOrChangeBallotRequest;
+import com.app.bitwit.data.source.remote.dto.request.CreateBallotRequest;
 import com.app.bitwit.data.source.remote.dto.request.SearchStockRequest;
 import com.app.bitwit.domain.Ballot;
 import com.app.bitwit.domain.Stock;
 import com.app.bitwit.domain.Vote;
+import com.app.bitwit.util.subscription.SingleSubscription;
+import com.app.bitwit.util.subscription.Subscription;
+import com.app.bitwit.dto.SearchItem;
+import com.app.bitwit.viewmodel.common.RxJavaViewModelSupport;
 import dagger.hilt.android.lifecycle.HiltViewModel;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.functions.Consumer;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 import lombok.Getter;
 
 import javax.inject.Inject;
@@ -46,45 +45,38 @@ public class SearchActivityViewModel extends RxJavaViewModelSupport {
         this.ballotRepository = ballotRepository;
     }
     
-    public void search(String keyword) {
+    public Subscription<List<SearchItem>> search(String keyword) {
         if (keyword.isEmpty( )) {
             stocks.postValue(new ArrayList<>( ));
-            return;
+            return unsubscribe( );
         }
         
-        addDisposable(
+        return subscribe(
                 stockRepository
                         .searchStock(new SearchStockRequest(keyword))
-                        .subscribeOn(Schedulers.io( ))
-                        .observeOn(AndroidSchedulers.mainThread( ))
                         .map(SearchItem::fromStocks)
-                        .subscribe(searchItems::postValue, e -> Log.e("ERROR", "search", e))
+                        .doOnSuccess(searchItems::postValue)
         );
     }
     
     @SuppressLint("NewApi")
-    public void getLastVoteByTicker(String ticker, Consumer<VoteItem> onSuccess) {
-        addDisposable(
+    public SingleSubscription<VoteItem> getLastVoteByTicker(String ticker) {
+        return subscribe(
                 voteRepository
-                        .getVotesByTicker(ticker)
+                        .getVotesByTicker("vote-item", ticker)
                         .map(votes -> {
                             votes.sort(Comparator.comparing(Vote::getEndedAt).reversed( ));
                             return votes.get(0);
                         })
                         .map(VoteItem::fromVote)
-                        .subscribeOn(Schedulers.io( ))
-                        .observeOn(AndroidSchedulers.mainThread( ))
-                        .subscribe(onSuccess, e -> Log.e("SearchActivityViewModel", "getLastVoteByTicker", e))
         );
     }
     
-    public void createOrChangeBallot(CreateOrChangeBallotRequest request, Consumer<Ballot> onSuccess) {
-        addDisposable(
-                ballotRepository
-                        .createOrChangeBallot(request)
-                        .subscribeOn(Schedulers.io( ))
-                        .observeOn(AndroidSchedulers.mainThread( ))
-                        .subscribe(onSuccess, e -> Log.e("ERROR", "createOrChangeBallot: ", e))
-        );
+    public Subscription<Ballot> createBallot(CreateBallotRequest request) {
+        return subscribe(ballotRepository.createOrChangeBallot(request));
+    }
+    
+    public Subscription<Void> refreshVoteItem(Long voteId) {
+        return subscribe(voteRepository.getVoteItem(voteId, "vote-item"));
     }
 }

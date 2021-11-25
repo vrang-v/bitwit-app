@@ -17,8 +17,7 @@ import androidx.transition.TransitionManager;
 import com.app.bitwit.R;
 import com.app.bitwit.databinding.ActivityFrameBinding;
 import com.app.bitwit.util.SnackbarViewModel;
-import com.app.bitwit.view.fragment.HotPostFragment;
-import com.app.bitwit.view.fragment.MainFragment;
+import com.app.bitwit.view.fragment.HomeFragment;
 import com.app.bitwit.view.fragment.PostFragment;
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior;
 import com.google.android.material.snackbar.Snackbar;
@@ -32,9 +31,9 @@ public class FrameActivity extends AppCompatActivity {
     
     private final FragmentManager fragmentManager = getSupportFragmentManager( );
     
-    private final MainFragment    mainFragment    = new MainFragment( );
-    private final PostFragment    postFragment    = new PostFragment( );
-    private final HotPostFragment hotPostFragment = new HotPostFragment( );
+    private final HomeFragment homeFragment  = new HomeFragment( );
+    private final PostFragment postFragment  = new PostFragment( );
+    private final HomeFragment homeFragment2 = new HomeFragment( );
     
     private ActivityFrameBinding binding;
     
@@ -50,13 +49,13 @@ public class FrameActivity extends AppCompatActivity {
         
         observeHasText(this, SnackbarViewModel.MESSAGE, this::makeSnackbar);
         
-        changeFragment(mainFragment);
+        changeFragment(homeFragment);
         
         binding.navigationView.setOnNavigationItemSelectedListener(item -> {
             switch (item.getItemId( )) {
                 case R.id.home:
                     fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                    changeFragment(mainFragment);
+                    changeFragment(homeFragment);
                     setNavigationViewBehavior(new HideBottomViewOnScrollBehavior<>( ));
                     break;
                 case R.id.post:
@@ -65,8 +64,8 @@ public class FrameActivity extends AppCompatActivity {
                     break;
                 case R.id.account:
                     fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                    changeFragment(hotPostFragment);
-                    setNavigationViewBehavior(null);
+                    changeFragment(homeFragment2);
+                    setNavigationViewBehavior(new HideBottomViewOnScrollBehavior<>( ));
                     break;
                 default:
                     break;
@@ -77,10 +76,10 @@ public class FrameActivity extends AppCompatActivity {
         binding.navigationView.setOnNavigationItemReselectedListener(item -> {
             switch (item.getItemId( )) {
                 case R.id.home:
-                    mainFragment.initRecyclerViewPosition( );
+                    homeFragment.initRecyclerViewPosition( );
                     break;
                 case R.id.post:
-                    postFragment.initRecyclerViewPosition( );
+                    postFragment.onNavigationItemReselected(item);
                     break;
                 case R.id.account:
                     break;
@@ -88,6 +87,7 @@ public class FrameActivity extends AppCompatActivity {
                     break;
             }
         });
+        binding.navigationView.setOnNavigationItemReselectedListener(postFragment);
         findViewById(R.id.home).setOnLongClickListener(v -> true);
         findViewById(R.id.post).setOnLongClickListener(v -> true);
         findViewById(R.id.account).setOnLongClickListener(v -> true);
@@ -127,22 +127,18 @@ public class FrameActivity extends AppCompatActivity {
     
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode != KeyEvent.KEYCODE_BACK) {
-            return super.onKeyDown(keyCode, event);
-        }
-        
-        if (fragmentManager.getBackStackEntryCount( ) > 0) {
-            fragmentManager.popBackStack( );
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (fragmentManager.getBackStackEntryCount( ) > 0) {
+                fragmentManager.popBackStack( );
+                return true;
+            }
+            if (System.currentTimeMillis( ) - lastBackKeydownTimeMillis < 2000) {
+                finish( );
+            }
+            lastBackKeydownTimeMillis = System.currentTimeMillis( );
+            makeSnackbar("뒤로가기 버튼을 누르면 앱이 종료됩니다.");
             return true;
         }
-        
-        if (System.currentTimeMillis( ) - lastBackKeydownTimeMillis > 2000) {
-            makeSnackbar("뒤로가기 버튼을 누르면 앱이 종료됩니다");
-            lastBackKeydownTimeMillis = System.currentTimeMillis( );
-        }
-        else {
-            finish( );
-        }
-        return true;
+        return super.onKeyDown(keyCode, event);
     }
 }

@@ -12,7 +12,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import com.app.bitwit.R;
-import com.app.bitwit.databinding.StockInfoActivityBinding;
+import com.app.bitwit.databinding.ActivityStockInfoBinding;
 import com.app.bitwit.util.Colors;
 import com.app.bitwit.view.adapter.PostPreviewAdapter;
 import com.app.bitwit.viewmodel.StockInfoViewModel;
@@ -32,6 +32,7 @@ import java.util.Map;
 
 import static android.view.animation.AnimationUtils.loadAnimation;
 import static com.app.bitwit.util.IntentKeys.STOCK_TICKER;
+import static com.app.bitwit.util.LiveDataUtils.observe;
 import static com.app.bitwit.util.LiveDataUtils.observeAllNotNull;
 import static com.app.bitwit.util.LiveDataUtils.observeNotEmpty;
 import static com.app.bitwit.util.LiveDataUtils.observeNotNull;
@@ -39,7 +40,7 @@ import static com.app.bitwit.util.LiveDataUtils.observeNotNull;
 @AndroidEntryPoint
 public class StockInfoActivity extends AppCompatActivity implements OnTouchListener {
     
-    private StockInfoActivityBinding binding;
+    private ActivityStockInfoBinding binding;
     private StockInfoViewModel       viewModel;
     
     private LineDataSet       lineDataSet;
@@ -53,22 +54,28 @@ public class StockInfoActivity extends AppCompatActivity implements OnTouchListe
         initLineDataSet( );
         initIntervalMap( );
         
-        observeNotNull(this, viewModel.getTicker( ), viewModel::loadVoteItem);
-        observeNotNull(this, viewModel.getTicker( ), viewModel::loadPosts);
-        observeAllNotNull(this, viewModel.getTicker( ), viewModel.getChartInterval( ), viewModel::loadChart);
-        observeAllNotNull(this, viewModel.getTicker( ), viewModel.getChartInterval( ), viewModel::refreshChart);
+        observeNotNull(this, viewModel.getTicker( ), ticker -> {
+            viewModel.loadVoteItem(ticker);
+            viewModel.loadPosts(ticker).subscribe( );
+        });
+        
+        observeAllNotNull(this, viewModel.getTicker( ), viewModel.getChartInterval( ), (ticker, interval) -> {
+            viewModel.loadChart(ticker, interval);
+            viewModel.refreshChart(ticker, interval).subscribe( );
+        });
+        
         observeNotEmpty(this, viewModel.getEntries( ), this::drawChart);
         
-        viewModel.getVoteItem( ).observe(this, voteItem -> {
+        observe(this, viewModel.getVoteItem( ), voteItem -> {
             binding.participantCount.startAnimation(loadAnimation(this, R.anim.anim_fade));
             binding.currentPrice.startAnimation(loadAnimation(this, R.anim.anim_fade));
             binding.currentFluctuateRate.startAnimation(loadAnimation(this, R.anim.anim_fade));
         });
         
         var adapter = new PostPreviewAdapter( );
-        adapter.setOnItemClickListener(this, itemClick -> {
-            Intent intent = new Intent(this, PostActivity.class)
-                    .putExtra("postId", itemClick.getPostPreviewItem( ).getId( ));
+        adapter.addAdapterEventListener(this, event -> {
+            var intent = new Intent(this, PostActivity.class)
+                    .putExtra("postId", event.getItem( ).getId( ));
             startActivity(intent);
             overridePendingTransition(R.anim.slide_right_to_left_enter, R.anim.slide_right_to_left_exit);
         });
@@ -102,7 +109,7 @@ public class StockInfoActivity extends AppCompatActivity implements OnTouchListe
     }
     
     private void init( ) {
-        binding   = DataBindingUtil.setContentView(this, R.layout.stock_info_activity);
+        binding   = DataBindingUtil.setContentView(this, R.layout.activity_stock_info);
         viewModel = new ViewModelProvider(this).get(StockInfoViewModel.class);
         viewModel.setTicker(getIntent( ).getStringExtra(STOCK_TICKER));
         viewModel.setChartInterval("1m");

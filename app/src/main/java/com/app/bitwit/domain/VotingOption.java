@@ -1,16 +1,14 @@
 package com.app.bitwit.domain;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
-public enum VotingOption
-{
-    INCREMENT("increment"), DECREMENT("decrement");
+@RequiredArgsConstructor
+public enum VotingOption {
+    
+    INCREMENT("increment"),
+    DECREMENT("decrement");
     
     private final String option;
-    
-    VotingOption(String option)
-    {
-        this.option = option;
-    }
 }

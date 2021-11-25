@@ -16,20 +16,20 @@
         android:background="@color/white">
 
         <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guidelineY06"
+            android:id="@+id/guidelineTopBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_begin="50dp" />
+            app:layout_constraintGuide_begin="@dimen/top_bar_height" />
 
         <Button
-            android:id="@+id/back"
+            android:id="@+id/backBtn"
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="27dp"
             android:layout_height="27dp"
             android:layout_marginStart="16dp"
             android:background="@drawable/outline_arrow_back_24"
-            app:layout_constraintBottom_toTopOf="@id/guidelineY06"
+            app:layout_constraintBottom_toTopOf="@id/guidelineTopBar"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -50,33 +50,17 @@
             android:text="@={viewModel.searchWord}"
             android:textColor="@color/black"
             android:textSize="13dp"
-            app:layout_constraintBottom_toTopOf="@+id/guidelineY06"
+            app:layout_constraintBottom_toTopOf="@+id/guidelineTopBar"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/back"
+            app:layout_constraintStart_toEndOf="@+id/backBtn"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/swipeLayout"
-            android:layout_width="0dp"
+        <FrameLayout
+            android:id="@+id/postList"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:descendantFocusability="blocksDescendants"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/guidelineY06">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/postRecycler"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:orientation="vertical"
-                android:overScrollMode="never"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                bind:posts="@{viewModel.posts}" />
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+            app:layout_constraintTop_toBottomOf="@+id/guidelineTopBar" />
 
         <TextView
             android:id="@+id/noSearchResultText"
@@ -87,6 +71,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/guidelineY06" />
+            app:layout_constraintTop_toTopOf="@+id/guidelineTopBar" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="top_bar_height">40dp</dimen>
+    <dimen name="top_bar_margin">16dp</dimen>
+    <dimen name="top_bar_btn">25dp</dimen>
+    <dimen name="top_bar_back_btn">27dp</dimen>
+    
+    <dimen name="post_activity_icon">14dp</dimen>
+    <dimen name="post_activity_icon_text">13dp</dimen>
+
+    <dimen name="posting_activity_text">14dp</dimen>
+</resources>

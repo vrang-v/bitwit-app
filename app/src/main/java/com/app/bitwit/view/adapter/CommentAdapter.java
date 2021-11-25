@@ -1,5 +1,6 @@
 package com.app.bitwit.view.adapter;
 
+import android.util.AndroidRuntimeException;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -7,144 +8,93 @@ import android.view.View;
 import android.view.View.OnCreateContextMenuListener;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.MutableLiveData;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.RecyclerView.Adapter;
-import androidx.recyclerview.widget.RecyclerView.ViewHolder;
-import com.app.bitwit.databinding.CommentItemBinding;
-import com.app.bitwit.databinding.InnerCommentItemBinding;
+import com.app.bitwit.databinding.ItemCommentBinding;
+import com.app.bitwit.databinding.ItemInnerCommentBinding;
 import com.app.bitwit.domain.Comment;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import org.jetbrains.annotations.NotNull;
+import com.app.bitwit.view.adapter.CommentAdapter.CommentAdapterEvent;
+import com.app.bitwit.view.adapter.common.EventAdapter;
+import com.app.bitwit.view.adapter.common.RecyclerViewEvent;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
+import static com.app.bitwit.view.adapter.CommentAdapter.CommentAdapterEvent.*;
 
-public class CommentAdapter extends Adapter<RecyclerView.ViewHolder> {
-    
-    private final List<Comment> comments = new ArrayList<>( );
-    
-    private final MutableLiveData<CommentAdapterEvent> event = new MutableLiveData<>( );
-    
-    @NonNull
-    @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        switch (viewType) {
-            case 0:
-                return new CommentViewHolder(
-                        CommentItemBinding.inflate(LayoutInflater.from(parent.getContext( )), parent, false)
-                );
-            case 1:
-                return new CommentViewHolder(
-                        InnerCommentItemBinding.inflate(LayoutInflater.from(parent.getContext( )), parent, false)
-                );
-            default:
-                return null;
-        }
-    }
+public class CommentAdapter extends EventAdapter<Comment, CommentAdapterEvent> {
     
     @Override
     public int getItemViewType(int position) {
-        return comments.get(position).getDepth( );
+        return items.get(position).getDepth( );
     }
     
+    @NonNull
     @Override
-    public void onBindViewHolder(@NonNull @NotNull ViewHolder holder, int position) {
-        Comment comment = comments.get(position);
-        switch (comment.getDepth( )) {
+    public EventAdapter<Comment, CommentAdapterEvent>.EventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        switch (viewType) {
             case 0:
-                ((CommentViewHolder)holder).bind(comment, position != 0);
-                break;
+                return new CommentViewHolder(
+                        ItemCommentBinding.inflate(LayoutInflater.from(parent.getContext( )), parent, false)
+                );
             case 1:
-                ((CommentViewHolder)holder).bind(comment, false);
-                break;
+                return new CommentViewHolder(
+                        ItemInnerCommentBinding.inflate(LayoutInflater.from(parent.getContext( )), parent, false)
+                );
             default:
-                break;
+                throw new AndroidRuntimeException( );
         }
     }
     
-    @Override
-    public int getItemCount( ) {
-        return comments.size( );
-    }
-    
-    public void addEventListener(LifecycleOwner lifecycleOwner, Consumer<CommentAdapterEvent> onEvent) {
-        event.observe(lifecycleOwner, onEvent::accept);
-    }
-    
-    public void updateComments(List<Comment> comments) {
-        this.comments.clear( );
-        this.comments.addAll(comments);
-        notifyDataSetChanged( );
-    }
-    
-    public enum EventType {
+    public enum CommentAdapterEvent implements RecyclerViewEvent {
         CLICK_COMMENT, CLICK_REPLY, EDIT, DELETE, HEART
     }
     
-    @Data
-    @AllArgsConstructor
-    public static class CommentAdapterEvent {
-        private EventType eventType;
-        private Comment   comment;
-        private View      view;
-        private int       position;
-    }
-    
-    class CommentViewHolder extends RecyclerView.ViewHolder implements OnCreateContextMenuListener {
+    class CommentViewHolder extends EventAdapter<Comment, CommentAdapterEvent>.EventViewHolder implements OnCreateContextMenuListener {
         
-        private final boolean                 isRoot;
-        private       CommentItemBinding      binding;
-        private       InnerCommentItemBinding replyBinding;
-        private       Comment                 comment;
+        private final boolean isRoot;
+        private final boolean showContour;
         
-        public CommentViewHolder(CommentItemBinding binding) {
+        private ItemCommentBinding      binding;
+        private ItemInnerCommentBinding replyBinding;
+        
+        public CommentViewHolder(ItemCommentBinding binding) {
             super(binding.getRoot( ));
-            this.binding = binding;
-            this.isRoot  = true;
+            this.binding     = binding;
+            this.isRoot      = true;
+            this.showContour = getAdapterPosition( ) != 0;
             binding.getRoot( ).setOnCreateContextMenuListener(this);
-            binding.reply.setOnClickListener(v -> publishEvent(EventType.CLICK_COMMENT, v));
-            binding.heartBtn.setOnClickListener(v -> publishEvent(EventType.HEART, v));
+            binding.reply.setOnClickListener(v -> publishEvent(CLICK_COMMENT, v));
+            binding.heartBtn.setOnClickListener(v -> publishEvent(HEART, v));
         }
         
-        public CommentViewHolder(InnerCommentItemBinding binding) {
+        public CommentViewHolder(ItemInnerCommentBinding binding) {
             super(binding.getRoot( ));
             this.replyBinding = binding;
             this.isRoot       = false;
+            this.showContour  = false;
             binding.getRoot( ).setOnCreateContextMenuListener(this);
-            binding.reply.setOnClickListener(v -> publishEvent(EventType.CLICK_REPLY, v));
-            binding.heartBtn.setOnClickListener(v -> publishEvent(EventType.HEART, v));
+            binding.reply.setOnClickListener(v -> publishEvent(CLICK_REPLY, v));
+            binding.heartBtn.setOnClickListener(v -> publishEvent(HEART, v));
         }
         
-        private void publishEvent(EventType eventType, View view) {
-            event.postValue(new CommentAdapterEvent(eventType, comment, view, getAdapterPosition( )));
-        }
-        
-        public void bind(Comment comment, boolean showContour) {
-            this.comment = comment;
+        @Override
+        public void bind( ) {
             if (isRoot) {
-                binding.setComment(comment);
+                binding.setComment(item);
                 binding.executePendingBindings( );
                 binding.contour.setVisibility(showContour ? View.VISIBLE : View.INVISIBLE);
             }
             else {
-                replyBinding.setComment(comment);
+                replyBinding.setComment(item);
                 replyBinding.executePendingBindings( );
             }
         }
         
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-            if (comment.isEditable( )) {
+            if (item.isEditable( )) {
                 menu.add("수정").setOnMenuItemClickListener(item -> {
-                    publishEvent(EventType.EDIT, item.getActionView( ));
+                    publishEvent(EDIT, item.getActionView( ));
                     return true;
                 });
                 menu.add("삭제").setOnMenuItemClickListener(item -> {
-                    publishEvent(EventType.DELETE, item.getActionView( ));
+                    publishEvent(DELETE, item.getActionView( ));
                     return true;
                 });
             }

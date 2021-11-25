@@ -10,19 +10,19 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import com.app.bitwit.R;
-import com.app.bitwit.databinding.AccountFragmentBinding;
+import com.app.bitwit.databinding.FragmentAccountBinding;
 import com.app.bitwit.viewmodel.AccountViewModel;
 
 public class AccountFragment extends Fragment {
     
-    private AccountFragmentBinding binding;
+    private FragmentAccountBinding binding;
     private AccountViewModel       viewModel;
     
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = DataBindingUtil.inflate(inflater, R.layout.account_fragment, container, false);
+        binding   = DataBindingUtil.inflate(inflater, R.layout.fragment_account, container, false);
         viewModel = new ViewModelProvider(this).get(AccountViewModel.class);
-    
+        
         return binding.getRoot( );
     }
 }

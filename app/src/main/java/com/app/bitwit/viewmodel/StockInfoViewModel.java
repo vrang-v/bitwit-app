@@ -1,7 +1,6 @@
 package com.app.bitwit.viewmodel;
 
 import android.annotation.SuppressLint;
-import android.util.Log;
 import androidx.lifecycle.MutableLiveData;
 import com.app.bitwit.data.repository.CandlestickRepository;
 import com.app.bitwit.data.repository.PostRepository;
@@ -9,12 +8,14 @@ import com.app.bitwit.data.repository.VoteRepository;
 import com.app.bitwit.data.source.local.entity.Candlestick;
 import com.app.bitwit.data.source.local.entity.VoteItem;
 import com.app.bitwit.domain.SelectedCandlestick;
-import com.app.bitwit.util.ObserveDelegate;
-import com.app.bitwit.view.adapter.PostPreviewItem;
+import com.app.bitwit.util.ChangeableLiveData;
+import com.app.bitwit.util.MutableLiveList;
+import com.app.bitwit.util.SnackbarViewModel;
+import com.app.bitwit.util.subscription.Subscription;
+import com.app.bitwit.dto.PostPreviewItem;
+import com.app.bitwit.viewmodel.common.RxJavaViewModelSupport;
 import com.github.mikephil.charting.data.Entry;
 import dagger.hilt.android.lifecycle.HiltViewModel;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 import lombok.Getter;
 import lombok.var;
 
@@ -32,22 +33,19 @@ import static com.app.bitwit.util.LiveDataUtils.observeUntilNotEmpty;
 
 @Getter
 @HiltViewModel
-public class StockInfoViewModel extends RxJavaViewModelSupport {
+public class StockInfoViewModel extends RxJavaViewModelSupport implements SnackbarViewModel {
     
     private final VoteRepository        voteRepository;
     private final CandlestickRepository candlestickRepository;
     private final PostRepository        postRepository;
     
+    private final ChangeableLiveData<VoteItem>     voteItem         = new ChangeableLiveData<>( );
+    private final MutableLiveList<Entry>           entries          = new MutableLiveList<>( );
+    private final MutableLiveList<PostPreviewItem> postPreviewItems = new MutableLiveList<>( );
+    
     private final MutableLiveData<String>              ticker              = new MutableLiveData<>( );
     private final MutableLiveData<String>              chartInterval       = new MutableLiveData<>( );
     private final MutableLiveData<SelectedCandlestick> selectedCandlestick = new MutableLiveData<>( );
-    
-    private final MutableLiveData<List<PostPreviewItem>> postPreviewItems = new MutableLiveData<>( );
-    
-    private final MutableLiveData<VoteItem>    voteItem = new MutableLiveData<>( );
-    private final MutableLiveData<List<Entry>> entries  = new MutableLiveData<>( );
-    
-    private final ObserveDelegate<VoteItem> voteItemObserver = new ObserveDelegate<>(voteItem);
     
     private final List<Candlestick> chartData = new ArrayList<>( );
     
@@ -58,28 +56,8 @@ public class StockInfoViewModel extends RxJavaViewModelSupport {
         this.postRepository        = postRepository;
     }
     
-    public void setTicker(String ticker) {
-        this.ticker.postValue(ticker);
-    }
-    
-    public void setChartInterval(String chartInterval) {
-        this.chartInterval.postValue(chartInterval);
-    }
-    
-    public void setSelectedCandlestick(int index) {
-        if (chartData.isEmpty( ) || index >= chartData.size( )) { return; }
-        
-        this.selectedCandlestick.postValue(
-                new SelectedCandlestick(
-                        chartData.get(index),
-                        chartData.get(0),
-                        index == 0 ? chartData.get(0) : chartData.get(index - 1)
-                )
-        );
-    }
-    
     public void loadVoteItem(String ticker) {
-        voteItemObserver.observe(voteRepository.loadLastEndedVoteByTicker(ticker));
+        voteItem.changeSource(voteRepository.loadLastEndedVoteByTicker(ticker));
     }
     
     public void loadChart(String ticker, String interval) {
@@ -100,8 +78,8 @@ public class StockInfoViewModel extends RxJavaViewModelSupport {
     }
     
     @SuppressLint("NewApi")
-    public void refreshChart(String ticker, String interval) {
-        addDisposable(
+    public Subscription<Void> refreshChart(String ticker, String interval) {
+        return subscribe(
                 candlestickRepository
                         .getLastDateTime(ticker, interval)
                         .filter(localDateTime -> {
@@ -129,19 +107,37 @@ public class StockInfoViewModel extends RxJavaViewModelSupport {
                             }
                         })
                         .flatMapCompletable(unused -> candlestickRepository.refreshCandlestick(ticker, interval))
-                        .subscribeOn(Schedulers.io( ))
-                        .observeOn(AndroidSchedulers.mainThread( ))
-                        .subscribe(( ) -> { }, e -> Log.e("ERROR", "refreshChart: ", e))
+                        .doOnError(e -> setSnackbar("차트 데이터를 가져오는 도중 문제가 발생했어요"))
         );
     }
     
-    public void loadPosts(String ticker) {
-        addDisposable(
-                postRepository.searchPostByTickers(Collections.singletonList(ticker), 5)
-                              .map(posts -> posts.stream( ).map(PostPreviewItem::new).collect(Collectors.toList( )))
-                              .subscribeOn(Schedulers.io( ))
-                              .observeOn(AndroidSchedulers.mainThread( ))
-                              .subscribe(postPreviewItems::postValue, e -> Log.e("ERROR", "loadMostViewedPosts", e)));
+    public Subscription<List<PostPreviewItem>> loadPosts(String ticker) {
+        return subscribe(
+                postRepository
+                        .searchPostByTickers(Collections.singletonList(ticker), 5)
+                        .map(posts -> posts.stream( ).map(PostPreviewItem::new).collect(Collectors.toList( )))
+                        .doOnSuccess(postPreviewItems::postValue)
+        );
+    }
+    
+    public void setTicker(String ticker) {
+        this.ticker.postValue(ticker);
+    }
+    
+    public void setChartInterval(String chartInterval) {
+        this.chartInterval.postValue(chartInterval);
+    }
+    
+    public void setSelectedCandlestick(int index) {
+        if (chartData.isEmpty( ) || index >= chartData.size( )) { return; }
+        
+        this.selectedCandlestick.postValue(
+                new SelectedCandlestick(
+                        chartData.get(index),
+                        chartData.get(0),
+                        index == 0 ? chartData.get(0) : chartData.get(index - 1)
+                )
+        );
     }
     
     @SuppressLint("NewApi")
@@ -153,6 +149,6 @@ public class StockInfoViewModel extends RxJavaViewModelSupport {
     
     @Override
     protected void onCleared( ) {
-        voteItemObserver.dispose( );
+        voteItem.dispose( );
     }
 }

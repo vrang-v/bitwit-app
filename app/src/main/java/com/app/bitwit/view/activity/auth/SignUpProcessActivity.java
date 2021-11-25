@@ -1,13 +1,7 @@
 package com.app.bitwit.view.activity.auth;
 
-import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkInfo;
-import android.net.NetworkRequest;
 import android.os.Bundle;
-import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import com.app.bitwit.R;
@@ -86,11 +80,11 @@ public class SignUpProcessActivity extends AppCompatActivity {
     }
     
     private String getEmailSiteLink(String email) {
-        var domain = email.split("@")[1];
+        String domain = email.split("@")[1];
         if (domain.equals("naver.com")) {
             return "https://mail.naver.com";
         }
-        else if (domain.equals("gmail.com")) {
+        if (domain.equals("gmail.com")) {
             return "https://mail.google.com";
         }
         return null;

@@ -33,7 +33,6 @@ public class EntryPointActivity extends AppCompatActivity {
         };
         
         Consumer<Throwable> onError = throwable -> {
-            Log.e("ERROR", "entryPoint", throwable);
             var intent = new Intent(getApplicationContext( ), LoginActivity.class);
             startActivity(intent);
             finish( );

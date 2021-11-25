@@ -8,13 +8,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.app.bitwit.R;
 import com.app.bitwit.databinding.ActivityPostingBinding;
-import com.app.bitwit.view.adapter.EditableTickerAdapter;
+import com.app.bitwit.util.LoginAccount;
+import com.app.bitwit.view.adapter.TagAdapter;
+import com.app.bitwit.view.dialog.NicknameSettingDialog;
 import com.app.bitwit.viewmodel.PostingViewModel;
 import com.google.android.material.snackbar.Snackbar;
 import dagger.hilt.android.AndroidEntryPoint;
 import lombok.var;
 
-import static com.app.bitwit.util.Callback.callback;
 import static com.app.bitwit.util.LiveDataUtils.observe;
 import static com.app.bitwit.util.LiveDataUtils.observeAll;
 import static com.app.bitwit.util.StringUtils.hasText;
@@ -32,8 +33,13 @@ public class PostingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         init( );
-        
-        viewModel.getSnackbar( ).observe(this, s ->
+        observeViewModel( );
+        setClickListener( );
+        addTagAdapter( );
+    }
+    
+    private void observeViewModel( ) {
+        observe(this, viewModel.getSnackbar( ), s ->
                 Snackbar.make(binding.getRoot( ), s, LENGTH_SHORT).show( )
         );
         
@@ -44,29 +50,58 @@ public class PostingActivity extends AppCompatActivity {
         observe(this, viewModel.getInputTag( ), tag ->
                 binding.addTagBtn.setEnabled(hasText(tag))
         );
-        
-        binding.back.setOnClickListener(v ->
+    }
+    
+    private void setClickListener( ) {
+        binding.backBtn.setOnClickListener(v ->
                 finish( )
         );
         
-        binding.confirm.setOnClickListener(v ->
-                viewModel.createPost(callback(
-                        post -> {
-                            setResult(RESULT_SUCCESS);
-                            finish( );
-                        },
-                        e -> viewModel.setSnackbar("게시글 작성 도중 오류가 발생했어요")
-                ))
-        );
+        binding.confirm.setOnClickListener(v -> {
+            if (! hasAccountName(viewModel.getAccount( ))) {
+                showNicknameSettingDialog( );
+                return;
+            }
+            viewModel.createPost( )
+                     .onSuccess(post -> {
+                         setResult(RESULT_SUCCESS);
+                         finish( );
+                     })
+                     .subscribe( );
+        });
         
         binding.addTagBtn.setOnClickListener(v ->
                 viewModel.addTag( )
         );
-        
-        var editableTickerAdapter = new EditableTickerAdapter(viewModel.getTags( ));
-        viewModel.getTags( ).observe(this, strings -> editableTickerAdapter.notifyDataSetChanged( ));
-        binding.tagRecycler.setAdapter(editableTickerAdapter);
+    }
+    
+    private void addTagAdapter( ) {
+        var tagAdapter = new TagAdapter(viewModel.getTags( ));
+        viewModel.getTags( ).observe(this, tags -> tagAdapter.notifyDataSetChanged( ));
+        binding.tagRecycler.setAdapter(tagAdapter);
         binding.tagRecycler.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
+    }
+    
+    private boolean hasAccountName(LoginAccount account) {
+        return account != null && hasText(account.getName( ));
+    }
+    
+    private void showNicknameSettingDialog( ) {
+        NicknameSettingDialog
+                .builder(this)
+                .doOnSuccess(unused -> {
+                    viewModel.setSnackbar("닉네임을 설정했어요");
+                    viewModel.loadAccount( )
+                             .then(loginAccount -> viewModel.createPost( ))
+                             .onSuccess(post -> {
+                                 setResult(RESULT_SUCCESS);
+                                 finish( );
+                             })
+                             .subscribe( );
+                })
+                .doOnError(e -> viewModel.setSnackbar("닉네임을 설정하는 도중 문제가 발생했어요"))
+                .build( )
+                .show( );
     }
     
     private void init( ) {
@@ -75,5 +110,6 @@ public class PostingActivity extends AppCompatActivity {
         binding.setLifecycleOwner(this);
         binding.setViewModel(viewModel);
         binding.executePendingBindings( );
+        viewModel.loadAccount( ).subscribe( );
     }
 }

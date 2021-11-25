@@ -1,6 +1,5 @@
 package com.app.bitwit.viewmodel;
 
-import android.util.Log;
 import androidx.lifecycle.MutableLiveData;
 import com.app.bitwit.data.repository.AccountRepository;
 import com.app.bitwit.data.repository.PostRepository;
@@ -8,14 +7,14 @@ import com.app.bitwit.data.source.remote.dto.CreateCommentRequest;
 import com.app.bitwit.domain.Comment;
 import com.app.bitwit.domain.Like;
 import com.app.bitwit.domain.Post;
-import com.app.bitwit.util.Callback;
 import com.app.bitwit.util.Empty;
 import com.app.bitwit.util.LoginAccount;
+import com.app.bitwit.util.SnackbarViewModel;
 import com.app.bitwit.util.StringUtils;
+import com.app.bitwit.util.subscription.SingleSubscription;
+import com.app.bitwit.util.subscription.Subscription;
+import com.app.bitwit.viewmodel.common.RxJavaViewModelSupport;
 import dagger.hilt.android.lifecycle.HiltViewModel;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.functions.Consumer;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 import lombok.Getter;
 import lombok.var;
 import org.jetbrains.annotations.Nullable;
@@ -26,7 +25,10 @@ import java.util.List;
 
 @Getter
 @HiltViewModel
-public class PostViewModel extends RxJavaViewModelSupport {
+public class PostViewModel extends RxJavaViewModelSupport implements SnackbarViewModel {
+    
+    private final PostRepository    postRepository;
+    private final AccountRepository accountRepository;
     
     private final MutableLiveData<Post> post = new MutableLiveData<>( );
     
@@ -38,11 +40,6 @@ public class PostViewModel extends RxJavaViewModelSupport {
     private final MutableLiveData<Comment>     commentSelected = new MutableLiveData<>( );
     private final MutableLiveData<CommentType> commentType     = new MutableLiveData<>(CommentType.COMMENT);
     
-    private final MutableLiveData<String> snackbar = new MutableLiveData<>( );
-    
-    private final PostRepository    postRepository;
-    private final AccountRepository accountRepository;
-    
     private LoginAccount account;
     
     private boolean likeChanged = false;
@@ -51,161 +48,94 @@ public class PostViewModel extends RxJavaViewModelSupport {
     public PostViewModel(PostRepository postRepository, AccountRepository accountRepository) {
         this.postRepository    = postRepository;
         this.accountRepository = accountRepository;
-        loadAccount( );
+        loadAccount( ).subscribe( );
     }
     
-    public void loadPost(Long postId) {
-        addDisposable(
-                postRepository
-                        .viewPost(postId)
-                        .subscribeOn(Schedulers.io( ))
-                        .observeOn(AndroidSchedulers.mainThread( ))
-                        .doOnSuccess(post -> postFlattenComments(post.getComments( )))
-                        .subscribe(post::postValue, e -> Log.e("ERROR", "refreshPost", e))
-        );
-    }
-    
-    
-    public void deletePost(Callback<Empty> callback) {
-        subscribe(callback, postRepository.deletePost(post.getValue( ).getId( )));
-    }
-    
-    public void createComment(Consumer<Comment> onSuccess, Consumer<Throwable> onError) {
-        String content = commentContent.getValue( ).trim( );
-        if (! isValidComment(content)) {
-            return;
-        }
-        var request = new CreateCommentRequest(content, post.getValue( ).getId( ), getParentId( ));
-        addDisposable(
-                postRepository
-                        .createComment(request)
-                        .subscribeOn(Schedulers.io( ))
-                        .observeOn(AndroidSchedulers.mainThread( ))
-                        .doOnSuccess(unused -> commentContent.postValue(""))
-                        .subscribe(onSuccess, onError)
-        );
-    }
-    
-    
-    public void updateComment(Consumer<Empty> onSuccess, Consumer<Throwable> onError) {
-        String content = commentContent.getValue( ).trim( );
-        if (! isValidComment(content)) {
-            return;
-        }
-        addDisposable(
-                postRepository
-                        .updateComment(commentSelected.getValue( ).getId( ), content)
-                        .subscribeOn(Schedulers.io( ))
-                        .observeOn(AndroidSchedulers.mainThread( ))
-                        .doOnSuccess(unused -> commentContent.postValue(""))
-                        .subscribe(onSuccess, onError)
-        );
-    }
-    
-    public void deleteComment(Long commentId) {
-        addDisposable(
-                postRepository
-                        .deleteComment(commentId)
-                        .subscribeOn(Schedulers.io( ))
-                        .observeOn(AndroidSchedulers.mainThread( ))
-                        .subscribe(
-                                empty -> {
-                                    snackbar.postValue("댓글을 삭제했어요");
-                                    reloadComments( );
-                                },
-                                e -> {
-                                    snackbar.postValue("문제가 생겨 댓글을 삭제하지 못했어요");
-                                    Log.e("PostViewModel", "deleteComment", e);
-                                }
-                        )
-        );
-        
-    }
-    
-    public void reloadComment(int position) {
-        Comment comment = flattenComments.getValue( ).get(position);
-        addDisposable(
-                postRepository
-                        .getCommentsOnPost(post.getValue( ).getId( ))
-                        .subscribeOn(Schedulers.io( ))
-                        .observeOn(AndroidSchedulers.mainThread( ))
-                        .subscribe(this::postFlattenComments, e -> snackbar.postValue("댓글을 불러오는 도중 문제가 발생했습니다"))
-        );
-    }
-    
-    public void reloadComments( ) {
-        addDisposable(
-                postRepository
-                        .getCommentsOnPost(post.getValue( ).getId( ))
-                        .subscribeOn(Schedulers.io( ))
-                        .observeOn(AndroidSchedulers.mainThread( ))
-                        .subscribe(this::postFlattenComments, e -> snackbar.postValue("댓글을 불러오는 도중 문제가 발생했습니다"))
-        );
-    }
-    
-    private void like( ) {
-        addDisposable(
-                postRepository
-                        .like(this.post.getValue( ).getId( ))
-                        .subscribeOn(Schedulers.io( ))
-                        .observeOn(AndroidSchedulers.mainThread( ))
-                        .subscribe(
-                                like -> { },
-                                e -> Log.e("ERROR", "likeByPosition", e)
-                        )
-        );
-    }
-    
-    private void unlike( ) {
-        addDisposable(
-                postRepository
-                        .unlike(this.post.getValue( ).getId( ))
-                        .subscribeOn(Schedulers.io( ))
-                        .observeOn(AndroidSchedulers.mainThread( ))
-                        .subscribe(
-                                like -> { },
-                                e -> Log.e("ERROR", "unlike", e)
-                        )
-        );
-    }
-    
-    public void likeComment(Long commentId, Consumer<Like> onSuccess) {
-        addDisposable(
-                postRepository
-                        .likeComment(commentId)
-                        .subscribeOn(Schedulers.io( ))
-                        .observeOn(AndroidSchedulers.mainThread( ))
-                        .subscribe(
-                                onSuccess,
-                                e -> Log.e("ERROR", "likeByPosition", e)
-                        )
-        );
-    }
-    
-    public void unlikeComment(Long commentId, Consumer<Like> onSuccess) {
-        addDisposable(
-                postRepository
-                        .unlikeComment(commentId)
-                        .subscribeOn(Schedulers.io( ))
-                        .observeOn(AndroidSchedulers.mainThread( ))
-                        .subscribe(
-                                onSuccess,
-                                e -> Log.e("ERROR", "likeByPosition", e)
-                        )
-        );
-    }
-    
-    public void loadAccount( ) {
-        addDisposable(
+    public Subscription<LoginAccount> loadAccount( ) {
+        return subscribe(
                 accountRepository
                         .loadAccount( )
-                        .subscribeOn(Schedulers.io( ))
-                        .observeOn(AndroidSchedulers.mainThread( ))
-                        .subscribe(
-                                loginAccount -> this.account = loginAccount,
-                                e -> snackbar.postValue("사용자 정보를 불러오는 도중 문제가 발생했습니다")
-                        )
+                        .doOnSuccess(loginAccount -> this.account = loginAccount)
+                        .doOnError(e -> setSnackbar("사용자 정보를 불러오는 도중 문제가 발생했어요"))
         );
+    }
+    
+    public Subscription<Post> loadPost(Long postId) {
+        return subscribe(
+                postRepository.
+                        viewPost(postId)
+                        .doOnSuccess(post -> postFlattenComments(post.getComments( )))
+                        .doOnSuccess(post::postValue)
+        );
+    }
+    
+    public Subscription<Empty> deletePost( ) {
+        return subscribe(
+                postRepository
+                        .deletePost(post.getValue( ).getId( ))
+                        .doOnError(e -> setSnackbar("게시글을 삭제하는 도중 문제가 발생했어요"))
+        );
+    }
+    
+    public Subscription<Comment> createComment( ) {
+        String content = commentContent.getValue( ).trim( );
+        if (! isValidComment(content)) {
+            return unsubscribe( );
+        }
+        var request = new CreateCommentRequest(content, post.getValue( ).getId( ), getParentId( ));
+        return subscribe(
+                postRepository
+                        .createComment(request)
+                        .doOnSuccess(comment -> commentContent.postValue(""))
+                        .doOnError(e -> setSnackbar("댓글을 등록하는 도중 문제가 발생했어요"))
+        );
+    }
+    
+    public Subscription<Empty> updateComment( ) {
+        String content = commentContent.getValue( ).trim( );
+        if (! isValidComment(content)) {
+            return unsubscribe( );
+        }
+        return subscribe(
+                postRepository
+                        .updateComment(commentSelected.getValue( ).getId( ), content)
+                        .doOnSuccess(unused -> commentContent.postValue(""))
+                        .doOnError(e -> setSnackbar("댓글을 수정하는 도중 문제가 발생했어요"))
+        );
+    }
+    
+    public Subscription<Empty> deleteComment(Long commentId) {
+        return subscribe(
+                postRepository
+                        .deleteComment(commentId)
+                        .doOnSuccess(empty -> setSnackbar("댓글을 삭제했어요"))
+                        .doOnError(e -> setSnackbar("댓글을 삭제하는 도중 문제가 발생했어요"))
+        );
+    }
+    
+    public Subscription<List<Comment>> reloadComments( ) {
+        return subscribe(
+                postRepository
+                        .getCommentsOnPost(post.getValue( ).getId( ))
+                        .doOnSuccess(this::postFlattenComments)
+                        .doOnError(e -> setSnackbar("댓글을 불러오는 도중 문제가 발생했습니다"))
+        );
+    }
+    
+    private SingleSubscription<Like> like( ) {
+        return subscribe(postRepository.like(this.post.getValue( ).getId( )));
+    }
+    
+    private Subscription<Like> unlike( ) {
+        return subscribe(postRepository.unlike(this.post.getValue( ).getId( )));
+    }
+    
+    public Subscription<Like> likeComment(Long commentId) {
+        return subscribe(postRepository.likeComment(commentId));
+    }
+    
+    public Subscription<Like> unlikeComment(Long commentId) {
+        return subscribe(postRepository.unlikeComment(commentId));
     }
     
     private void postFlattenComments(List<Comment> nestedComments) {
@@ -236,12 +166,7 @@ public class PostViewModel extends RxJavaViewModelSupport {
     
     public void commitLike( ) {
         if (likeChanged) {
-            if (post.getValue( ).isLike( )) {
-                like( );
-            }
-            else {
-                unlike( );
-            }
+            (post.getValue( ).isLike( ) ? like( ) : unlike( )).subscribe( );
         }
     }
     
@@ -249,7 +174,7 @@ public class PostViewModel extends RxJavaViewModelSupport {
         if (StringUtils.hasText(content)) {
             return true;
         }
-        snackbar.postValue("댓글을 다시 확인해주세요");
+        setSnackbar("댓글을 다시 확인해주세요");
         return false;
     }
     
@@ -267,10 +192,6 @@ public class PostViewModel extends RxJavaViewModelSupport {
                 break;
         }
         return parentId;
-    }
-    
-    public void setSnackbar(String message) {
-        snackbar.postValue(message);
     }
     
     public void setCommentContent(String message) {

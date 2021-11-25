@@ -1,7 +1,6 @@
 package com.app.bitwit.util;
 
 import android.net.http.SslError;
-import android.util.Log;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
@@ -17,7 +16,6 @@ public class HttpWebViewClient extends WebViewClient {
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
         view.loadUrl(request.getUrl( ).toString( ));
-        Log.i("URL", request.getUrl( ).toString( ));
         return true;
     }
     

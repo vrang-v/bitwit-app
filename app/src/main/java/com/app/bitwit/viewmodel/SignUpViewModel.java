@@ -6,9 +6,10 @@ import com.app.bitwit.data.repository.AccountRepository;
 import com.app.bitwit.data.source.remote.dto.request.CreateAccountRequest;
 import com.app.bitwit.data.source.remote.dto.request.GoogleLoginRequest;
 import com.app.bitwit.data.source.remote.dto.response.LoginResponse;
-import com.app.bitwit.util.Callback;
 import com.app.bitwit.util.SnackbarViewModel;
 import com.app.bitwit.util.StringUtils;
+import com.app.bitwit.util.subscription.Subscription;
+import com.app.bitwit.viewmodel.common.RxJavaViewModelSupport;
 import dagger.hilt.android.lifecycle.HiltViewModel;
 import lombok.Getter;
 import lombok.var;
@@ -32,16 +33,16 @@ public class SignUpViewModel extends RxJavaViewModelSupport implements SnackbarV
         this.accountRepository = accountRepository;
     }
     
-    public void checkForDuplicateEmail(Callback<Boolean> callback) {
+    public Subscription<Boolean> checkForDuplicateEmail( ) {
         var request = new CreateAccountRequest("init", email.getValue( ), password.getValue( ));
-        
-        if (! isValidRequest(request)) { return; }
-        
-        subscribe(callback, accountRepository.isDuplicateEmail(request.getEmail( )));
+        if (! isValidRequest(request)) {
+            return unsubscribe( );
+        }
+        return subscribe(accountRepository.isDuplicateEmail(request.getEmail( )));
     }
     
-    public void googleLogin(GoogleLoginRequest request, Callback<LoginResponse> callback) {
-        subscribe(callback, accountRepository.googleLogin(request));
+    public Subscription<LoginResponse> googleLogin(GoogleLoginRequest request) {
+        return subscribe(accountRepository.googleLogin(request));
     }
     
     private boolean isValidRequest(CreateAccountRequest request) {

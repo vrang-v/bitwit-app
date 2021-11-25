@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="com.app.bitwit.util.TransitionNames" />
+
+        <import type="android.view.View" />
+
+        <variable
+            name="voteItem"
+            type="com.app.bitwit.dto.VoteItemDto" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_marginTop="17dp"
+        android:layout_marginBottom="17dp"
+        android:clickable="true"
+        android:elevation="8dp"
+        android:focusable="true"
+        android:orientation="vertical"
+        bind:background="@{voteItem.background}">
+
+        <TextView
+            android:id="@+id/status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="8dp"
+            android:text="@{voteItem.status, default=상태}"
+            android:textColor="@{voteItem.voteTextColor}"
+            android:textSize="14dp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@+id/tag"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tag"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{voteItem.tag}"
+            android:textColor="#444"
+            android:textSize="12dp"
+            app:layout_constraintBottom_toBottomOf="@+id/status"
+            app:layout_constraintEnd_toStartOf="@+id/participantCount"
+            app:layout_constraintHorizontal_weight="0.5"
+            app:layout_constraintStart_toEndOf="@+id/status"
+            app:layout_constraintTop_toTopOf="@+id/status" />
+
+        <TextView
+            android:id="@+id/participantCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:autoSizeTextType="uniform"
+            android:gravity="end"
+            android:maxLines="1"
+            android:text="@{voteItem.participantCount}"
+            android:textColor="#444"
+            android:textSize="13dp"
+            android:textStyle="bold"
+            android:transitionName="@{TransitionNames.PARTICIPANT_COUNT}"
+            app:layout_constraintBaseline_toBaselineOf="@+id/status"
+            app:layout_constraintEnd_toStartOf="@+id/participantCountBase"
+            app:layout_constraintStart_toEndOf="@+id/tag" />
+
+        <TextView
+            android:id="@+id/participantCountBase"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:autoSizeTextType="uniform"
+            android:gravity="end"
+            android:maxLines="1"
+            android:text="명 참여 중"
+            android:textColor="#444"
+            android:textSize="13dp"
+            android:textStyle="bold"
+            android:transitionName="@{TransitionNames.PARTICIPANT_COUNT_BASE}"
+            app:layout_constraintBaseline_toBaselineOf="@+id/participantCount"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/englishTicker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="36dp"
+            android:layout_marginEnd="8dp"
+            android:text="@{voteItem.ticker, default=티커}"
+            android:textColor="#000"
+            android:textSize="26dp"
+            android:textStyle="bold"
+            android:transitionName="@{TransitionNames.TICKER}"
+            app:layout_constraintEnd_toStartOf="@+id/koreanName"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toStartOf="@+id/status"
+            app:layout_constraintTop_toBottomOf="@+id/status" />
+
+        <TextView
+            android:id="@+id/koreanName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{voteItem.koreanName, default=한글이름}"
+            android:textColor="#000"
+            android:textSize="14dp"
+            android:maxLines="1"
+            android:ellipsize="marquee"
+            android:transitionName="@{TransitionNames.KOREAN_NAME}"
+            app:layout_constraintBaseline_toBaselineOf="@id/englishTicker"
+            app:layout_constraintEnd_toStartOf="@+id/fluctuateRate"
+            app:layout_constraintHorizontal_weight="0.8"
+            app:layout_constraintStart_toEndOf="@+id/englishTicker" />
+
+        <TextView
+            android:id="@+id/fluctuateRate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:maxLines="1"
+            android:text="@{voteItem.fluctuateRate, default=변동률}"
+            android:textColor="@{voteItem.stockTextColor}"
+            android:textSize="18dp"
+            android:textStyle="bold"
+            app:layout_constraintBaseline_toBaselineOf="@+id/englishTicker"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/realTimeFluctuation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:text="@{voteItem.realTimeFluctuation, default=실시간변동}"
+            android:textColor="@{voteItem.fluctuationTextColor}"
+            android:textSize="14dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/stockPrice"
+            app:layout_constraintEnd_toEndOf="@+id/stockPrice" />
+
+        <TextView
+            android:id="@+id/stockPrice"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:gravity="end"
+            android:maxLines="1"
+            android:text="@{voteItem.currentPrice, default=현재가}"
+            android:textColor="@{voteItem.stockTextColor}"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            app:layout_constraintBaseline_toBaselineOf="@+id/englishTicker"
+            app:layout_constraintEnd_toEndOf="@+id/participantCountBase"
+            app:layout_constraintHorizontal_weight="1.8"
+            app:layout_constraintStart_toEndOf="@+id/fluctuateRate" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/ifNotParticipateVisible"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="24dp"
+            android:paddingStart="15dp"
+            android:paddingEnd="15dp"
+            android:visibility="@{voteItem.participated ? View.GONE : View.VISIBLE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/englishTicker">
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginEnd="16dp"
+                android:background="#959595"
+                app:layout_constraintBottom_toBottomOf="@+id/textView4"
+                app:layout_constraintEnd_toStartOf="@+id/textView4"
+                app:layout_constraintHorizontal_weight="0.2"
+                app:layout_constraintTop_toTopOf="@+id/textView4" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginStart="16dp"
+                android:background="#959595"
+                app:layout_constraintBottom_toBottomOf="@+id/textView4"
+                app:layout_constraintHorizontal_weight="0.2"
+                app:layout_constraintStart_toEndOf="@+id/textView4"
+                app:layout_constraintTop_toTopOf="@+id/textView4" />
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="투표에 참여하고 결과를 확인하세요"
+                android:textColor="#5E5E5E"
+                android:textSize="12dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_weight="1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/button_increment"
+                android:layout_width="0dp"
+                android:layout_height="35dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/round_corner_button_red"
+                android:stateListAnimator="@null"
+                android:text="매수 추천"
+                android:textColor="#FFFFFF"
+                android:textSize="14dp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@+id/button_decrement"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView4" />
+
+            <Button
+                android:id="@+id/button_decrement"
+                android:layout_width="0dp"
+                android:layout_height="35dp"
+                android:layout_marginStart="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/round_corner_button_blue"
+                android:stateListAnimator="@null"
+                android:text="매도 추천"
+                android:textColor="#FFFFFF"
+                android:textSize="14dp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/button_increment"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/button_increment"
+                app:layout_constraintTop_toTopOf="@+id/button_increment" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/ifParticipateVisible"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="36dp"
+            android:layout_marginBottom="8dp"
+            android:visibility="@{voteItem.participated ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/participantCount"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="@+id/status"
+            app:layout_constraintTop_toBottomOf="@+id/englishTicker"
+            app:layout_constraintVertical_bias="1.0">
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:maxLines="1"
+                android:text="매수"
+                android:textColor="#FF7060"
+                android:textSize="11dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/incrementRate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="7dp"
+                android:maxLines="1"
+                android:text="@{voteItem.incrementRate}"
+                android:textColor="#FF7060"
+                android:textSize="15dp"
+                android:textStyle="bold"
+                android:transitionName="@{TransitionNames.INCREMENT_RATE}"
+                app:layout_constraintBaseline_toBaselineOf="@+id/textView"
+                app:layout_constraintStart_toEndOf="@+id/textView" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="24dp"
+                android:maxLines="1"
+                android:text="매도"
+                android:textColor="#1E83F3"
+                android:textSize="11dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/decrementRate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="7dp"
+                android:maxLines="1"
+                android:text="@{voteItem.decrementRate}"
+                android:textColor="#1E83F3"
+                android:textSize="15dp"
+                android:textStyle="bold"
+                android:transitionName="@{TransitionNames.DECREMENT_RATE}"
+                app:layout_constraintBaseline_toBaselineOf="@+id/textView2"
+                app:layout_constraintEnd_toStartOf="@+id/textView2" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/voteStatusBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
+                android:transitionName="@{TransitionNames.VOTE_STATUS_BAR}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView">
+
+                <View
+                    android:id="@+id/incrementBar"
+                    android:layout_width="0dp"
+                    android:layout_height="5dp"
+                    android:background="@drawable/round_corner_bar_red"
+                    app:layout_constraintEnd_toStartOf="@+id/decrementBar"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    bind:layout_constraintHorizontal_weight="@{voteItem.incrementBarWeight}" />
+
+                <View
+                    android:id="@+id/decrementBar"
+                    android:layout_width="0dp"
+                    android:layout_height="5dp"
+                    android:background="@drawable/round_corner_bar_blue"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/incrementBar"
+                    app:layout_constraintTop_toTopOf="parent"
+                    bind:layout_constraintHorizontal_weight="@{voteItem.decrementBarWeight}" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="투표 결과"
+                android:textSize="11dp"
+                android:textStyle="bold"
+                app:layout_constraintBaseline_toBaselineOf="@+id/textView"
+                app:layout_constraintEnd_toStartOf="@+id/textView2"
+                app:layout_constraintStart_toEndOf="@+id/textView" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

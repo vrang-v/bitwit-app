@@ -1,5 +1,7 @@
 package com.app.bitwit.view.activity;
 
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.os.Bundle;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -17,14 +19,15 @@ import com.app.bitwit.view.adapter.TickerAdapter;
 import com.app.bitwit.view.dialog.NicknameSettingDialog;
 import com.app.bitwit.viewmodel.PostViewModel;
 import com.app.bitwit.viewmodel.PostViewModel.CommentType;
+import com.bumptech.glide.Glide;
 import com.google.android.material.snackbar.Snackbar;
 import dagger.hilt.android.AndroidEntryPoint;
 import lombok.var;
 
+import static com.app.bitwit.util.StringUtils.hasText;
 import static com.app.bitwit.util.livedata.LiveDataUtils.observe;
 import static com.app.bitwit.util.livedata.LiveDataUtils.observeAll;
 import static com.app.bitwit.util.livedata.LiveDataUtils.observeHasText;
-import static com.app.bitwit.util.StringUtils.hasText;
 import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT;
 
 @AndroidEntryPoint
@@ -46,6 +49,15 @@ public class PostActivity extends AppCompatActivity {
                 Snackbar.make(binding.getRoot( ), s, LENGTH_SHORT).show( )
         );
         
+        observe(this, viewModel.getPost( ), post -> {
+            var profileImageUrl = post.getWriter( ).getProfileImageUrl( );
+            if (hasText(profileImageUrl)) {
+                Glide.with(this)
+                     .load(profileImageUrl)
+                     .into(binding.profileImage);
+            }
+        });
+        
         observe(this, viewModel.getCommentContent( ), s -> {
             viewModel.setCommentLengthInfo(s.trim( ).length( ) + "/100");
             binding.commentConfirm.setEnabled(hasText(s));
@@ -62,7 +74,7 @@ public class PostActivity extends AppCompatActivity {
                 case COMMENT_REPLY:
                 case REPLY_REPLY:
                     String toName = selected.getWriter( ).getName( );
-                    String myName = viewModel.getAccount( ).getName( );
+                    String myName = viewModel.getAccount( ).getValue( ).getName( );
                     if (toName.equals(myName)) {
                         viewModel.setCommentDetail(hasText ? "나에게 남길 답글을 작성하고 있어요" : blackCommentMessage);
                     }
@@ -95,7 +107,7 @@ public class PostActivity extends AppCompatActivity {
         
         binding.commentConfirm.setOnClickListener(v -> {
             hideSoftKeyboard( );
-            if (! hasAccountName(viewModel.getAccount( ))) {
+            if (! hasAccountName(viewModel.getAccount( ).getValue( ))) {
                 showNicknameSettingDialog( );
                 return;
             }
@@ -106,7 +118,7 @@ public class PostActivity extends AppCompatActivity {
             }
             else {
                 viewModel.createComment( )
-                         .then(empty -> viewModel.reloadComments( ))
+                         .then(comment -> viewModel.reloadComments( ))
                          .subscribe( );
             }
         });
@@ -143,6 +155,7 @@ public class PostActivity extends AppCompatActivity {
                     break;
                 case DELETE:
                     viewModel.deleteComment(comment.getId( ))
+                             .onSuccess(empty -> Snackbar.make(binding.getRoot( ), "댓글을 삭제했어요", LENGTH_SHORT).show( ))
                              .then(empty -> viewModel.reloadComments( ))
                              .subscribe( );
                     break;

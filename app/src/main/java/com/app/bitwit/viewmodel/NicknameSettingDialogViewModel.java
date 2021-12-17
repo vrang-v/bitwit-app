@@ -42,7 +42,7 @@ public class NicknameSettingDialogViewModel extends RxJavaViewModelSupport {
     
     public Subscription<Account> changeNickname( ) {
         if (! Objects.equals(valid.getValue( ), TRUE)) {
-            return unsubscribe( );
+            return empty( );
         }
         var request = new UpdateAccountRequest( );
         request.setNickname(nickname.getValue( ));

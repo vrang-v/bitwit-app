@@ -1,7 +1,6 @@
 package com.app.bitwit.domain;
 
 import android.annotation.SuppressLint;
-import com.app.bitwit.data.source.remote.dto.response.AccountResponse;
 import com.app.bitwit.util.TimeUtils;
 import com.google.gson.annotations.SerializedName;
 import lombok.Data;
@@ -17,7 +16,9 @@ public class Comment {
     
     String content;
     
-    AccountResponse writer;
+    Post post;
+    
+    Account writer;
     
     int depth;
     

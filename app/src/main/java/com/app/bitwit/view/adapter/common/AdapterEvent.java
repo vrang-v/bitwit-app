@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class AdapterEvent<T, E extends RecyclerViewEvent> {
+public class AdapterEvent<T, E extends AdapterEventType> {
     
     private T    item;
     private E    event;

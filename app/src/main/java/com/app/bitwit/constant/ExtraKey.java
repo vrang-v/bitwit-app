@@ -9,4 +9,7 @@ public interface ExtraKey {
     String SIGN_IN_SUCCESS = "123";
     
     String POST_ID = "postId";
+    
+    String LOGOUT = "logout";
+    
 }

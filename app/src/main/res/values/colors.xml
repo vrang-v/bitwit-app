@@ -19,7 +19,7 @@
     <color name="colorBasic">#FFF</color>
     <color name="colorContrast">#FFDF00</color>
     <color name="correct">#44A548</color>
-    <color name="colorWarning">#DB4455</color>
+    <color name="colorWarning">#F44336</color>
     <color name="colorWarningLight">#ff5454</color>
     <color name="blind">#7000</color>
     <color name="incrementText">#FF3E3E</color>

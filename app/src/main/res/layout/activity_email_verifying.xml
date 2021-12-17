@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="viewModel"
+            type="com.app.bitwit.viewmodel.EmailVerifyingViewModel" />
+    </data>
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".view.activity.auth.EmailVerifyingActivity">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineY20"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent=".2" />
+    
+    <TextView
+        android:id="@+id/textView19"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="이메일 인증"
+        android:textColor="@color/colorAccent"
+        android:textSize="25dp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/guidelineY20" />
+
+    <TextView
+        android:id="@+id/message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center"
+        android:text="@{viewModel.infoMessage == null ? @string/loginMessage : viewModel.infoMessage}"
+        android:textSize="13dp"
+        android:textColor="@{viewModel.isWarning ? @color/colorWarning : @color/black}"
+        android:lineSpacingExtra="6dp"
+        app:layout_constraintBottom_toTopOf="@+id/resendEmailBtn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView19" />
+    
+    <Button
+        android:id="@+id/resendEmailBtn"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:stateListAnimator="@null"
+        android:text="메일 다시 보내기"
+        android:textSize="15dp"
+        android:textColor="@color/colorAccent"
+        android:background="@drawable/button_round"
+        android:enabled="@{viewModel.resendBtnEnable}"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/confirmBtn"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:backgroundTint="@color/colorAccent"
+        android:stateListAnimator="@null"
+        android:layout_marginTop="24dp"
+        android:text="인증 확인"
+        android:textColor="@color/colorBasic"
+        android:textSize="15dp"
+        style="@style/Widget.AppCompat.Button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/resendEmailBtn"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

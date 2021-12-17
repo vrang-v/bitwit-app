@@ -48,7 +48,7 @@ public class SearchActivityViewModel extends RxJavaViewModelSupport {
     public Subscription<List<SearchItem>> search(String keyword) {
         if (keyword.isEmpty( )) {
             stocks.postValue(new ArrayList<>( ));
-            return unsubscribe( );
+            return empty( );
         }
         
         return subscribe(

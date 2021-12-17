@@ -10,7 +10,7 @@ import com.app.bitwit.databinding.ItemVoteBinding;
 import com.app.bitwit.dto.VoteItemDto;
 import com.app.bitwit.view.adapter.VoteItemAdapter.VoteItemAdapterEvent;
 import com.app.bitwit.view.adapter.common.EventAdapter;
-import com.app.bitwit.view.adapter.common.RecyclerViewEvent;
+import com.app.bitwit.view.adapter.common.AdapterEventType;
 import lombok.var;
 
 import static android.view.animation.AnimationUtils.loadAnimation;
@@ -32,7 +32,7 @@ public class VoteItemAdapter extends EventAdapter<VoteItem, VoteItemAdapterEvent
         return new VoteItemHolder(binding);
     }
     
-    public enum VoteItemAdapterEvent implements RecyclerViewEvent {
+    public enum VoteItemAdapterEvent implements AdapterEventType {
         INCREMENT_BTN_CLICK, DECREMENT_BTN_CLICK, LAYOUT_CLICK
     }
     

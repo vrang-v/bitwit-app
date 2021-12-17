@@ -27,4 +27,18 @@ public class HttpUtils {
         }
         return Empty.getInstance( );
     }
+    
+    public static <T> Response<T> filterHttpError(Response<T> response, int errorCode) throws IOException {
+        if (! response.isSuccessful( ) && response.code( ) == errorCode) {
+            throw new BitwitHttpException(response);
+        }
+        return response;
+    }
+    
+    public static <T> Response<T> filter429Error(Response<T> response) throws IOException {
+        if (! response.isSuccessful( ) && response.code( ) == 429) {
+            throw new BitwitHttpException(response);
+        }
+        return response;
+    }
 }

@@ -26,8 +26,8 @@ public class RxJavaViewModelSupport extends ViewModel {
         return new CompletableSubscription(completable, compositeDisposable);
     }
     
-    public <T> Subscription<T> unsubscribe( ) {
-        return ( ) -> { };
+    public <T> Subscription<T> empty( ) {
+        return Subscription.empty( );
     }
     
     @Override

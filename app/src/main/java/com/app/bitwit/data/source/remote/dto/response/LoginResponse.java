@@ -18,4 +18,6 @@ public class LoginResponse {
     String email;
     
     String name;
+    
+    boolean emailVerified;
 }

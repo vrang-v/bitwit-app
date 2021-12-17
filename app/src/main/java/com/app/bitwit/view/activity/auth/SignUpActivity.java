@@ -1,8 +1,13 @@
 package com.app.bitwit.view.activity.auth;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
+import android.transition.Fade;
+import android.transition.Slide;
+import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.Window;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,9 +25,9 @@ import com.google.android.material.snackbar.Snackbar;
 import dagger.hilt.android.AndroidEntryPoint;
 import lombok.var;
 
-import static com.app.bitwit.util.livedata.LiveDataUtils.observe;
 import static com.app.bitwit.util.StringUtils.isEmailFormat;
 import static com.app.bitwit.util.google.GoogleSignInUtils.getGoogleSignInAccount;
+import static com.app.bitwit.util.livedata.LiveDataUtils.observe;
 import static com.app.bitwit.view.activity.auth.SignUpProcessActivity.RESULT_FAILURE;
 import static com.app.bitwit.view.activity.auth.SignUpProcessActivity.RESULT_SUCCESS;
 import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT;
@@ -70,12 +75,10 @@ public class SignUpActivity extends AppCompatActivity {
         
         observe(this, viewModel.getEmail( ), email -> {
             if (isEmailFormat(email)) {
-                binding.signUpText1.setText("");
-                binding.signUpText2.setText("");
+                viewModel.initMessage( );
             }
             else {
-                binding.signUpText1.setText("올바른 이메일이 맞나요?");
-                binding.signUpText2.setText("다시 한번 확인해 주세요");
+                viewModel.setInfoMessage("올바른 이메일 형식인가요?\n다시 한번 확인해 주세요");
             }
         });
         
@@ -87,10 +90,10 @@ public class SignUpActivity extends AppCompatActivity {
                                  return;
                              }
                              if (isDuplicate) {
-                                 binding.warningText.setText("이미 존재하는 이메일입니다.");
+                                 viewModel.setWarningMessage("이미 가입된 이메일이 있습니다.");
                              }
                              else {
-                                 binding.warningText.setText("");
+                                 viewModel.initMessage( );
                                  var intent = new Intent(this, SignUpProcessActivity.class)
                                          .putExtra(ExtraKey.EMAIL, viewModel.getEmail( ).getValue( ))
                                          .putExtra(ExtraKey.PASSWORD, viewModel.getPassword( ).getValue( ));
@@ -98,7 +101,7 @@ public class SignUpActivity extends AppCompatActivity {
                              }
                          })
                          .onError(e ->
-                                 viewModel.setSnackbar("인증 도중 문제가 발생했습니다. 다시 시도해주세요.")
+                                 viewModel.setWarningMessage("서버에 문제가 발생했습니다\n잠시 후 다시 시도해주세요")
                          )
                          .subscribe( )
         );
@@ -123,7 +126,7 @@ public class SignUpActivity extends AppCompatActivity {
                      startActivity(intent);
                      finish( );
                  })
-                 .onError(e -> binding.warningText.setText("구글 회원가입 실패"))
+                 .onError(e -> viewModel.setWarningMessage("구글 회원가입 실패"))
                  .subscribe( );
     }
     

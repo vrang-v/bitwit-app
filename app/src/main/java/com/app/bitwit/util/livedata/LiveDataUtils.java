@@ -59,8 +59,8 @@ public class LiveDataUtils {
         });
     }
     
-    public static <T1> void observe(final LifecycleOwner lifecycleOwner, final LiveData<T1> liveData1, final Consumer<T1> consumer) {
-        liveData1.observe(lifecycleOwner, consumer::accept);
+    public static <T> void observe(final LifecycleOwner lifecycleOwner, final LiveData<T> liveData, final Consumer<T> consumer) {
+        liveData.observe(lifecycleOwner, consumer::accept);
     }
     
     public static <T1, T2> void observeAll(final LifecycleOwner lifecycleOwner, final LiveData<T1> liveData1, final LiveData<T2> liveData2, final BiConsumer<T1, T2> consumer) {

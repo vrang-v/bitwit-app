@@ -69,7 +69,7 @@ public class VoteItemDto {
         
         switch (getStatus(voteItem)) {
             case NOT_PARTICIPATE:
-                this.background = R.drawable.round_corner_grey;
+                this.background = R.drawable.round_corner_gray;
                 this.voteTextColor = Color.BLACK;
                 this.status = "투표 미참여";
                 break;

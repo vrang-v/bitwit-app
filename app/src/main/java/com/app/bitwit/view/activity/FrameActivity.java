@@ -16,9 +16,10 @@ import androidx.transition.Transition;
 import androidx.transition.TransitionManager;
 import com.app.bitwit.R;
 import com.app.bitwit.databinding.ActivityFrameBinding;
-import com.app.bitwit.viewmodel.common.SnackbarViewModel;
+import com.app.bitwit.view.fragment.AccountFragment;
 import com.app.bitwit.view.fragment.HomeFragment;
 import com.app.bitwit.view.fragment.PostFragment;
+import com.app.bitwit.viewmodel.common.SnackbarViewModel;
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior;
 import com.google.android.material.snackbar.Snackbar;
 import dagger.hilt.android.AndroidEntryPoint;
@@ -31,9 +32,9 @@ public class FrameActivity extends AppCompatActivity {
     
     private final FragmentManager fragmentManager = getSupportFragmentManager( );
     
-    private final HomeFragment homeFragment  = new HomeFragment( );
-    private final PostFragment postFragment  = new PostFragment( );
-    private final HomeFragment homeFragment2 = new HomeFragment( );
+    private final HomeFragment    homeFragment    = new HomeFragment( );
+    private final PostFragment    postFragment    = new PostFragment( );
+    private final AccountFragment accountFragment = new AccountFragment( );
     
     private ActivityFrameBinding binding;
     
@@ -56,16 +57,13 @@ public class FrameActivity extends AppCompatActivity {
                 case R.id.home:
                     fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                     changeFragment(homeFragment);
-                    setNavigationViewBehavior(new HideBottomViewOnScrollBehavior<>( ));
                     break;
                 case R.id.post:
                     changeFragment(postFragment);
-                    setNavigationViewBehavior(null);
                     break;
                 case R.id.account:
                     fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                    changeFragment(homeFragment2);
-                    setNavigationViewBehavior(new HideBottomViewOnScrollBehavior<>( ));
+                    changeFragment(accountFragment);
                     break;
                 default:
                     break;

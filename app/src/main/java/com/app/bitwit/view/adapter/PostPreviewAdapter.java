@@ -8,7 +8,7 @@ import com.app.bitwit.databinding.ItemPostPreviewBinding;
 import com.app.bitwit.dto.PostPreviewItem;
 import com.app.bitwit.view.adapter.PostPreviewAdapter.PostPreviewAdapterEvent;
 import com.app.bitwit.view.adapter.common.EventAdapter;
-import com.app.bitwit.view.adapter.common.RecyclerViewEvent;
+import com.app.bitwit.view.adapter.common.AdapterEventType;
 import lombok.var;
 
 import static android.view.animation.AnimationUtils.loadAnimation;
@@ -22,7 +22,7 @@ public class PostPreviewAdapter extends EventAdapter<PostPreviewItem, PostPrevie
         return new PostPreviewAdapter.PostPreviewAdapterViewHolder(binding);
     }
     
-    public enum PostPreviewAdapterEvent implements RecyclerViewEvent {
+    public enum PostPreviewAdapterEvent implements AdapterEventType {
         CLICK
     }
     

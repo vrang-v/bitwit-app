@@ -7,6 +7,7 @@ import com.app.bitwit.data.source.remote.dto.request.UpdateCommentRequest;
 import com.app.bitwit.domain.Comment;
 import com.app.bitwit.domain.Like;
 import com.app.bitwit.domain.Post;
+import com.app.bitwit.dto.Page;
 import com.app.bitwit.util.Empty;
 import com.app.bitwit.util.HttpUtils;
 import io.reactivex.rxjava3.core.Single;
@@ -113,6 +114,30 @@ public class PostRepository {
     public Single<List<Post>> getMostViewedPostPage(int page, int size) {
         return postServiceClient
                 .getPostPageOrderByViewCountDesc(page, size)
+                .map(HttpUtils::get2xxBody);
+    }
+    
+    public Single<List<Post>> getRecentlyPostPageByWriterName(String name, int page, int size) {
+        return postServiceClient
+                .getPostPageByWriterNameOrderByCreatedAtDesc(name, page, size)
+                .map(HttpUtils::get2xxBody);
+    }
+    
+    public Single<List<Post>> getPostPageByLikerId(Long likerId, int page, int size) {
+        return postServiceClient
+                .getPostPageByLikerId(likerId, page, size)
+                .map(HttpUtils::get2xxBody);
+    }
+    
+    public Single<Page<Comment>> getCommentPageByWriterId(Long writerId, int page, int size) {
+        return postServiceClient
+                .getCommentPageByWriterId(writerId, page, size)
+                .map(HttpUtils::get2xxBody);
+    }
+    
+    public Single<Page<Comment>> getCommentPageByLikerId(Long likerId, int page, int size) {
+        return postServiceClient
+                .getCommentPageByLikerId(likerId, page, size)
                 .map(HttpUtils::get2xxBody);
     }
 }

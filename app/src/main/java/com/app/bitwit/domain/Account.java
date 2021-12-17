@@ -22,4 +22,11 @@ public class Account {
     String email;
     
     String password;
+    
+    String accountType;
+    
+    Boolean emailVerified;
+    
+    @SerializedName("profileImage")
+    String profileImageUrl;
 }

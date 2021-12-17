@@ -7,7 +7,7 @@ import com.app.bitwit.databinding.ItemTickerBinding;
 import com.app.bitwit.domain.Stock;
 import com.app.bitwit.view.adapter.TickerAdapter.TickerAdapterEvent;
 import com.app.bitwit.view.adapter.common.EventAdapter;
-import com.app.bitwit.view.adapter.common.RecyclerViewEvent;
+import com.app.bitwit.view.adapter.common.AdapterEventType;
 import lombok.var;
 
 import static android.util.TypedValue.COMPLEX_UNIT_DIP;
@@ -27,7 +27,7 @@ public class TickerAdapter extends EventAdapter<Stock, TickerAdapterEvent> {
         this.tickerFontSize = tickerFontSize;
     }
     
-    public enum TickerAdapterEvent implements RecyclerViewEvent { }
+    public enum TickerAdapterEvent implements AdapterEventType { }
     
     public class ViewHolder extends EventAdapter<Stock, TickerAdapterEvent>.EventViewHolder {
         

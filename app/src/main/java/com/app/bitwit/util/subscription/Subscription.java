@@ -7,6 +7,10 @@ import io.reactivex.rxjava3.functions.Function;
 @FunctionalInterface
 public interface Subscription<T> {
     
+    static <T> Subscription<T> empty( ) {
+        return ( ) -> { };
+    }
+    
     void subscribe( );
     
     default Subscription<T> onSuccess(Consumer<T> onSuccess) {

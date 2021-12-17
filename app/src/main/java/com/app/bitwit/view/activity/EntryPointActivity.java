@@ -27,7 +27,13 @@ public class EntryPointActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Consumer<LoginResponse> onSuccess = account -> {
-            var intent = new Intent(getApplicationContext( ), FrameActivity.class);
+            Intent intent;
+            if (account.isEmailVerified( )) {
+                intent = new Intent(getApplicationContext( ), FrameActivity.class);
+            }
+            else {
+                intent = new Intent(getApplicationContext( ), LoginActivity.class);
+            }
             startActivity(intent);
             finish( );
         };

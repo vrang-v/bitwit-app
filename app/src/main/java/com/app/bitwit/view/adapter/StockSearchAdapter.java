@@ -7,7 +7,7 @@ import com.app.bitwit.databinding.ItemStockSearchBinding;
 import com.app.bitwit.dto.SearchItem;
 import com.app.bitwit.view.adapter.StockSearchAdapter.StockSearchEvent;
 import com.app.bitwit.view.adapter.common.EventAdapter;
-import com.app.bitwit.view.adapter.common.RecyclerViewEvent;
+import com.app.bitwit.view.adapter.common.AdapterEventType;
 import lombok.var;
 
 import static com.app.bitwit.view.adapter.StockSearchAdapter.StockSearchEvent.DECREMENT_BTN;
@@ -45,7 +45,7 @@ public class StockSearchAdapter extends EventAdapter<SearchItem, StockSearchEven
         return new StockSearchViewHolder(binding);
     }
     
-    public enum StockSearchEvent implements RecyclerViewEvent {
+    public enum StockSearchEvent implements AdapterEventType {
         INCREMENT_BTN, DECREMENT_BTN, ROOT
     }
     

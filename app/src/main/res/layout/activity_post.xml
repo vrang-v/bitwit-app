@@ -30,8 +30,8 @@
         <Button
             android:id="@+id/backBtn"
             style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="@dimen/top_bar_back_btn"
-            android:layout_height="@dimen/top_bar_back_btn"
+            android:layout_width="@dimen/top_bar_back_btn_size"
+            android:layout_height="@dimen/top_bar_back_btn_size"
             android:layout_marginStart="@dimen/top_bar_margin"
             android:background="@drawable/outline_arrow_back_24"
             app:layout_constraintBottom_toTopOf="@+id/topBar"
@@ -41,8 +41,8 @@
         <Button
             android:id="@+id/board"
             style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="@dimen/top_bar_btn"
-            android:layout_height="@dimen/top_bar_btn"
+            android:layout_width="@dimen/top_bar_btn_size"
+            android:layout_height="@dimen/top_bar_btn_size"
             android:layout_marginStart="@dimen/top_bar_margin"
             android:background="@drawable/outline_question_answer_24"
             app:layout_constraintBottom_toBottomOf="@id/backBtn"
@@ -53,8 +53,8 @@
             android:id="@+id/deleteBtn"
             style="@style/Widget.AppCompat.Button.Borderless"
             android:visibility="@{viewModel.post.writer.id.equals(viewModel.account.id) ? View.VISIBLE : View.GONE}"
-            android:layout_width="@dimen/top_bar_btn"
-            android:layout_height="@dimen/top_bar_btn"
+            android:layout_width="@dimen/top_bar_btn_size"
+            android:layout_height="@dimen/top_bar_btn_size"
             android:layout_marginEnd="@dimen/top_bar_margin"
             android:background="@drawable/outline_delete_24"
             app:layout_constraintBottom_toBottomOf="@id/backBtn"
@@ -75,7 +75,7 @@
                 android:layout_height="match_parent">
 
                 <TextView
-                    android:id="@+id/textView14"
+                    android:id="@+id/title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="24dp"
@@ -87,15 +87,25 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
+                <com.app.bitwit.view.custom.ProfileImageView
+                    android:id="@+id/profileImage"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="24dp"
+                    android:src="@drawable/default_profile_icon_24"
+                    android:layout_height="24dp"
+                    app:layout_constraintStart_toStartOf="@+id/title"
+                    app:layout_constraintTop_toBottomOf="@+id/title"/>
+
                 <TextView
-                    android:id="@+id/textView23"
+                    android:id="@+id/name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
                     android:text="@{viewModel.post.writer.name}"
                     android:textSize="12dp"
-                    app:layout_constraintStart_toStartOf="@+id/textView14"
-                    app:layout_constraintTop_toBottomOf="@+id/textView14" />
+                    android:layout_marginStart="12dp"
+                    app:layout_constraintStart_toEndOf="@id/profileImage"
+                    app:layout_constraintTop_toTopOf="@id/profileImage"
+                    app:layout_constraintBottom_toBottomOf="@id/profileImage"/>
 
                 <TextView
                     android:id="@+id/textView26"
@@ -104,17 +114,17 @@
                     android:layout_marginStart="4dp"
                     android:text="•"
                     android:textSize="12dp"
-                    app:layout_constraintBaseline_toBaselineOf="@+id/textView23"
-                    app:layout_constraintStart_toEndOf="@+id/textView23" />
+                    app:layout_constraintBaseline_toBaselineOf="@+id/name"
+                    app:layout_constraintStart_toEndOf="@+id/name" />
 
                 <TextView
-                    android:id="@+id/textView25"
+                    android:id="@+id/time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
                     android:text="@{viewModel.post.timeString}"
                     android:textSize="12dp"
-                    app:layout_constraintBaseline_toBaselineOf="@+id/textView23"
+                    app:layout_constraintBaseline_toBaselineOf="@+id/name"
                     app:layout_constraintStart_toEndOf="@+id/textView26" />
 
                 <TextView
@@ -129,7 +139,7 @@
                     android:textSize="14dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView23" />
+                    app:layout_constraintTop_toBottomOf="@+id/name" />
 
                 <Button
                     android:id="@+id/viewIcon"
@@ -150,7 +160,7 @@
                     android:textColor="#5EC5C5"
                     android:textSize="@dimen/post_activity_icon_text"
                     android:textStyle="bold"
-                    app:layout_constraintBaseline_toBaselineOf="@+id/textView25"
+                    app:layout_constraintBaseline_toBaselineOf="@+id/time"
                     app:layout_constraintEnd_toEndOf="@+id/textView24" />
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -161,7 +171,7 @@
                     android:orientation="horizontal"
                     app:layout_constraintBottom_toBottomOf="@+id/heartBtn"
                     app:layout_constraintEnd_toStartOf="@+id/heartBtn"
-                    app:layout_constraintStart_toStartOf="@+id/textView14"
+                    app:layout_constraintStart_toStartOf="@+id/title"
                     app:layout_constraintTop_toTopOf="@+id/heartBtn" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout

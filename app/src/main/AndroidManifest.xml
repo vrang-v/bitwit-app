@@ -16,7 +16,9 @@
         android:supportsRtl="true"
         android:theme="@style/Bitwit"
         android:usesCleartextTraffic="true"
+        android:windowSoftInputMode="adjustResize"
         tools:replace="android:appComponentFactory">
+        <activity android:name=".view.activity.auth.EmailVerifyingActivity"></activity>
         <activity
             android:name=".view.activity.EntryPointActivity"
             android:noHistory="true">
@@ -25,7 +27,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".view.activity.PostingActivity"></activity>
+        <activity android:name=".view.activity.PostingActivity" />
         <activity android:name=".view.activity.FrameActivity" />
         <activity android:name=".view.activity.auth.SignUpActivity" />
         <activity android:name=".view.activity.auth.SignUpProcessActivity" />

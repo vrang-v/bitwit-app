@@ -33,4 +33,9 @@ public class LocalStorage {
         String json = sharedPreferences.getString(key, null);
         return json == null ? Optional.empty( ) : Optional.of(gson.fromJson(json, type));
     }
+    
+    public LocalStorage clear(String key) {
+        sharedPreferences.edit().remove(key).apply( );
+        return this;
+    }
 }

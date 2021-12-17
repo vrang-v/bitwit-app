@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.app.bitwit.domain.Post;
 import com.app.bitwit.view.adapter.PostsAdapter;
 import com.app.bitwit.view.adapter.common.EventAdapter;
-import com.app.bitwit.view.adapter.common.RecyclerViewEvent;
+import com.app.bitwit.view.adapter.common.AdapterEventType;
 import lombok.NoArgsConstructor;
 
 import java.util.Collection;
@@ -20,7 +20,7 @@ import java.util.List;
 public class BindingAdapters {
     
     @BindingAdapter("bind:adapter")
-    public static <T, E extends RecyclerViewEvent> void adapterCollection(RecyclerView recyclerView, Collection<T> items) {
+    public static <T, E extends AdapterEventType> void adapterCollection(RecyclerView recyclerView, Collection<T> items) {
         EventAdapter<T, E> adapter = (EventAdapter<T, E>)recyclerView.getAdapter( );
         if (adapter != null) {
             adapter.updateItems(items);

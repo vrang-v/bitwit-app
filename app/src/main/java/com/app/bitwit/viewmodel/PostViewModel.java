@@ -7,13 +7,13 @@ import com.app.bitwit.data.source.remote.dto.CreateCommentRequest;
 import com.app.bitwit.domain.Comment;
 import com.app.bitwit.domain.Like;
 import com.app.bitwit.domain.Post;
-import com.app.bitwit.util.Empty;
 import com.app.bitwit.dto.LoginAccount;
-import com.app.bitwit.viewmodel.common.SnackbarViewModel;
+import com.app.bitwit.util.Empty;
 import com.app.bitwit.util.StringUtils;
 import com.app.bitwit.util.subscription.SingleSubscription;
 import com.app.bitwit.util.subscription.Subscription;
 import com.app.bitwit.viewmodel.common.RxJavaViewModelSupport;
+import com.app.bitwit.viewmodel.common.SnackbarViewModel;
 import dagger.hilt.android.lifecycle.HiltViewModel;
 import lombok.Getter;
 import lombok.var;
@@ -40,7 +40,7 @@ public class PostViewModel extends RxJavaViewModelSupport implements SnackbarVie
     private final MutableLiveData<Comment>     commentSelected = new MutableLiveData<>( );
     private final MutableLiveData<CommentType> commentType     = new MutableLiveData<>(CommentType.COMMENT);
     
-    private LoginAccount account;
+    private final MutableLiveData<LoginAccount> account = new MutableLiveData<>( );
     
     private boolean likeChanged = false;
     
@@ -55,7 +55,7 @@ public class PostViewModel extends RxJavaViewModelSupport implements SnackbarVie
         return subscribe(
                 accountRepository
                         .loadAccount( )
-                        .doOnSuccess(loginAccount -> this.account = loginAccount)
+                        .doOnSuccess(account::postValue)
                         .doOnError(e -> setSnackbar("사용자 정보를 불러오는 도중 문제가 발생했어요"))
         );
     }
@@ -80,7 +80,7 @@ public class PostViewModel extends RxJavaViewModelSupport implements SnackbarVie
     public Subscription<Comment> createComment( ) {
         String content = commentContent.getValue( ).trim( );
         if (! isValidComment(content)) {
-            return unsubscribe( );
+            return empty( );
         }
         var request = new CreateCommentRequest(content, post.getValue( ).getId( ), getParentId( ));
         return subscribe(
@@ -94,7 +94,7 @@ public class PostViewModel extends RxJavaViewModelSupport implements SnackbarVie
     public Subscription<Empty> updateComment( ) {
         String content = commentContent.getValue( ).trim( );
         if (! isValidComment(content)) {
-            return unsubscribe( );
+            return empty( );
         }
         return subscribe(
                 postRepository
@@ -108,7 +108,6 @@ public class PostViewModel extends RxJavaViewModelSupport implements SnackbarVie
         return subscribe(
                 postRepository
                         .deleteComment(commentId)
-                        .doOnSuccess(empty -> setSnackbar("댓글을 삭제했어요"))
                         .doOnError(e -> setSnackbar("댓글을 삭제하는 도중 문제가 발생했어요"))
         );
     }
@@ -141,7 +140,7 @@ public class PostViewModel extends RxJavaViewModelSupport implements SnackbarVie
     private void postFlattenComments(List<Comment> nestedComments) {
         var flattenComments = new ArrayList<Comment>( );
         nestedComments.forEach(comment -> getChildrenComments(comment, flattenComments));
-        flattenComments.forEach(comment -> comment.setEditable(account.getId( )));
+        flattenComments.forEach(comment -> comment.setEditable(account.getValue( ).getId( )));
         this.flattenComments.postValue(flattenComments);
     }
     

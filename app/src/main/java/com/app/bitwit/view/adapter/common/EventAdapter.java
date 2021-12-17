@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
-public abstract class EventAdapter<T, E extends RecyclerViewEvent> extends Adapter<EventAdapter<T, E>.EventViewHolder> {
+public abstract class EventAdapter<T, E extends AdapterEventType> extends Adapter<EventAdapter<T, E>.EventViewHolder> {
     
     protected final List<T> items = new ArrayList<>( );
     
@@ -26,6 +26,11 @@ public abstract class EventAdapter<T, E extends RecyclerViewEvent> extends Adapt
     @Override
     public int getItemCount( ) {
         return items.size( );
+    }
+    
+    public void deleteItem(int position) {
+        items.remove(position);
+        notifyItemRemoved(position);
     }
     
     public void updateItems(Collection<T> items) {

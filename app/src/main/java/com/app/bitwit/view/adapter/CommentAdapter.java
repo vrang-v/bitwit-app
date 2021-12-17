@@ -13,7 +13,7 @@ import com.app.bitwit.databinding.ItemInnerCommentBinding;
 import com.app.bitwit.domain.Comment;
 import com.app.bitwit.view.adapter.CommentAdapter.CommentAdapterEvent;
 import com.app.bitwit.view.adapter.common.EventAdapter;
-import com.app.bitwit.view.adapter.common.RecyclerViewEvent;
+import com.app.bitwit.view.adapter.common.AdapterEventType;
 
 import static com.app.bitwit.view.adapter.CommentAdapter.CommentAdapterEvent.*;
 
@@ -41,7 +41,7 @@ public class CommentAdapter extends EventAdapter<Comment, CommentAdapterEvent> {
         }
     }
     
-    public enum CommentAdapterEvent implements RecyclerViewEvent {
+    public enum CommentAdapterEvent implements AdapterEventType {
         CLICK_COMMENT, CLICK_REPLY, EDIT, DELETE, HEART
     }
     

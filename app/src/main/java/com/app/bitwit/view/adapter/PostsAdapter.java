@@ -12,9 +12,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.app.bitwit.databinding.ItemPostBinding;
 import com.app.bitwit.databinding.ProgressBarBinding;
 import com.app.bitwit.domain.Post;
+import com.app.bitwit.util.StringUtils;
 import com.app.bitwit.view.adapter.common.AdapterEvent;
-import com.app.bitwit.view.adapter.common.RecyclerViewEvent;
+import com.app.bitwit.view.adapter.common.AdapterEventType;
 import com.app.bitwit.view.holder.ProgressBar;
+import com.bumptech.glide.Glide;
 import lombok.var;
 
 import java.util.ArrayList;
@@ -90,7 +92,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         this.lastPage = false;
     }
     
-    public enum PostsAdapterEvent implements RecyclerViewEvent {
+    public enum PostsAdapterEvent implements AdapterEventType {
         CLICK, HEART, NEXT_PAGE
     }
     
@@ -117,11 +119,22 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         
         public void bind(Post post) {
             this.post = post;
+            loadProfileImage(post.getWriter( ).getProfileImageUrl( ));
             var adapter = new TickerAdapter( );
             binding.tickerRecycler.setAdapter(adapter);
             binding.tickerRecycler.setLayoutManager(new LinearLayoutManager(itemView.getContext( ), HORIZONTAL, true));
             binding.setPost(post);
             binding.executePendingBindings( );
+        }
+        
+        private void loadProfileImage(String profileImageUrl) {
+            if (! StringUtils.hasText(profileImageUrl)) {
+                return;
+            }
+            
+            Glide.with(binding.profileImage)
+                 .load(profileImageUrl)
+                 .into(binding.profileImage);
         }
     }
 }

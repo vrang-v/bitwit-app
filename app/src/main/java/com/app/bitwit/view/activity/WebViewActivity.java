@@ -19,11 +19,10 @@ public class WebViewActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_web_view);
-        
-        Bundle extras = getIntent( ).getExtras( );
-        
-        String url = extras.getString(URL);
-        
+    
+        binding.close.setOnClickListener(v -> finish( ));
+    
+        String url = getIntent( ).getExtras( ).getString(URL);
         loadWebView(url);
     }
     
@@ -45,7 +44,7 @@ public class WebViewActivity extends AppCompatActivity {
         settings.setJavaScriptEnabled(true);
         settings.setJavaScriptCanOpenWindowsAutomatically(true);
         
-        binding.webView.setWebChromeClient(new WebChromeClient( ));
+//        binding.webView.setWebChromeClient(new WebChromeClient( ));
         binding.webView.setWebViewClient(new HttpWebViewClient( ));
         binding.webView.clearCache(true);
         

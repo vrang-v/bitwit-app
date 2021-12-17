@@ -3,7 +3,6 @@ package com.app.bitwit.view.activity.auth;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
-import android.view.View;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,9 +20,9 @@ import com.google.android.material.snackbar.Snackbar;
 import dagger.hilt.android.AndroidEntryPoint;
 import lombok.var;
 
-import static com.app.bitwit.util.livedata.LiveDataUtils.observe;
 import static com.app.bitwit.util.google.GoogleSignInUtils.getGoogleSignInAccount;
 import static com.app.bitwit.util.google.GoogleSignInUtils.getGoogleSignInIntent;
+import static com.app.bitwit.util.livedata.LiveDataUtils.observe;
 import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT;
 
 @AndroidEntryPoint
@@ -76,17 +75,20 @@ public class LoginActivity extends AppCompatActivity {
     }
     
     private void handleLoginSuccess(LoginResponse loginResponse) {
-        viewModel.setSnackbar("반갑습니다");
-        var intent = new Intent(this, FrameActivity.class);
+        Intent intent;
+        if (loginResponse.isEmailVerified( )) {
+            viewModel.setSnackbar("반갑습니다");
+            intent = new Intent(this, FrameActivity.class);
+        }
+        else {
+            intent = new Intent(this, EmailVerifyingActivity.class);
+        }
         startActivity(intent);
     }
     
     private void handleLoginError(Throwable e) {
         viewModel.setSnackbar("로그인 실패");
-        binding.warning1Text.setText("아이디 또는 비밀번호가 일치하지 않거나");
-        binding.warning2Text.setText("네트워크에 연결되어 있지 않습니다");
-        binding.warning2Text.setVisibility(View.VISIBLE);
-        binding.loginText.setVisibility(View.INVISIBLE);
+        viewModel.setWarningMessage("아이디 또는 비밀번호가 일치하지 않거나\n네트워크에 연결되어 있지 않습니다");
     }
     
     private void resolveGoogleSignedInAccount(GoogleSignInAccount googleAccount) {
@@ -112,7 +114,10 @@ public class LoginActivity extends AppCompatActivity {
             binding.emailEdit.setText(extras.getString(ExtraKey.EMAIL));
             binding.passwordEdit.setText(extras.getString(ExtraKey.PASSWORD));
             if (extras.getBoolean(ExtraKey.SIGN_IN_SUCCESS)) {
-                binding.loginText.setText("로그인 버튼을 눌러주세요");
+                viewModel.setInfoMessage("로그인 버튼을 눌러주세요");
+            }
+            if (extras.getBoolean(ExtraKey.LOGOUT)) {
+                Snackbar.make(binding.getRoot( ), "로그아웃 되었습니다", LENGTH_SHORT).show( );
             }
         }
     }

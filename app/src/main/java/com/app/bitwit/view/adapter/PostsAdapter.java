@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.app.bitwit.R;
 import com.app.bitwit.databinding.ItemPostBinding;
 import com.app.bitwit.databinding.ProgressBarBinding;
 import com.app.bitwit.domain.Post;
@@ -65,13 +66,23 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
     
     @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, @NonNull List<Object> payloads) {
+        if (payloads.isEmpty( )) {
+            onBindViewHolder(holder, position);
+            return;
+        }
+        ViewHolder viewHolder = (ViewHolder)holder;
+        viewHolder.update(posts.get(position));
+    }
+    
+    @Override
     public int getItemCount( ) {
         return lastPage ? posts.size( ) : posts.size( ) + 1;
     }
     
     public void updatePost(int index, Post post) {
         this.posts.set(index, post);
-        notifyItemChanged(index);
+        notifyItemChanged(index, "update");
     }
     
     public void updatePosts(List<Post> posts) {
@@ -125,10 +136,26 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             binding.tickerRecycler.setLayoutManager(new LinearLayoutManager(itemView.getContext( ), HORIZONTAL, true));
             binding.setPost(post);
             binding.executePendingBindings( );
+            binding.content.post(( ) ->
+                    binding.seeMoreText.setVisibility(
+                            binding.content.getLineCount( ) >= binding.content.getMaxLines( ) ? View.VISIBLE : View.GONE
+                    )
+            );
+            binding.seeMoreText.setOnClickListener(v -> {
+                binding.content.setMaxLines(Integer.MAX_VALUE);
+                binding.seeMoreText.setVisibility(View.GONE);
+            });
+        }
+        
+        public void update(Post post) {
+            this.post = post;
+            binding.setPost(post);
+            binding.executePendingBindings( );
         }
         
         private void loadProfileImage(String profileImageUrl) {
             if (! StringUtils.hasText(profileImageUrl)) {
+                binding.profileImage.setImageResource(R.drawable.default_profile_icon_24);
                 return;
             }
             

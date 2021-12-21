@@ -1,10 +1,11 @@
 package com.app.bitwit.view.activity;
 
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.OvalShape;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
@@ -39,6 +40,16 @@ public class PostActivity extends AppCompatActivity {
     
     private ActivityPostBinding binding;
     private PostViewModel       viewModel;
+    
+    private final ActivityResultLauncher<Intent> postEditingLauncher = registerForActivityResult(
+            new StartActivityForResult( ), result -> {
+                if (result.getResultCode( ) == PostEditingActivity.RESULT_SUCCESS) {
+                    viewModel.loadPost( )
+                             .onSuccess(post -> viewModel.setSnackbar("게시글이 수정되었습니다"))
+                             .subscribe( );
+                }
+            }
+    );
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +102,13 @@ public class PostActivity extends AppCompatActivity {
         binding.backBtn.setOnClickListener(v ->
                 finish( )
         );
+        
+        binding.editBtn.setOnClickListener(v -> {
+            var intent = new Intent(this, PostEditingActivity.class)
+                    .putExtra("postId", viewModel.getPost( ).getValue( ).getId( ));
+            postEditingLauncher.launch(intent);
+            overridePendingTransition(R.anim.slide_right_to_left_enter, R.anim.slide_right_to_left_exit);
+        });
         
         binding.deleteBtn.setOnClickListener(v ->
                 viewModel.deletePost( )
@@ -176,6 +194,12 @@ public class PostActivity extends AppCompatActivity {
         });
         binding.commentRecyclerView.setAdapter(commentAdapter);
         binding.commentRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        
+        binding.swipeLayout.setOnRefreshListener(( ) ->
+                viewModel.loadPost( )
+                         .onSuccess(post -> binding.swipeLayout.setRefreshing(false))
+                         .subscribe( )
+        );
     }
     
     private boolean hasAccountName(LoginAccount account) {
@@ -221,7 +245,8 @@ public class PostActivity extends AppCompatActivity {
         setOnKeyboardStatusChangeEvent( );
         
         var postId = getIntent( ).getExtras( ).getLong(ExtraKey.POST_ID);
-        viewModel.loadPost(postId)
+        viewModel.setPostId(postId);
+        viewModel.loadPost( )
                  .onError(e -> viewModel.setSnackbar("게시물을 불러오는 도중 문제가 발생했어요"))
                  .subscribe( );
         
@@ -233,7 +258,6 @@ public class PostActivity extends AppCompatActivity {
     protected void onPause( ) {
         super.onPause( );
         viewModel.commitLike( );
-        overridePendingTransition(R.anim.slide_left_to_right_enter, R.anim.slide_left_to_right_exit);
     }
     
     private void showSoftKeyboard( ) {
@@ -245,5 +269,11 @@ public class PostActivity extends AppCompatActivity {
     
     private void hideSoftKeyboard( ) {
         inputMethodManager.hideSoftInputFromWindow(binding.commentInput.getWindowToken( ), 0);
+    }
+    
+    @Override
+    public void onBackPressed( ) {
+        super.onBackPressed( );
+        overridePendingTransition(R.anim.slide_left_to_right_enter, R.anim.slide_left_to_right_exit);
     }
 }

@@ -16,6 +16,7 @@ import com.app.bitwit.viewmodel.common.RxJavaViewModelSupport;
 import com.app.bitwit.viewmodel.common.SnackbarViewModel;
 import dagger.hilt.android.lifecycle.HiltViewModel;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.var;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,6 +43,8 @@ public class PostViewModel extends RxJavaViewModelSupport implements SnackbarVie
     
     private final MutableLiveData<LoginAccount> account = new MutableLiveData<>( );
     
+    @Setter
+    private Long    postId;
     private boolean likeChanged = false;
     
     @Inject
@@ -60,7 +63,7 @@ public class PostViewModel extends RxJavaViewModelSupport implements SnackbarVie
         );
     }
     
-    public Subscription<Post> loadPost(Long postId) {
+    public Subscription<Post> loadPost( ) {
         return subscribe(
                 postRepository.
                         viewPost(postId)

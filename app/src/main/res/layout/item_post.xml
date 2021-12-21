@@ -40,7 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@{post.writer.name}"
-            android:layout_marginStart="4dp"
+            android:layout_marginStart="6dp"
             android:textSize="10dp"
             app:layout_constraintStart_toEndOf="@id/profileImage"
             app:layout_constraintTop_toTopOf="@id/profileImage"
@@ -67,7 +67,7 @@
             app:layout_constraintStart_toEndOf="@+id/name" />
 
         <TextView
-            android:id="@+id/textView24"
+            android:id="@+id/content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
@@ -76,9 +76,20 @@
             android:text="@{post.content}"
             android:textColor="@color/black"
             android:textSize="13dp"
+            android:maxLines="5"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/name" />
+
+        <TextView
+            android:id="@+id/seeMoreText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="... 더 보기"
+            android:textSize="11dp"
+            android:layout_marginTop="4dp"
+            app:layout_constraintStart_toStartOf="@+id/content"
+            app:layout_constraintTop_toBottomOf="@+id/content" />
 
         <Button
             android:id="@+id/viewIcon"
@@ -100,7 +111,7 @@
             android:textSize="12dp"
             android:textStyle="bold"
             app:layout_constraintBaseline_toBaselineOf="@+id/time"
-            app:layout_constraintEnd_toEndOf="@+id/textView24" />
+            app:layout_constraintEnd_toEndOf="@+id/content" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/commentBtn"
@@ -109,8 +120,8 @@
             android:layout_marginTop="12dp"
             android:layout_marginBottom="12dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/textView24"
-            app:layout_constraintTop_toBottomOf="@+id/textView24">
+            app:layout_constraintEnd_toEndOf="@+id/content"
+            app:layout_constraintTop_toBottomOf="@+id/seeMoreText">
 
             <Button
                 android:id="@+id/comment"

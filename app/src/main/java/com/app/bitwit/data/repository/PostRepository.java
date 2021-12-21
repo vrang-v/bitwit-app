@@ -4,6 +4,7 @@ import com.app.bitwit.data.source.remote.PostServiceClient;
 import com.app.bitwit.data.source.remote.dto.CreateCommentRequest;
 import com.app.bitwit.data.source.remote.dto.request.CreatePostRequest;
 import com.app.bitwit.data.source.remote.dto.request.UpdateCommentRequest;
+import com.app.bitwit.data.source.remote.dto.request.UpdatePostRequest;
 import com.app.bitwit.domain.Comment;
 import com.app.bitwit.domain.Like;
 import com.app.bitwit.domain.Post;
@@ -24,6 +25,12 @@ public class PostRepository {
     public Single<Post> createPost(CreatePostRequest request) {
         return postServiceClient
                 .createPost(request)
+                .map(HttpUtils::get2xxBody);
+    }
+    
+    public Single<Post> updatePost(UpdatePostRequest request) {
+        return postServiceClient
+                .updatePost(request.getPostId( ), request)
                 .map(HttpUtils::get2xxBody);
     }
     

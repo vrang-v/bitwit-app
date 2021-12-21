@@ -25,7 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_begin="@dimen/top_bar_height"/>
+            app:layout_constraintGuide_begin="@dimen/top_bar_height" />
 
         <Button
             android:id="@+id/backBtn"
@@ -50,6 +50,19 @@
             app:layout_constraintTop_toTopOf="@id/backBtn" />
 
         <Button
+            android:id="@+id/editBtn"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:visibility="@{viewModel.post.writer.id.equals(viewModel.account.id) ? View.VISIBLE : View.GONE}"
+            android:layout_width="@dimen/top_bar_btn_size"
+            android:layout_height="@dimen/top_bar_btn_size"
+            android:layout_marginEnd="@dimen/top_bar_margin"
+            android:background="@drawable/baseline_edit_24"
+            android:backgroundTint="@color/black"
+            app:layout_constraintBottom_toBottomOf="@id/backBtn"
+            app:layout_constraintEnd_toStartOf="@id/deleteBtn"
+            app:layout_constraintTop_toTopOf="@id/backBtn" />
+
+        <Button
             android:id="@+id/deleteBtn"
             style="@style/Widget.AppCompat.Button.Borderless"
             android:visibility="@{viewModel.post.writer.id.equals(viewModel.account.id) ? View.VISIBLE : View.GONE}"
@@ -61,220 +74,236 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/backBtn" />
 
-        <androidx.core.widget.NestedScrollView
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeLayout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:fillViewport="true"
             app:layout_constraintBottom_toTopOf="@+id/commentInputArea"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/topBar">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <androidx.core.widget.NestedScrollView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:fillViewport="true">
 
-                <TextView
-                    android:id="@+id/title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginTop="8dp"
-                    android:text="@{viewModel.post.title}"
-                    android:textColor="@color/black"
-                    android:textSize="17dp"
-                    android:textStyle="bold"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <com.app.bitwit.view.custom.ProfileImageView
-                    android:id="@+id/profileImage"
-                    android:layout_marginTop="8dp"
-                    android:layout_width="24dp"
-                    android:src="@drawable/default_profile_icon_24"
-                    android:layout_height="24dp"
-                    app:layout_constraintStart_toStartOf="@+id/title"
-                    app:layout_constraintTop_toBottomOf="@+id/title"/>
-
-                <TextView
-                    android:id="@+id/name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@{viewModel.post.writer.name}"
-                    android:textSize="12dp"
-                    android:layout_marginStart="12dp"
-                    app:layout_constraintStart_toEndOf="@id/profileImage"
-                    app:layout_constraintTop_toTopOf="@id/profileImage"
-                    app:layout_constraintBottom_toBottomOf="@id/profileImage"/>
-
-                <TextView
-                    android:id="@+id/textView26"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:text="•"
-                    android:textSize="12dp"
-                    app:layout_constraintBaseline_toBaselineOf="@+id/name"
-                    app:layout_constraintStart_toEndOf="@+id/name" />
-
-                <TextView
-                    android:id="@+id/time"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:text="@{viewModel.post.timeString}"
-                    android:textSize="12dp"
-                    app:layout_constraintBaseline_toBaselineOf="@+id/name"
-                    app:layout_constraintStart_toEndOf="@+id/textView26" />
-
-                <TextView
-                    android:id="@+id/textView24"
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginEnd="24dp"
-                    android:text="@{viewModel.post.content}"
-                    android:textColor="@color/black"
-                    android:textSize="14dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/name" />
-
-                <Button
-                    android:id="@+id/viewIcon"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="@dimen/post_activity_icon"
-                    android:layout_height="@dimen/post_activity_icon"
-                    android:layout_marginEnd="8dp"
-                    android:background="@drawable/ic_eye_regular"
-                    app:layout_constraintBottom_toBottomOf="@+id/viewCount"
-                    app:layout_constraintEnd_toStartOf="@+id/viewCount"
-                    app:layout_constraintTop_toTopOf="@+id/viewCount" />
-
-                <TextView
-                    android:id="@+id/viewCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@{String.valueOf(viewModel.post.viewCount)}"
-                    android:textColor="#5EC5C5"
-                    android:textSize="@dimen/post_activity_icon_text"
-                    android:textStyle="bold"
-                    app:layout_constraintBaseline_toBaselineOf="@+id/time"
-                    app:layout_constraintEnd_toEndOf="@+id/textView24" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/tickerRecycler"
-                    bind:adapter="@{viewModel.post.stocks}"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    app:layout_constraintBottom_toBottomOf="@+id/heartBtn"
-                    app:layout_constraintEnd_toStartOf="@+id/heartBtn"
-                    app:layout_constraintStart_toStartOf="@+id/title"
-                    app:layout_constraintTop_toTopOf="@+id/heartBtn" />
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/commentBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    app:layout_constraintEnd_toEndOf="@+id/textView24"
-                    app:layout_constraintTop_toBottomOf="@+id/textView24">
-
-                    <Button
-                        android:id="@+id/comment"
-                        style="@style/Widget.AppCompat.Button.Borderless"
-                        android:layout_width="@dimen/post_activity_icon"
-                        android:layout_height="@dimen/post_activity_icon"
-                        android:layout_marginEnd="8dp"
-                        android:background="@drawable/ic_comment_regular"
-                        app:layout_constraintBottom_toBottomOf="@+id/commentCount"
-                        app:layout_constraintEnd_toStartOf="@+id/commentCount"
-                        app:layout_constraintTop_toTopOf="@+id/commentCount" />
+                    android:layout_height="match_parent">
 
                     <TextView
-                        android:id="@+id/commentCount"
+                        android:id="@+id/title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@{String.valueOf(viewModel.flattenComments.size())}"
+                        android:layout_marginStart="24dp"
+                        android:layout_marginTop="8dp"
+                        android:text="@{viewModel.post.title}"
                         android:textColor="@color/black"
-                        android:textSize="@dimen/post_activity_icon_text"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
+                        android:textSize="17dp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/heartBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="12dp"
-                    android:paddingStart="8dp"
-                    app:layout_constraintBottom_toBottomOf="@+id/commentBtn"
-                    app:layout_constraintEnd_toStartOf="@+id/commentBtn"
-                    app:layout_constraintTop_toTopOf="@+id/commentBtn">
+                    <com.app.bitwit.view.custom.ProfileImageView
+                        android:id="@+id/profileImage"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="24dp"
+                        android:src="@drawable/default_profile_icon_24"
+                        android:layout_height="24dp"
+                        app:layout_constraintStart_toStartOf="@+id/title"
+                        app:layout_constraintTop_toBottomOf="@+id/title" />
+
+                    <TextView
+                        android:id="@+id/name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{viewModel.post.writer.name}"
+                        android:textSize="12dp"
+                        android:layout_marginStart="10dp"
+                        app:layout_constraintStart_toEndOf="@id/profileImage"
+                        app:layout_constraintTop_toTopOf="@id/profileImage"
+                        app:layout_constraintBottom_toBottomOf="@id/profileImage" />
+
+                    <TextView
+                        android:id="@+id/textView26"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:text="•"
+                        android:textSize="12dp"
+                        app:layout_constraintBaseline_toBaselineOf="@+id/name"
+                        app:layout_constraintStart_toEndOf="@+id/name" />
+
+                    <TextView
+                        android:id="@+id/time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:text="@{viewModel.post.timeString}"
+                        android:textSize="12dp"
+                        app:layout_constraintBaseline_toBaselineOf="@+id/name"
+                        app:layout_constraintStart_toEndOf="@+id/textView26" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="2dp"
+                        android:text="(수정 됨)"
+                        android:textSize="12dp"
+                        android:visibility="@{viewModel.post.edited ? View.VISIBLE : View.GONE}"
+                        app:layout_constraintStart_toEndOf="@id/time"
+                        app:layout_constraintBaseline_toBaselineOf="@id/name" />
+
+                    <TextView
+                        android:id="@+id/content"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="24dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="24dp"
+                        android:text="@{viewModel.post.content}"
+                        android:textColor="@color/black"
+                        android:textSize="14dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/name" />
 
                     <Button
-                        android:id="@+id/heart"
+                        android:id="@+id/viewIcon"
                         style="@style/Widget.AppCompat.Button.Borderless"
                         android:layout_width="@dimen/post_activity_icon"
                         android:layout_height="@dimen/post_activity_icon"
-                        android:layout_marginStart="8dp"
                         android:layout_marginEnd="8dp"
-                        android:background="@{viewModel.post.like ? @drawable/ic_heart_solid : @drawable/ic_heart_regular}"
-                        app:layout_constraintBottom_toBottomOf="@+id/starCount"
-                        app:layout_constraintEnd_toStartOf="@+id/starCount"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@+id/starCount" />
+                        android:background="@drawable/ic_eye_regular"
+                        app:layout_constraintBottom_toBottomOf="@+id/viewCount"
+                        app:layout_constraintEnd_toStartOf="@+id/viewCount"
+                        app:layout_constraintTop_toTopOf="@+id/viewCount" />
 
                     <TextView
-                        android:id="@+id/starCount"
+                        android:id="@+id/viewCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginEnd="8dp"
-                        android:layout_marginBottom="5dp"
-                        android:text="@{String.valueOf(viewModel.post.likeCount)}"
-                        android:textColor="#E4FF7474"
+                        android:text="@{String.valueOf(viewModel.post.viewCount)}"
+                        android:textColor="#5EC5C5"
                         android:textSize="@dimen/post_activity_icon_text"
-                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:textStyle="bold"
+                        app:layout_constraintBaseline_toBaselineOf="@+id/time"
+                        app:layout_constraintEnd_toEndOf="@+id/content" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/tickerRecycler"
+                        bind:adapter="@{viewModel.post.stocks}"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        app:layout_constraintBottom_toBottomOf="@+id/heartBtn"
+                        app:layout_constraintEnd_toStartOf="@+id/heartBtn"
+                        app:layout_constraintStart_toStartOf="@+id/title"
+                        app:layout_constraintTop_toTopOf="@+id/heartBtn" />
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/commentBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        app:layout_constraintEnd_toEndOf="@+id/content"
+                        app:layout_constraintTop_toBottomOf="@+id/content">
+
+                        <Button
+                            android:id="@+id/comment"
+                            style="@style/Widget.AppCompat.Button.Borderless"
+                            android:layout_width="@dimen/post_activity_icon"
+                            android:layout_height="@dimen/post_activity_icon"
+                            android:layout_marginEnd="8dp"
+                            android:background="@drawable/ic_comment_regular"
+                            app:layout_constraintBottom_toBottomOf="@+id/commentCount"
+                            app:layout_constraintEnd_toStartOf="@+id/commentCount"
+                            app:layout_constraintTop_toTopOf="@+id/commentCount" />
+
+                        <TextView
+                            android:id="@+id/commentCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@{String.valueOf(viewModel.flattenComments.size())}"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/post_activity_icon_text"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/heartBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="12dp"
+                        android:paddingStart="8dp"
+                        app:layout_constraintBottom_toBottomOf="@+id/commentBtn"
+                        app:layout_constraintEnd_toStartOf="@+id/commentBtn"
+                        app:layout_constraintTop_toTopOf="@+id/commentBtn">
+
+                        <Button
+                            android:id="@+id/heart"
+                            style="@style/Widget.AppCompat.Button.Borderless"
+                            android:layout_width="@dimen/post_activity_icon"
+                            android:layout_height="@dimen/post_activity_icon"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:background="@{viewModel.post.like ? @drawable/ic_heart_solid : @drawable/ic_heart_regular}"
+                            app:layout_constraintBottom_toBottomOf="@+id/starCount"
+                            app:layout_constraintEnd_toStartOf="@+id/starCount"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="@+id/starCount" />
+
+                        <TextView
+                            android:id="@+id/starCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginEnd="8dp"
+                            android:layout_marginBottom="5dp"
+                            android:text="@{String.valueOf(viewModel.post.likeCount)}"
+                            android:textColor="#E4FF7474"
+                            android:textSize="@dimen/post_activity_icon_text"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <View
+                        android:id="@+id/view4"
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@color/black"
+                        app:layout_constraintEnd_toEndOf="@+id/content"
+                        app:layout_constraintStart_toStartOf="@+id/content"
+                        app:layout_constraintTop_toBottomOf="@id/heartBtn" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/commentRecyclerView"
+                        bind:adapter="@{viewModel.flattenComments}"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:overScrollMode="never"
+                        app:layout_constraintEnd_toEndOf="@+id/content"
+                        app:layout_constraintStart_toStartOf="@+id/content"
+                        app:layout_constraintTop_toBottomOf="@+id/view4" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="아직 댓글이 없어요, 첫번째 댓글을 달아보세요"
+                        android:textSize="11dp"
+                        android:visibility="@{viewModel.flattenComments.empty ? View.VISIBLE : View.GONE}"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/view4" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <View
-                    android:id="@+id/view4"
-                    android:layout_width="0dp"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="8dp"
-                    android:background="@color/black"
-                    app:layout_constraintEnd_toEndOf="@+id/textView24"
-                    app:layout_constraintStart_toStartOf="@+id/textView24"
-                    app:layout_constraintTop_toBottomOf="@id/heartBtn" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/commentRecyclerView"
-                    bind:adapter="@{viewModel.flattenComments}"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:overScrollMode="never"
-                    app:layout_constraintEnd_toEndOf="@+id/textView24"
-                    app:layout_constraintStart_toStartOf="@+id/textView24"
-                    app:layout_constraintTop_toBottomOf="@+id/view4" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="아직 댓글이 없어요, 첫번째 댓글을 달아보세요"
-                    android:textSize="11dp"
-                    android:visibility="@{viewModel.flattenComments.empty ? View.VISIBLE : View.GONE}"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/view4" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </androidx.core.widget.NestedScrollView>
+            </androidx.core.widget.NestedScrollView>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/commentInputArea"

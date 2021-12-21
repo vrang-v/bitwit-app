@@ -45,9 +45,11 @@ public abstract class CommentListViewModel extends RxJavaViewModelSupport implem
         page = 0;
         return subscribe(
                 loadCommentPage( )
-                        .doOnSuccess(x -> page += 1)
-                        .doOnSuccess(commentPage -> last = commentPage.isLast( ))
-                        .doOnSuccess(commentPage -> comments.postValue(commentPage.getContent( )))
+                        .doOnSuccess(commentPage -> {
+                            page += 1;
+                            last = commentPage.isLast( );
+                            comments.postValue(commentPage.getContent( ));
+                        })
                         .doOnError(e -> setSnackbar("새로고침 도중 문제가 발생했어요"))
         );
     }

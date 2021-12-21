@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="viewModel"
             type="com.app.bitwit.viewmodel.AccountViewModel" />
@@ -63,9 +65,9 @@
                 android:layout_height="wrap_content"
                 android:text="@{viewModel.account.name}"
                 android:textColor="@color/black"
-                android:textSize="15dp"
-                android:textStyle="bold"
+                android:textSize="14dp"
                 android:layout_marginStart="12dp"
+                android:layout_marginTop="2dp"
                 app:layout_constraintStart_toEndOf="@id/profileImage"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -74,8 +76,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@{viewModel.account.email}"
-                android:textSize="13dp"
-                android:layout_marginBottom="2dp"
+                android:textSize="12dp"
+                android:layout_marginBottom="4dp"
                 app:layout_constraintBottom_toBottomOf="@+id/profileImage"
                 app:layout_constraintStart_toStartOf="@+id/nickname"/>
 
@@ -85,6 +87,7 @@
                 android:layout_height="wrap_content"
                 android:text="계정 유형: "
                 android:textSize="10dp"
+                android:visibility="@{viewModel.account.koreanAccountType == null ? View.GONE : View.VISIBLE}"
                 app:layout_constraintBaseline_toBaselineOf="@+id/accountType"
                 app:layout_constraintEnd_toStartOf="@+id/accountType" />
 
@@ -92,7 +95,7 @@
                 android:id="@+id/accountType"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{viewModel.account.accountType}"
+                android:text="@{viewModel.account.koreanAccountType}"
                 android:textSize="10dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

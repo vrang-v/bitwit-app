@@ -28,6 +28,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".view.activity.PostingActivity" />
+        <activity android:name=".view.activity.PostEditingActivity" />
         <activity android:name=".view.activity.FrameActivity" />
         <activity android:name=".view.activity.auth.SignUpActivity" />
         <activity android:name=".view.activity.auth.SignUpProcessActivity" />

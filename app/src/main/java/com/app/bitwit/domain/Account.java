@@ -29,4 +29,15 @@ public class Account {
     
     @SerializedName("profileImage")
     String profileImageUrl;
+    
+    public String getKoreanAccountType( ) {
+        switch( accountType ) {
+            case "EMAIL":
+                return "이메일";
+            case "GOOGLE":
+                return "구글";
+            default:
+                return "";
+        }
+    }
 }

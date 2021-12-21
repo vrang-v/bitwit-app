@@ -3,6 +3,7 @@ package com.app.bitwit.data.source.remote;
 import com.app.bitwit.data.source.remote.dto.CreateCommentRequest;
 import com.app.bitwit.data.source.remote.dto.request.CreatePostRequest;
 import com.app.bitwit.data.source.remote.dto.request.UpdateCommentRequest;
+import com.app.bitwit.data.source.remote.dto.request.UpdatePostRequest;
 import com.app.bitwit.domain.Comment;
 import com.app.bitwit.domain.Like;
 import com.app.bitwit.domain.Post;
@@ -17,6 +18,9 @@ public interface PostServiceClient {
     
     @POST("/api/posts")
     Single<Response<Post>> createPost(@Body CreatePostRequest request);
+    
+    @PATCH("/api/posts/{postId}")
+    Single<Response<Post>> updatePost(@Path("postId") Long postId, @Body UpdatePostRequest request);
     
     @GET("/api/posts/search")
     Single<Response<List<Post>>> searchPostsByTickers(@Query("ticker") List<String> tickers, @Query("size") int size);

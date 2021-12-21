@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import com.app.bitwit.R;
 import com.app.bitwit.constant.ExtraKey;
 import com.app.bitwit.databinding.FragmentCommentListBinding;
 import com.app.bitwit.view.activity.PostActivity;
@@ -42,7 +43,7 @@ public class CommentListFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         init(inflater, container);
-    
+        
         binding.backBtn.setOnClickListener(v ->
                 getActivity( ).onBackPressed( )
         );
@@ -55,6 +56,9 @@ public class CommentListFragment extends Fragment {
                     var intent = new Intent(getContext( ), PostActivity.class)
                             .putExtra(ExtraKey.POST_ID, comment.getPost( ).getId( ));
                     startActivity(intent);
+                    getActivity( ).overridePendingTransition(
+                            R.anim.slide_right_to_left_enter, R.anim.slide_right_to_left_exit
+                    );
                     break;
                 case NEXT_PAGE:
                     viewModel.nextPage( )
@@ -73,6 +77,13 @@ public class CommentListFragment extends Fragment {
         });
         binding.commentsRecycler.setAdapter(adapter);
         binding.commentsRecycler.setLayoutManager(new LinearLayoutManager(getContext( )));
+        
+        binding.swipeRefreshLayout.setOnRefreshListener(( ) ->
+                viewModel.refreshPage( )
+                         .onSuccess(commentPage -> binding.swipeRefreshLayout.setRefreshing(false))
+                         .subscribe( )
+        );
+        
         return binding.getRoot( );
     }
     

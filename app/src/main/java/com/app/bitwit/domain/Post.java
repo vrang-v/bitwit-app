@@ -35,6 +35,8 @@ public class Post {
     
     Set<Stock> stocks;
     
+    boolean edited;
+    
     @SuppressLint("NewApi")
     public String getTimeString( ) {
         return TimeUtils.formatTimeString(createdAt.getEpochSecond( ));

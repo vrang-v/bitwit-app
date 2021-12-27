@@ -193,7 +193,7 @@
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/tickerRecycler"
-                        bind:adapter="@{viewModel.post.stocks}"
+                        bind:adapter="@{viewModel.post.tags}"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
@@ -296,6 +296,7 @@
                         android:layout_height="wrap_content"
                         android:text="아직 댓글이 없어요, 첫번째 댓글을 달아보세요"
                         android:textSize="11dp"
+                        android:padding="36dp"
                         android:visibility="@{viewModel.flattenComments.empty ? View.VISIBLE : View.GONE}"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"

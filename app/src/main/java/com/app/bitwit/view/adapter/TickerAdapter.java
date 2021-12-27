@@ -4,21 +4,21 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import com.app.bitwit.databinding.ItemTickerBinding;
-import com.app.bitwit.domain.Stock;
+import com.app.bitwit.domain.Tag;
 import com.app.bitwit.view.adapter.TickerAdapter.TickerAdapterEvent;
-import com.app.bitwit.view.adapter.common.EventAdapter;
 import com.app.bitwit.view.adapter.common.AdapterEventType;
+import com.app.bitwit.view.adapter.common.EventAdapter;
 import lombok.var;
 
 import static android.util.TypedValue.COMPLEX_UNIT_DIP;
 
-public class TickerAdapter extends EventAdapter<Stock, TickerAdapterEvent> {
+public class TickerAdapter extends EventAdapter<Tag, TickerAdapterEvent> {
     
     private Float tickerFontSize;
     
     @NonNull
     @Override
-    public EventAdapter<Stock, TickerAdapterEvent>.EventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public EventAdapter<Tag, TickerAdapterEvent>.EventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         var binding = ItemTickerBinding.inflate(LayoutInflater.from(parent.getContext( )), parent, false);
         return new ViewHolder(binding);
     }
@@ -29,7 +29,7 @@ public class TickerAdapter extends EventAdapter<Stock, TickerAdapterEvent> {
     
     public enum TickerAdapterEvent implements AdapterEventType { }
     
-    public class ViewHolder extends EventAdapter<Stock, TickerAdapterEvent>.EventViewHolder {
+    public class ViewHolder extends EventAdapter<Tag, TickerAdapterEvent>.EventViewHolder {
         
         ItemTickerBinding binding;
         
@@ -40,7 +40,7 @@ public class TickerAdapter extends EventAdapter<Stock, TickerAdapterEvent> {
         
         @Override
         public void bind( ) {
-            binding.setTicker(item.getTicker( ));
+            binding.setTicker(item.getName( ));
             binding.executePendingBindings( );
             
             if (tickerFontSize != null) {

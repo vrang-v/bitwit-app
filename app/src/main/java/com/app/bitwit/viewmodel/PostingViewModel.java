@@ -54,6 +54,7 @@ public class PostingViewModel extends RxJavaViewModelSupport implements Snackbar
         request.setTitle(title.getValue( ));
         request.setContent(content.getValue( ));
         request.setTickers(tags);
+        request.setTags(tags);
         return subscribe(
                 postRepository.createPost(request)
                               .doOnError(e -> setSnackbar("게시물을 작성하는 도중 문제가 발생했어요"))

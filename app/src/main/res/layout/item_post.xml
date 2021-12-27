@@ -199,7 +199,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            bind:adapter="@{post.stocks}"
+            bind:adapter="@{post.tags}"
             app:layout_constraintBottom_toBottomOf="@+id/heartBtn"
             app:layout_constraintStart_toStartOf="@+id/title"
             app:layout_constraintTop_toTopOf="@+id/heartBtn" />

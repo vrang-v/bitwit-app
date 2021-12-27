@@ -31,6 +31,8 @@ public class Post {
     
     Instant createdAt;
     
+    List<Tag> tags;
+    
     List<Comment> comments;
     
     Set<Stock> stocks;

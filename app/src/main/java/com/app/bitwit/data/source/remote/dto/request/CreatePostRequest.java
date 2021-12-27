@@ -13,6 +13,8 @@ public class CreatePostRequest {
     
     String content;
     
+    List<String> tags;
+    
     List<String> tickers;
     
 }

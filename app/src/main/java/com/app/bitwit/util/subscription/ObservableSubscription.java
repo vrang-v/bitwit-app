@@ -8,15 +8,16 @@ import io.reactivex.rxjava3.functions.Action;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.Setter;
 
-import java.util.concurrent.CompletableFuture;
-
-public class ObservableSubscription<T> implements Subscription<Void> {
+public class ObservableSubscription<T> implements Subscription {
     
     private final DisposableContainer disposableContainer;
     
-    private Observable<T> observable;
+    @Getter(AccessLevel.PACKAGE)
+    private final Observable<T> observable;
     
     @Setter
     private Scheduler subscribingScheduler = Schedulers.io( );
@@ -32,37 +33,69 @@ public class ObservableSubscription<T> implements Subscription<Void> {
         this.disposableContainer = disposableContainer;
     }
     
+    public static <T> ObservableSubscription<T> empty( ) {
+        return new ObservableSubscription<>(null, null);
+    }
+    
     public ObservableSubscription<T> onNext(Consumer<T> onSuccess) {
         this.onNext = onSuccess;
         return this;
     }
     
-    @Override
     public ObservableSubscription<T> onError(Consumer<? super Throwable> onError) {
         this.onError = onError;
         return this;
     }
     
-    @Override
-    public Subscription<Void> onComplete(Action onComplete) {
+    public ObservableSubscription<T> onComplete(Action onComplete) {
         this.onComplete = onComplete;
         return this;
     }
     
-    @Override
-    public <R> Subscription<R> then(Function<Void, Subscription<R>> mapper) {
-        CompletableFuture<Void> complete = new CompletableFuture<>( );
-        try {
-            observable = observable.doOnComplete(( ) -> complete.complete(null));
-            subscribe( );
-            return mapper.apply(complete.get( ));
+    public <R> ObservableSubscription<R> thenObservable(Function<T, ObservableSubscription<R>> mapper) {
+        if (observable == null) {
+            return ObservableSubscription.empty( );
         }
-        catch (Throwable ignored) { }
-        return null;
+        return new ObservableSubscription<>(
+                observable.doOnNext(onNext)
+                          .doOnComplete(onComplete)
+                          .doOnError(onError)
+                          .flatMap(t -> mapper.apply(t).getObservable( )),
+                disposableContainer
+        );
+    }
+    
+    public <R> ObservableSubscription<R> thenSingle(Function<T, SingleSubscription<R>> mapper) {
+        if (observable == null) {
+            return ObservableSubscription.empty( );
+        }
+        return new ObservableSubscription<>(
+                observable.doOnNext(onNext)
+                          .doOnComplete(onComplete)
+                          .doOnError(onError)
+                          .flatMapSingle(t -> mapper.apply(t).getSingle( )),
+                disposableContainer
+        );
+    }
+    
+    public CompletableSubscription thenCompletable(Function<T, CompletableSubscription> mapper) {
+        if (observable == null) {
+            return CompletableSubscription.empty( );
+        }
+        return new CompletableSubscription(
+                observable.doOnNext(onNext)
+                          .doOnComplete(onComplete)
+                          .doOnError(onError)
+                          .flatMapCompletable(t -> mapper.apply(t).getCompletable( )),
+                disposableContainer
+        );
     }
     
     @Override
     public void subscribe( ) {
+        if (observable == null) {
+            return;
+        }
         disposableContainer.add(
                 observable.subscribeOn(subscribingScheduler)
                           .observeOn(observingScheduler)

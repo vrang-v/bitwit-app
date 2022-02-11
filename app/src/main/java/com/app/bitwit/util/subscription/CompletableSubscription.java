@@ -6,17 +6,18 @@ import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.disposables.DisposableContainer;
 import io.reactivex.rxjava3.functions.Action;
 import io.reactivex.rxjava3.functions.Consumer;
-import io.reactivex.rxjava3.functions.Function;
+import io.reactivex.rxjava3.functions.Supplier;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.Setter;
 
-import java.util.concurrent.CompletableFuture;
-
-public class CompletableSubscription implements Subscription<Void> {
+public class CompletableSubscription implements Subscription {
     
     private final DisposableContainer disposableContainer;
     
-    private Completable completable;
+    @Getter(AccessLevel.PACKAGE)
+    private final Completable completable;
     
     @Setter
     private Scheduler subscribingScheduler = Schedulers.io( );
@@ -31,32 +32,61 @@ public class CompletableSubscription implements Subscription<Void> {
         this.disposableContainer = disposableContainer;
     }
     
-    @Override
-    public Subscription<Void> onComplete(Action onComplete) {
+    public static CompletableSubscription empty( ) {
+        return new CompletableSubscription(null, null);
+    }
+    
+    public CompletableSubscription onComplete(Action onComplete) {
         this.onComplete = onComplete;
         return this;
     }
     
-    @Override
-    public Subscription<Void> onError(Consumer<? super Throwable> onError) {
+    public CompletableSubscription onError(Consumer<? super Throwable> onError) {
         this.onError = onError;
         return this;
     }
     
-    @Override
-    public <R> Subscription<R> then(Function<Void, Subscription<R>> mapper) {
-        CompletableFuture<Void> complete = new CompletableFuture<>( );
-        try {
-            completable = completable.doOnComplete(( ) -> complete.complete(null));
-            subscribe( );
-            return mapper.apply(complete.get( ));
+    public CompletableSubscription then(Supplier<CompletableSubscription> next) throws Throwable {
+        if (completable == null) {
+            return CompletableSubscription.empty( );
         }
-        catch (Throwable ignored) { }
-        return null;
+        return new CompletableSubscription(
+                completable.doOnComplete(onComplete)
+                           .doOnError(onError)
+                           .andThen(next.get( ).getCompletable( )),
+                disposableContainer
+        );
+    }
+    
+    public <R> ObservableSubscription<R> thenObservable(Supplier<ObservableSubscription<R>> next) throws Throwable {
+        if (completable == null) {
+            return ObservableSubscription.empty( );
+        }
+        return new ObservableSubscription<>(
+                completable.doOnComplete(onComplete)
+                           .doOnError(onError)
+                           .andThen(next.get( ).getObservable( )),
+                disposableContainer
+        );
+    }
+    
+    public <R> SingleSubscription<R> thenSingle(Supplier<SingleSubscription<R>> next) throws Throwable {
+        if (completable == null) {
+            return SingleSubscription.empty( );
+        }
+        return new SingleSubscription<>(
+                completable.doOnComplete(onComplete)
+                           .doOnError(onError)
+                           .andThen(next.get( ).getSingle( )),
+                disposableContainer
+        );
     }
     
     @Override
     public void subscribe( ) {
+        if (completable == null) {
+            return;
+        }
         disposableContainer.add(
                 completable
                         .subscribeOn(subscribingScheduler)

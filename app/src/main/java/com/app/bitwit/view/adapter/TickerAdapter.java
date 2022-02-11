@@ -31,7 +31,7 @@ public class TickerAdapter extends EventAdapter<Tag, TickerAdapterEvent> {
     
     public class ViewHolder extends EventAdapter<Tag, TickerAdapterEvent>.EventViewHolder {
         
-        ItemTickerBinding binding;
+        private final ItemTickerBinding binding;
         
         public ViewHolder(ItemTickerBinding binding) {
             super(binding.getRoot( ));

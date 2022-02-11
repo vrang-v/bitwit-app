@@ -77,20 +77,20 @@ public class PostActivity extends AppCompatActivity {
         observeAll(this, viewModel.getCommentContent( ), viewModel.getCommentType( ), (comment, type) -> {
             Comment selected            = viewModel.getCommentSelected( ).getValue( );
             boolean hasText             = hasText(comment);
-            String  blackCommentMessage = "공백 댓글은 작성할 수 없어요";
+            String  blankCommentMessage = "공백 댓글은 작성할 수 없어요";
             switch (type) {
                 case COMMENT:
-                    viewModel.setCommentDetail(hasText ? "댓글을 작성하고 있어요" : blackCommentMessage);
+                    viewModel.setCommentDetail(hasText ? "댓글을 작성하고 있어요" : blankCommentMessage);
                     break;
                 case COMMENT_REPLY:
                 case REPLY_REPLY:
                     String toName = selected.getWriter( ).getName( );
                     String myName = viewModel.getAccount( ).getValue( ).getName( );
                     if (toName.equals(myName)) {
-                        viewModel.setCommentDetail(hasText ? "나에게 남길 답글을 작성하고 있어요" : blackCommentMessage);
+                        viewModel.setCommentDetail(hasText ? "나에게 남길 답글을 작성하고 있어요" : blankCommentMessage);
                     }
                     else {
-                        viewModel.setCommentDetail(hasText ? toName + " 님에게 남길 답글을 작성하고 있어요" : blackCommentMessage);
+                        viewModel.setCommentDetail(hasText ? toName + " 님에게 남길 답글을 작성하고 있어요" : blankCommentMessage);
                     }
                     break;
                 case EDIT:

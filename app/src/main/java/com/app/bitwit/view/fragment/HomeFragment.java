@@ -114,7 +114,7 @@ public class HomeFragment extends Fragment implements OnNavigationItemReselected
                             event.getEvent( ) == INCREMENT_BTN_CLICK ? INCREMENT : DECREMENT
                     );
                     viewModel.createBallot(request)
-                             .then(ballot -> viewModel.refreshVoteItem(event.getPosition( )))
+                             .thenCompletable(ballot -> viewModel.refreshVoteItem(event.getPosition( )))
                              .subscribe( );
                     break;
             }

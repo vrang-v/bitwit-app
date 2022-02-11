@@ -11,9 +11,9 @@ import com.app.bitwit.data.source.remote.dto.request.SearchStockRequest;
 import com.app.bitwit.domain.Ballot;
 import com.app.bitwit.domain.Stock;
 import com.app.bitwit.domain.Vote;
-import com.app.bitwit.util.subscription.SingleSubscription;
-import com.app.bitwit.util.subscription.Subscription;
 import com.app.bitwit.dto.SearchItem;
+import com.app.bitwit.util.subscription.CompletableSubscription;
+import com.app.bitwit.util.subscription.SingleSubscription;
 import com.app.bitwit.viewmodel.common.RxJavaViewModelSupport;
 import dagger.hilt.android.lifecycle.HiltViewModel;
 import lombok.Getter;
@@ -45,12 +45,11 @@ public class SearchActivityViewModel extends RxJavaViewModelSupport {
         this.ballotRepository = ballotRepository;
     }
     
-    public Subscription<List<SearchItem>> search(String keyword) {
+    public SingleSubscription<List<SearchItem>> search(String keyword) {
         if (keyword.isEmpty( )) {
             stocks.postValue(new ArrayList<>( ));
-            return empty( );
+            return SingleSubscription.empty( );
         }
-        
         return subscribe(
                 stockRepository
                         .searchStock(new SearchStockRequest(keyword))
@@ -72,11 +71,11 @@ public class SearchActivityViewModel extends RxJavaViewModelSupport {
         );
     }
     
-    public Subscription<Ballot> createBallot(CreateBallotRequest request) {
+    public SingleSubscription<Ballot> createBallot(CreateBallotRequest request) {
         return subscribe(ballotRepository.createOrChangeBallot(request));
     }
     
-    public Subscription<Void> refreshVoteItem(Long voteId) {
+    public CompletableSubscription refreshVoteItem(Long voteId) {
         return subscribe(voteRepository.getVoteItem(voteId, "vote-item"));
     }
 }

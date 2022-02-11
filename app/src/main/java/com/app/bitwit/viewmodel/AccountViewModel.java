@@ -6,7 +6,6 @@ import com.app.bitwit.domain.Account;
 import com.app.bitwit.util.IOUtils;
 import com.app.bitwit.util.subscription.CompletableSubscription;
 import com.app.bitwit.util.subscription.SingleSubscription;
-import com.app.bitwit.util.subscription.Subscription;
 import com.app.bitwit.viewmodel.common.RxJavaViewModelSupport;
 import com.app.bitwit.viewmodel.common.SnackbarViewModel;
 import dagger.hilt.android.lifecycle.HiltViewModel;
@@ -32,7 +31,7 @@ public class AccountViewModel extends RxJavaViewModelSupport implements Snackbar
         this.accountRepository = accountRepository;
     }
     
-    public Subscription<Account> loadAccount( ) {
+    public SingleSubscription<Account> loadAccount( ) {
         return subscribe(
                 accountRepository
                         .getAccount( )

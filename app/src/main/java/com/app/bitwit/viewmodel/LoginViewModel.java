@@ -6,7 +6,7 @@ import com.app.bitwit.data.source.remote.dto.request.GoogleLoginRequest;
 import com.app.bitwit.data.source.remote.dto.request.LoginRequest;
 import com.app.bitwit.data.source.remote.dto.response.LoginResponse;
 import com.app.bitwit.util.StringUtils;
-import com.app.bitwit.util.subscription.Subscription;
+import com.app.bitwit.util.subscription.SingleSubscription;
 import com.app.bitwit.viewmodel.common.RxJavaViewModelSupport;
 import com.app.bitwit.viewmodel.common.SnackbarViewModel;
 import dagger.hilt.android.lifecycle.HiltViewModel;
@@ -32,21 +32,25 @@ public class LoginViewModel extends RxJavaViewModelSupport implements SnackbarVi
         this.accountRepository = accountRepository;
     }
     
-    public Subscription<LoginResponse> login( ) {
+    public SingleSubscription<LoginResponse> login( ) {
         var request = new LoginRequest(email.getValue( ), password.getValue( ));
         if (! isValidLoginRequest(request)) {
-            return empty( );
+            return SingleSubscription.empty( );
         }
         return subscribe(accountRepository.login(request));
     }
     
-    public Subscription<LoginResponse> googleLogin(GoogleLoginRequest request) {
+    public SingleSubscription<LoginResponse> googleLogin(GoogleLoginRequest request) {
         return subscribe(accountRepository.googleLogin(request));
     }
     
     private boolean isValidLoginRequest(LoginRequest request) {
         if (! StringUtils.hasText(request.getEmail( ))) {
             setSnackbar("이메일을 입력해주세요");
+            return false;
+        }
+        if (!StringUtils.isEmailFormat(request.getEmail( ))) {
+            setSnackbar("이메일 형식인지 확인해주세요");
             return false;
         }
         if (! StringUtils.hasText(request.getPassword( ))) {

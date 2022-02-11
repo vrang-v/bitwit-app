@@ -114,6 +114,7 @@
                 android:layout_marginBottom="10dp"
                 android:orientation="horizontal"
                 android:visibility="@{viewModel.tags.empty ? View.GONE : View.VISIBLE}"
+                bind:adapter="@{viewModel.tags}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

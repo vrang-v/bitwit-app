@@ -312,11 +312,54 @@
                             app:layout_constraintEnd_toStartOf="@+id/textView13" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
+                    <Button
+                        android:id="@+id/candleStickChartBtn"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_marginEnd="16dp"
+                        android:background="@drawable/outline_candlestick_chart_24"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/selectedCandlestickInfo" />
+
+                    <View
+                        android:layout_width="0.7dp"
+                        android:layout_height="24dp"
+                        android:background="@color/black"
+                        app:layout_constraintBottom_toBottomOf="@+id/lineChartBtn"
+                        app:layout_constraintEnd_toStartOf="@id/candleStickChartBtn"
+                        app:layout_constraintStart_toEndOf="@id/lineChartBtn"
+                        android:layout_marginStart="1dp"
+                        android:layout_marginEnd="1dp"
+                        app:layout_constraintTop_toTopOf="@+id/lineChartBtn" />
+
+                    <Button
+                        android:id="@+id/lineChartBtn"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:background="@drawable/outline_show_chart_24"
+                        android:layout_marginEnd="4dp"
+                        app:layout_constraintBottom_toBottomOf="@+id/candleStickChartBtn"
+                        app:layout_constraintEnd_toStartOf="@+id/candleStickChartBtn"
+                        app:layout_constraintTop_toBottomOf="@+id/selectedCandlestickInfo" />
+
+
                     <com.github.mikephil.charting.charts.LineChart
                         android:id="@+id/lineChart"
+                        android:background="@color/white"
                         android:layout_width="0dp"
                         android:layout_height="300dp"
-                        android:visibility="invisible"
+                        android:visibility="@{viewModel.chartType.equals(`line`) ? View.VISIBLE : View.INVISIBLE}"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/selectedCandlestickInfo"
+                        app:layout_constraintWidth_percent="1" />
+
+                    <com.github.mikephil.charting.charts.CandleStickChart
+                        android:id="@+id/candleStickChart"
+                        android:background="@color/white"
+                        android:layout_width="0dp"
+                        android:layout_height="300dp"
+                        android:visibility="@{viewModel.chartType.equals(`candleStick`) ? View.VISIBLE : View.INVISIBLE}"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/selectedCandlestickInfo"

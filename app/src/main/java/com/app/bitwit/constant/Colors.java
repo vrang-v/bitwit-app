@@ -10,4 +10,5 @@ public interface Colors {
     int PRIMARY_BLUE_LIGHT = Color.parseColor("#80C1FF");
     int GRAY               = Color.parseColor("#ACACAC");
     int BLACK              = Color.BLACK;
+    
 }

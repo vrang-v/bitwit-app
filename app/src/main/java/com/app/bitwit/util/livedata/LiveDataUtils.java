@@ -2,18 +2,28 @@ package com.app.bitwit.util.livedata;
 
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import com.app.bitwit.util.StringUtils;
-import com.app.bitwit.util.livedata.Consumer3;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.util.Collection;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LiveDataUtils {
+    
+    public static <T> void updateLiveData(final MutableLiveData<T> liveData, final Supplier<T> supplier) {
+        liveData.postValue(supplier.get( ));
+    }
+    
+    public static <T> void updateLiveData(final MutableLiveData<T> liveData, final Function<T, T> converter) {
+        liveData.postValue(converter.apply(liveData.getValue( )));
+    }
     
     public static <T> void observeUntilNotNull(final LiveData<T> liveData, final Observer<T> observer) {
         liveData.observeForever(new Observer<T>( ) {

@@ -12,7 +12,6 @@ import javax.inject.Inject;
 @HiltViewModel
 public class PostSearchViewModel extends RxJavaViewModelSupport implements SnackbarViewModel {
     
-    
     private final MutableLiveData<String> searchWord = new MutableLiveData<>( );
     
     @Inject

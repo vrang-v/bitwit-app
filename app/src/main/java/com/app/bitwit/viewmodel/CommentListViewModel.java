@@ -5,7 +5,7 @@ import com.app.bitwit.domain.Comment;
 import com.app.bitwit.dto.Page;
 import com.app.bitwit.util.Empty;
 import com.app.bitwit.util.livedata.MutableLiveList;
-import com.app.bitwit.util.subscription.Subscription;
+import com.app.bitwit.util.subscription.SingleSubscription;
 import com.app.bitwit.viewmodel.common.RxJavaViewModelSupport;
 import com.app.bitwit.viewmodel.common.SnackbarViewModel;
 import io.reactivex.rxjava3.core.Single;
@@ -28,9 +28,9 @@ public abstract class CommentListViewModel extends RxJavaViewModelSupport implem
     
     protected abstract Single<Page<Comment>> loadCommentPage( );
     
-    public Subscription<Page<Comment>> nextPage( ) {
+    public SingleSubscription<Page<Comment>> nextPage( ) {
         if (last) {
-            return Subscription.empty( );
+            return SingleSubscription.empty( );
         }
         return subscribe(
                 loadCommentPage( )
@@ -41,7 +41,7 @@ public abstract class CommentListViewModel extends RxJavaViewModelSupport implem
         );
     }
     
-    public Subscription<Page<Comment>> refreshPage( ) {
+    public SingleSubscription<Page<Comment>> refreshPage( ) {
         page = 0;
         return subscribe(
                 loadCommentPage( )
@@ -54,7 +54,7 @@ public abstract class CommentListViewModel extends RxJavaViewModelSupport implem
         );
     }
     
-    public Subscription<Empty> deleteComment(Long commentId) {
+    public SingleSubscription<Empty> deleteComment(Long commentId) {
         return subscribe(
                 postRepository
                         .deleteComment(commentId)

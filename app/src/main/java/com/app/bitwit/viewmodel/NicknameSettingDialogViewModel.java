@@ -5,7 +5,6 @@ import com.app.bitwit.data.repository.AccountRepository;
 import com.app.bitwit.data.source.remote.dto.request.UpdateAccountRequest;
 import com.app.bitwit.domain.Account;
 import com.app.bitwit.util.subscription.SingleSubscription;
-import com.app.bitwit.util.subscription.Subscription;
 import com.app.bitwit.viewmodel.common.RxJavaViewModelSupport;
 import dagger.hilt.android.lifecycle.HiltViewModel;
 import lombok.Getter;
@@ -40,9 +39,9 @@ public class NicknameSettingDialogViewModel extends RxJavaViewModelSupport {
         );
     }
     
-    public Subscription<Account> changeNickname( ) {
+    public SingleSubscription<Account> changeNickname( ) {
         if (! Objects.equals(valid.getValue( ), TRUE)) {
-            return empty( );
+            return SingleSubscription.empty( );
         }
         var request = new UpdateAccountRequest( );
         request.setNickname(nickname.getValue( ));

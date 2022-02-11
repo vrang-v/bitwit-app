@@ -10,6 +10,7 @@ import com.app.bitwit.R;
 import com.app.bitwit.databinding.ActivityPostingBinding;
 import com.app.bitwit.dto.LoginAccount;
 import com.app.bitwit.view.adapter.TagAdapter;
+import com.app.bitwit.view.adapter.TagAdapter.TagAdapterEvent;
 import com.app.bitwit.view.dialog.NicknameSettingDialog;
 import com.app.bitwit.viewmodel.PostingViewModel;
 import com.google.android.material.snackbar.Snackbar;
@@ -76,8 +77,12 @@ public class PostingActivity extends AppCompatActivity {
     }
     
     private void addTagAdapter( ) {
-        var tagAdapter = new TagAdapter(viewModel.getTags( ));
-        viewModel.getTags( ).observe(this, tags -> tagAdapter.notifyDataSetChanged( ));
+        var tagAdapter = new TagAdapter( );
+        tagAdapter.addAdapterEventListener(this, event -> {
+            if (event.getEvent( ) == TagAdapterEvent.DELETE) {
+                viewModel.removeTag(event.getItem( ));
+            }
+        });
         binding.tagRecycler.setAdapter(tagAdapter);
         binding.tagRecycler.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
     }

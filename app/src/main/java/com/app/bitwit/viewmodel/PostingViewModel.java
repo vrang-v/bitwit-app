@@ -8,7 +8,6 @@ import com.app.bitwit.domain.Post;
 import com.app.bitwit.dto.LoginAccount;
 import com.app.bitwit.util.livedata.MutableLiveList;
 import com.app.bitwit.util.subscription.SingleSubscription;
-import com.app.bitwit.util.subscription.Subscription;
 import com.app.bitwit.viewmodel.common.RxJavaViewModelSupport;
 import com.app.bitwit.viewmodel.common.SnackbarViewModel;
 import dagger.hilt.android.lifecycle.HiltViewModel;
@@ -40,7 +39,7 @@ public class PostingViewModel extends RxJavaViewModelSupport implements Snackbar
         this.accountRepository = accountRepository;
     }
     
-    public Subscription<LoginAccount> loadAccount( ) {
+    public SingleSubscription<LoginAccount> loadAccount( ) {
         return subscribe(
                 accountRepository
                         .loadAccount( )
@@ -64,5 +63,9 @@ public class PostingViewModel extends RxJavaViewModelSupport implements Snackbar
     public void addTag( ) {
         tags.add(inputTag.getValue( ));
         inputTag.postValue("");
+    }
+    
+    public void removeTag(String tag) {
+        tags.remove(tag);
     }
 }

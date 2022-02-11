@@ -7,7 +7,7 @@ import com.app.bitwit.data.source.remote.dto.request.CreateAccountRequest;
 import com.app.bitwit.data.source.remote.dto.request.GoogleLoginRequest;
 import com.app.bitwit.data.source.remote.dto.response.LoginResponse;
 import com.app.bitwit.util.StringUtils;
-import com.app.bitwit.util.subscription.Subscription;
+import com.app.bitwit.util.subscription.SingleSubscription;
 import com.app.bitwit.viewmodel.common.RxJavaViewModelSupport;
 import com.app.bitwit.viewmodel.common.SnackbarViewModel;
 import dagger.hilt.android.lifecycle.HiltViewModel;
@@ -33,15 +33,15 @@ public class SignUpViewModel extends RxJavaViewModelSupport implements SnackbarV
         this.accountRepository = accountRepository;
     }
     
-    public Subscription<Boolean> checkForDuplicateEmail( ) {
+    public SingleSubscription<Boolean> checkForDuplicateEmail( ) {
         var request = new CreateAccountRequest("init", email.getValue( ), password.getValue( ));
         if (! isValidRequest(request)) {
-            return empty( );
+            return SingleSubscription.empty( );
         }
         return subscribe(accountRepository.isDuplicateEmail(request.getEmail( )));
     }
     
-    public Subscription<LoginResponse> googleLogin(GoogleLoginRequest request) {
+    public SingleSubscription<LoginResponse> googleLogin(GoogleLoginRequest request) {
         return subscribe(accountRepository.googleLogin(request));
     }
     

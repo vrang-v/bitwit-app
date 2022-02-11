@@ -18,9 +18,9 @@ import java.util.Locale;
 @AllArgsConstructor
 public class SelectedCandlestick {
     
-    Candlestick selected;
-    Candlestick first;
-    Candlestick previous;
+    private Candlestick selected;
+    private Candlestick first;
+    private Candlestick previous;
     
     @SuppressLint("NewApi")
     public String getYearMonthDay( ) {
@@ -46,8 +46,8 @@ public class SelectedCandlestick {
             return stringBuilder.toString( );
         }
         stringBuilder.append(String.format("%s시", hour));
-        if (minute != 0) { stringBuilder.append(String.format("%s분", minute)); }
-        if (second != 0) { stringBuilder.append(String.format("%s초", minute)); }
+        if (minute != 0) { stringBuilder.append(String.format(" %s분", minute)); }
+        if (second != 0) { stringBuilder.append(String.format(" %s초", minute)); }
         return stringBuilder.toString( );
     }
     

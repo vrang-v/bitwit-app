@@ -15,6 +15,8 @@ public class UpdatePostRequest {
     
     String content;
     
+    List<String> tags;
+    
     List<String> tickers;
     
 }

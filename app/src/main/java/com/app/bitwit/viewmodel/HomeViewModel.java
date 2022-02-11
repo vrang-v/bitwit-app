@@ -8,8 +8,9 @@ import com.app.bitwit.data.source.local.entity.VoteItem;
 import com.app.bitwit.data.source.remote.dto.request.CreateBallotRequest;
 import com.app.bitwit.domain.Ballot;
 import com.app.bitwit.dto.LoginAccount;
-import com.app.bitwit.util.livedata.ChangeableLiveData;
-import com.app.bitwit.util.subscription.Subscription;
+import com.app.bitwit.util.livedata.LiveDataObserver;
+import com.app.bitwit.util.subscription.CompletableSubscription;
+import com.app.bitwit.util.subscription.SingleSubscription;
 import com.app.bitwit.viewmodel.common.RxJavaViewModelSupport;
 import com.app.bitwit.viewmodel.common.SnackbarViewModel;
 import dagger.hilt.android.lifecycle.HiltViewModel;
@@ -41,7 +42,7 @@ public class HomeViewModel extends RxJavaViewModelSupport implements SnackbarVie
     private final MutableLiveData<Integer>      sortDirection     = new MutableLiveData<>(- 1);
     private final MutableLiveData<String>       sortStatus        = new MutableLiveData<>("");
     
-    private final ChangeableLiveData<List<VoteItem>> voteItems = new ChangeableLiveData<>( );
+    private final LiveDataObserver<List<VoteItem>> voteItems = new LiveDataObserver<>( );
     
     @Inject
     public HomeViewModel(VoteRepository voteRepository, AccountRepository accountRepository, BallotRepository ballotRepository) {
@@ -51,27 +52,27 @@ public class HomeViewModel extends RxJavaViewModelSupport implements SnackbarVie
         voteItems.changeSource(voteRepository.loadVoteItems( ));
     }
     
-    public Subscription<Void> refreshVoteItem(int position) {
+    public CompletableSubscription refreshVoteItem(int position) {
         var voteId = voteItems.getValue( ).get(position).getId( );
         return subscribe(
                 voteRepository.getVoteItem(voteId, "vote-item")
         );
     }
     
-    public Subscription<Void> refreshVoteItemsSchedule(long refreshInterval) {
+    public CompletableSubscription refreshVoteItemsSchedule(long refreshInterval) {
         return subscribe(
                 Observable.interval(0L, refreshInterval, TimeUnit.SECONDS)
                           .flatMapCompletable(event -> voteRepository.refreshVoteItems( ))
         );
     }
     
-    public Subscription<Ballot> createBallot(CreateBallotRequest request) {
+    public SingleSubscription<Ballot> createBallot(CreateBallotRequest request) {
         return subscribe(
                 ballotRepository.createOrChangeBallot(request)
         );
     }
     
-    public Subscription<LoginAccount> loadAccount( ) {
+    public SingleSubscription<LoginAccount> loadAccount( ) {
         return subscribe(
                 accountRepository.loadAccount( )
                                  .doOnSuccess(account::postValue)
@@ -98,7 +99,7 @@ public class HomeViewModel extends RxJavaViewModelSupport implements SnackbarVie
             sortStatus.postValue("");
             return;
         }
-        StringBuilder status = new StringBuilder( );
+        var status = new StringBuilder( );
         switch (sortOption) {
             case PRICE_FLUCTUATION:
                 status.append("가격 변동");
@@ -146,7 +147,6 @@ public class HomeViewModel extends RxJavaViewModelSupport implements SnackbarVie
     
     @Override
     protected void onCleared( ) {
-//        voteItemsObserveDelegate.dispose( );
         voteItems.dispose( );
         super.onCleared( );
     }

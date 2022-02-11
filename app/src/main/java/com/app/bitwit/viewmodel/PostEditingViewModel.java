@@ -5,11 +5,10 @@ import com.app.bitwit.data.repository.AccountRepository;
 import com.app.bitwit.data.repository.PostRepository;
 import com.app.bitwit.data.source.remote.dto.request.UpdatePostRequest;
 import com.app.bitwit.domain.Post;
-import com.app.bitwit.domain.Stock;
+import com.app.bitwit.domain.Tag;
 import com.app.bitwit.dto.LoginAccount;
 import com.app.bitwit.util.livedata.MutableLiveList;
 import com.app.bitwit.util.subscription.SingleSubscription;
-import com.app.bitwit.util.subscription.Subscription;
 import com.app.bitwit.viewmodel.common.RxJavaViewModelSupport;
 import com.app.bitwit.viewmodel.common.SnackbarViewModel;
 import dagger.hilt.android.lifecycle.HiltViewModel;
@@ -43,7 +42,7 @@ public class PostEditingViewModel extends RxJavaViewModelSupport implements Snac
         this.accountRepository = accountRepository;
     }
     
-    public Subscription<LoginAccount> loadAccount( ) {
+    public SingleSubscription<LoginAccount> loadAccount( ) {
         return subscribe(
                 accountRepository
                         .loadAccount( )
@@ -52,16 +51,16 @@ public class PostEditingViewModel extends RxJavaViewModelSupport implements Snac
         );
     }
     
-    public Subscription<Post> loadPost( ) {
+    public SingleSubscription<Post> loadPost( ) {
         return subscribe(
                 postRepository.getPost(postId)
                               .doOnSuccess(post -> {
                                   title.postValue(post.getTitle( ));
                                   content.postValue(post.getContent( ));
                                   tags.postValue(
-                                          post.getStocks( )
+                                          post.getTags( )
                                               .stream( )
-                                              .map(Stock::getTicker)
+                                              .map(Tag::getName)
                                               .collect(Collectors.toList( )));
                               })
                               .doOnError(e -> setSnackbar("게시물을 불러오는 도중 문제가 발생했어요"))
@@ -73,6 +72,7 @@ public class PostEditingViewModel extends RxJavaViewModelSupport implements Snac
         request.setPostId(postId);
         request.setTitle(title.getValue( ));
         request.setContent(content.getValue( ));
+        request.setTags(tags);
         request.setTickers(tags);
         return subscribe(
                 postRepository.updatePost(request)
@@ -87,5 +87,9 @@ public class PostEditingViewModel extends RxJavaViewModelSupport implements Snac
     public void addTag( ) {
         tags.add(inputTag.getValue( ));
         inputTag.postValue("");
+    }
+    
+    public void removeTag(String tag) {
+        tags.remove(tag);
     }
 }

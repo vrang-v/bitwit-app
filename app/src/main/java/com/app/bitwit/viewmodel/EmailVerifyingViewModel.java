@@ -9,7 +9,6 @@ import com.app.bitwit.data.source.remote.dto.response.EmailVerificationResponse;
 import com.app.bitwit.dto.LoginAccount;
 import com.app.bitwit.util.Empty;
 import com.app.bitwit.util.subscription.SingleSubscription;
-import com.app.bitwit.util.subscription.Subscription;
 import com.app.bitwit.viewmodel.common.RxJavaViewModelSupport;
 import com.app.bitwit.viewmodel.common.SnackbarViewModel;
 import dagger.hilt.android.lifecycle.HiltViewModel;
@@ -41,7 +40,7 @@ public class EmailVerifyingViewModel extends RxJavaViewModelSupport implements S
                          .subscribe( );
     }
     
-    public Subscription<Empty> resendEmailToken( ) {
+    public SingleSubscription<Empty> resendEmailToken( ) {
         if (loginAccount == null) {
             loadAccount( );
         }

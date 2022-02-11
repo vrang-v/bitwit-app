@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel;
 import com.app.bitwit.util.subscription.CompletableSubscription;
 import com.app.bitwit.util.subscription.ObservableSubscription;
 import com.app.bitwit.util.subscription.SingleSubscription;
-import com.app.bitwit.util.subscription.Subscription;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
@@ -24,10 +23,6 @@ public class RxJavaViewModelSupport extends ViewModel {
     
     public CompletableSubscription subscribe(Completable completable) {
         return new CompletableSubscription(completable, compositeDisposable);
-    }
-    
-    public <T> Subscription<T> empty( ) {
-        return Subscription.empty( );
     }
     
     @Override

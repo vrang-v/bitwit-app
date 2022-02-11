@@ -1,13 +1,8 @@
 package com.app.bitwit.view.activity.auth;
 
-import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
-import android.transition.Fade;
-import android.transition.Slide;
-import android.view.Gravity;
 import android.view.KeyEvent;
-import android.view.Window;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult;
 import androidx.appcompat.app.AppCompatActivity;

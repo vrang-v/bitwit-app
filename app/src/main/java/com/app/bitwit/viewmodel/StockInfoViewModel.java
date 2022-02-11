@@ -8,13 +8,13 @@ import com.app.bitwit.data.repository.VoteRepository;
 import com.app.bitwit.data.source.local.entity.Candlestick;
 import com.app.bitwit.data.source.local.entity.VoteItem;
 import com.app.bitwit.domain.SelectedCandlestick;
-import com.app.bitwit.util.livedata.ChangeableLiveData;
-import com.app.bitwit.util.livedata.MutableLiveList;
-import com.app.bitwit.viewmodel.common.SnackbarViewModel;
-import com.app.bitwit.util.subscription.Subscription;
 import com.app.bitwit.dto.PostPreviewItem;
+import com.app.bitwit.util.livedata.LiveDataObserver;
+import com.app.bitwit.util.livedata.MutableLiveList;
+import com.app.bitwit.util.subscription.CompletableSubscription;
+import com.app.bitwit.util.subscription.SingleSubscription;
 import com.app.bitwit.viewmodel.common.RxJavaViewModelSupport;
-import com.github.mikephil.charting.data.Entry;
+import com.app.bitwit.viewmodel.common.SnackbarViewModel;
 import dagger.hilt.android.lifecycle.HiltViewModel;
 import lombok.Getter;
 import lombok.var;
@@ -23,10 +23,8 @@ import javax.inject.Inject;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static com.app.bitwit.util.livedata.LiveDataUtils.observeUntilNotEmpty;
@@ -39,15 +37,14 @@ public class StockInfoViewModel extends RxJavaViewModelSupport implements Snackb
     private final CandlestickRepository candlestickRepository;
     private final PostRepository        postRepository;
     
-    private final ChangeableLiveData<VoteItem>     voteItem         = new ChangeableLiveData<>( );
-    private final MutableLiveList<Entry>           entries          = new MutableLiveList<>( );
-    private final MutableLiveList<PostPreviewItem> postPreviewItems = new MutableLiveList<>( );
+    private final LiveDataObserver<VoteItem> voteItem = new LiveDataObserver<>( );
     
     private final MutableLiveData<String>              ticker              = new MutableLiveData<>( );
+    private final MutableLiveList<Candlestick>         chartData           = new MutableLiveList<>( );
+    private final MutableLiveData<String>              chartType           = new MutableLiveData<>( );
     private final MutableLiveData<String>              chartInterval       = new MutableLiveData<>( );
     private final MutableLiveData<SelectedCandlestick> selectedCandlestick = new MutableLiveData<>( );
-    
-    private final List<Candlestick> chartData = new ArrayList<>( );
+    private final MutableLiveList<PostPreviewItem>     postPreviewItems    = new MutableLiveList<>( );
     
     @Inject
     public StockInfoViewModel(VoteRepository voteRepository, CandlestickRepository candlestickRepository, PostRepository postRepository) {
@@ -60,25 +57,15 @@ public class StockInfoViewModel extends RxJavaViewModelSupport implements Snackb
         voteItem.changeSource(voteRepository.loadLastEndedVoteByTicker(ticker));
     }
     
-    public void loadChart(String ticker, String interval) {
-        observeUntilNotEmpty(candlestickRepository.loadCandlesticks(ticker, interval, 300),
-                candlesticks -> {
-                    Collections.reverse(candlesticks);
-                    chartData.clear( );
-                    chartData.addAll(candlesticks);
-                    var index = new AtomicInteger(0);
-                    var entries = candlesticks
-                            .stream( )
-                            .map(candlestick -> new Entry(index.getAndAdd(1),
-                                    (float)candlestick.getClosingPrice( ).doubleValue( )))
-                            .collect(Collectors.toList( ));
-                    this.entries.postValue(entries);
-                }
-        );
+    public void loadChartData(String ticker, String interval) {
+        observeUntilNotEmpty(candlestickRepository.loadCandlesticks(ticker, interval, 500), candlesticks -> {
+            Collections.reverse(candlesticks);
+            chartData.postValue(candlesticks);
+        });
     }
     
     @SuppressLint("NewApi")
-    public Subscription<Void> refreshChart(String ticker, String interval) {
+    public CompletableSubscription refreshChartData(String ticker, String interval) {
         return subscribe(
                 candlestickRepository
                         .getLastDateTime(ticker, interval)
@@ -111,13 +98,17 @@ public class StockInfoViewModel extends RxJavaViewModelSupport implements Snackb
         );
     }
     
-    public Subscription<List<PostPreviewItem>> loadPosts(String ticker) {
+    public SingleSubscription<List<PostPreviewItem>> loadPostPreviews(String ticker) {
         return subscribe(
                 postRepository
                         .searchPostByTickers(Collections.singletonList(ticker), 5)
                         .map(posts -> posts.stream( ).map(PostPreviewItem::new).collect(Collectors.toList( )))
                         .doOnSuccess(postPreviewItems::postValue)
         );
+    }
+    
+    public void setChartType(String chartType) {
+        this.chartType.postValue(chartType);
     }
     
     public void setTicker(String ticker) {
@@ -130,7 +121,6 @@ public class StockInfoViewModel extends RxJavaViewModelSupport implements Snackb
     
     public void setSelectedCandlestick(int index) {
         if (chartData.isEmpty( ) || index >= chartData.size( )) { return; }
-        
         this.selectedCandlestick.postValue(
                 new SelectedCandlestick(
                         chartData.get(index),
@@ -142,9 +132,8 @@ public class StockInfoViewModel extends RxJavaViewModelSupport implements Snackb
     
     @SuppressLint("NewApi")
     private boolean isOldData(LocalDateTime lastDataTime, Long amount, TemporalUnit temporalUnit) {
-        var now          = LocalDateTime.now( );
         var nextDataTime = lastDataTime.plus(amount, temporalUnit);
-        return now.isAfter(nextDataTime) || now.isEqual(nextDataTime);
+        return ! LocalDateTime.now( ).isBefore(nextDataTime);
     }
     
     @Override

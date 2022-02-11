@@ -2,7 +2,6 @@ package com.app.bitwit.view.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 import com.app.bitwit.data.repository.AccountRepository;
 import com.app.bitwit.data.source.remote.dto.response.LoginResponse;

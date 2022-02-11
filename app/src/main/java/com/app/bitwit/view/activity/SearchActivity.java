@@ -59,7 +59,7 @@ public class SearchActivity extends AppCompatActivity {
                                      adapter.showVoteScreen(event.getPosition( ));
                                  }
                              })
-                             .then(voteItem -> viewModel.refreshVoteItem(voteItem.getId( )))
+                             .thenCompletable(voteItem -> viewModel.refreshVoteItem(voteItem.getId( )))
                              .subscribe( );
                     break;
                 
@@ -74,7 +74,7 @@ public class SearchActivity extends AppCompatActivity {
                                  startActivity(new Intent(this, StockInfoActivity.class)
                                          .putExtra(STOCK_TICKER, searchItem.getStock( ).getTicker( )));
                              })
-                             .then(ballot -> viewModel.refreshVoteItem(ballot.getVoteId( )))
+                             .thenCompletable(ballot -> viewModel.refreshVoteItem(ballot.getVoteId( )))
                              .subscribe( );
                     break;
             }

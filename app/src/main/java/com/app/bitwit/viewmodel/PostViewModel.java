@@ -11,7 +11,6 @@ import com.app.bitwit.dto.LoginAccount;
 import com.app.bitwit.util.Empty;
 import com.app.bitwit.util.StringUtils;
 import com.app.bitwit.util.subscription.SingleSubscription;
-import com.app.bitwit.util.subscription.Subscription;
 import com.app.bitwit.viewmodel.common.RxJavaViewModelSupport;
 import com.app.bitwit.viewmodel.common.SnackbarViewModel;
 import dagger.hilt.android.lifecycle.HiltViewModel;
@@ -23,6 +22,8 @@ import org.jetbrains.annotations.Nullable;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.app.bitwit.util.livedata.LiveDataUtils.updateLiveData;
 
 @Getter
 @HiltViewModel
@@ -54,7 +55,7 @@ public class PostViewModel extends RxJavaViewModelSupport implements SnackbarVie
         loadAccount( ).subscribe( );
     }
     
-    public Subscription<LoginAccount> loadAccount( ) {
+    public SingleSubscription<LoginAccount> loadAccount( ) {
         return subscribe(
                 accountRepository
                         .loadAccount( )
@@ -63,16 +64,16 @@ public class PostViewModel extends RxJavaViewModelSupport implements SnackbarVie
         );
     }
     
-    public Subscription<Post> loadPost( ) {
+    public SingleSubscription<Post> loadPost( ) {
         return subscribe(
-                postRepository.
-                        viewPost(postId)
+                postRepository
+                        .viewPost(postId)
                         .doOnSuccess(post -> postFlattenComments(post.getComments( )))
                         .doOnSuccess(post::postValue)
         );
     }
     
-    public Subscription<Empty> deletePost( ) {
+    public SingleSubscription<Empty> deletePost( ) {
         return subscribe(
                 postRepository
                         .deletePost(post.getValue( ).getId( ))
@@ -80,10 +81,10 @@ public class PostViewModel extends RxJavaViewModelSupport implements SnackbarVie
         );
     }
     
-    public Subscription<Comment> createComment( ) {
+    public SingleSubscription<Comment> createComment( ) {
         String content = commentContent.getValue( ).trim( );
         if (! isValidComment(content)) {
-            return empty( );
+            return SingleSubscription.empty( );
         }
         var request = new CreateCommentRequest(content, post.getValue( ).getId( ), getParentId( ));
         return subscribe(
@@ -94,10 +95,10 @@ public class PostViewModel extends RxJavaViewModelSupport implements SnackbarVie
         );
     }
     
-    public Subscription<Empty> updateComment( ) {
+    public SingleSubscription<Empty> updateComment( ) {
         String content = commentContent.getValue( ).trim( );
         if (! isValidComment(content)) {
-            return empty( );
+            return SingleSubscription.empty( );
         }
         return subscribe(
                 postRepository
@@ -107,7 +108,7 @@ public class PostViewModel extends RxJavaViewModelSupport implements SnackbarVie
         );
     }
     
-    public Subscription<Empty> deleteComment(Long commentId) {
+    public SingleSubscription<Empty> deleteComment(Long commentId) {
         return subscribe(
                 postRepository
                         .deleteComment(commentId)
@@ -115,7 +116,7 @@ public class PostViewModel extends RxJavaViewModelSupport implements SnackbarVie
         );
     }
     
-    public Subscription<List<Comment>> reloadComments( ) {
+    public SingleSubscription<List<Comment>> reloadComments( ) {
         return subscribe(
                 postRepository
                         .getCommentsOnPost(post.getValue( ).getId( ))
@@ -128,15 +129,15 @@ public class PostViewModel extends RxJavaViewModelSupport implements SnackbarVie
         return subscribe(postRepository.like(this.post.getValue( ).getId( )));
     }
     
-    private Subscription<Like> unlike( ) {
+    private SingleSubscription<Like> unlike( ) {
         return subscribe(postRepository.unlike(this.post.getValue( ).getId( )));
     }
     
-    public Subscription<Like> likeComment(Long commentId) {
+    public SingleSubscription<Like> likeComment(Long commentId) {
         return subscribe(postRepository.likeComment(commentId));
     }
     
-    public Subscription<Like> unlikeComment(Long commentId) {
+    public SingleSubscription<Like> unlikeComment(Long commentId) {
         return subscribe(postRepository.unlikeComment(commentId));
     }
     
@@ -160,10 +161,11 @@ public class PostViewModel extends RxJavaViewModelSupport implements SnackbarVie
     
     public void invertLike( ) {
         likeChanged = ! likeChanged;
-        Post post = this.post.getValue( );
-        post.setLikeCount(post.isLike( ) ? post.getLikeCount( ) - 1 : post.getLikeCount( ) + 1);
-        post.setLike(! post.isLike( ));
-        this.post.postValue(post);
+        updateLiveData(post, p -> {
+            p.setLikeCount(p.isLike( ) ? p.getLikeCount( ) - 1 : p.getLikeCount( ) + 1);
+            p.setLike(! p.isLike( ));
+            return p;
+        });
     }
     
     public void commitLike( ) {
@@ -192,6 +194,7 @@ public class PostViewModel extends RxJavaViewModelSupport implements SnackbarVie
             case REPLY_REPLY:
                 parentId = commentSelected.getValue( ).getParentId( );
                 break;
+            default:
         }
         return parentId;
     }

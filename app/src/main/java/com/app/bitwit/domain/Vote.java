@@ -34,4 +34,5 @@ public class Vote {
     Map<VotingOption, Integer> selectionCount;
     
     List<Ballot> ballots;
+    
 }

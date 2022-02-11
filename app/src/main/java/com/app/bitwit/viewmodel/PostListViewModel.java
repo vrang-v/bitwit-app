@@ -4,9 +4,9 @@ import com.app.bitwit.data.repository.PostRepository;
 import com.app.bitwit.domain.Like;
 import com.app.bitwit.domain.Post;
 import com.app.bitwit.util.livedata.MutableLiveList;
-import com.app.bitwit.viewmodel.common.SnackbarViewModel;
-import com.app.bitwit.util.subscription.Subscription;
+import com.app.bitwit.util.subscription.SingleSubscription;
 import com.app.bitwit.viewmodel.common.RxJavaViewModelSupport;
+import com.app.bitwit.viewmodel.common.SnackbarViewModel;
 import io.reactivex.rxjava3.core.Single;
 import lombok.Getter;
 import lombok.var;
@@ -30,11 +30,11 @@ public abstract class PostListViewModel extends RxJavaViewModelSupport implement
     
     protected abstract Single<List<Post>> loadPosts( );
     
-    public Subscription<Post> loadPost(Long postId) {
+    public SingleSubscription<Post> loadPost(Long postId) {
         return subscribe(postRepository.getPost(postId));
     }
     
-    public Subscription<List<Post>> nextPage( ) {
+    public SingleSubscription<List<Post>> nextPage( ) {
         return subscribe(
                 loadPosts( )
                         .doOnSuccess(x -> postPage += 1)
@@ -43,7 +43,7 @@ public abstract class PostListViewModel extends RxJavaViewModelSupport implement
         );
     }
     
-    public Subscription<List<Post>> refreshPage( ) {
+    public SingleSubscription<List<Post>> refreshPage( ) {
         postPage = 0;
         return subscribe(
                 loadPosts( )
@@ -53,7 +53,6 @@ public abstract class PostListViewModel extends RxJavaViewModelSupport implement
         );
     }
     
-    
     public void removePost(Long postId) {
         var removed = posts.stream( )
                            .filter(post -> post.getId( ).equals(postId))
@@ -61,11 +60,11 @@ public abstract class PostListViewModel extends RxJavaViewModelSupport implement
         posts.removeAll(removed);
     }
     
-    public Subscription<Like> like(long postId) {
+    public SingleSubscription<Like> like(long postId) {
         return subscribe(postRepository.like(postId));
     }
     
-    public Subscription<Like> unlike(long postId) {
+    public SingleSubscription<Like> unlike(long postId) {
         return subscribe(postRepository.unlike(postId));
     }
 }

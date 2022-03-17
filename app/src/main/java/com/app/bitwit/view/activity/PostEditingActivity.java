@@ -81,7 +81,6 @@ public class PostEditingActivity extends AppCompatActivity {
         tagAdapter.addAdapterEventListener(this, event -> {
             if (event.getEvent( ) == TagAdapterEvent.DELETE) {
                 viewModel.removeTag(event.getItem( ));
-                System.out.println(viewModel.getTags( ));
             }
         });
         binding.tagRecycler.setAdapter(tagAdapter);

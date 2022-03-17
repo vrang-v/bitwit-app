@@ -27,7 +27,7 @@ public class SingleSubscription<T> implements Subscription {
     private Consumer<? super Throwable> onError   = e -> { };
     
     public SingleSubscription(Single<T> single, DisposableContainer disposableContainer) {
-        this.single              = single;
+        this.single              = single == null ? null : single.observeOn(observingScheduler);
         this.disposableContainer = disposableContainer;
     }
     
@@ -88,7 +88,6 @@ public class SingleSubscription<T> implements Subscription {
         }
         disposableContainer.add(
                 single.subscribeOn(subscribingScheduler)
-                      .observeOn(observingScheduler)
                       .subscribe(onSuccess, onError)
         );
     }

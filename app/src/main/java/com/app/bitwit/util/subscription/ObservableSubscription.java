@@ -29,7 +29,7 @@ public class ObservableSubscription<T> implements Subscription {
     private Action                      onComplete = ( ) -> { };
     
     public ObservableSubscription(Observable<T> observable, DisposableContainer disposableContainer) {
-        this.observable          = observable;
+        this.observable          = observable == null ? null : observable.observeOn(observingScheduler);
         this.disposableContainer = disposableContainer;
     }
     
@@ -98,7 +98,6 @@ public class ObservableSubscription<T> implements Subscription {
         }
         disposableContainer.add(
                 observable.subscribeOn(subscribingScheduler)
-                          .observeOn(observingScheduler)
                           .subscribe(onNext, onError, onComplete)
         );
     }

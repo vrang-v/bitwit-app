@@ -28,7 +28,7 @@ public class CompletableSubscription implements Subscription {
     private Consumer<? super Throwable> onError    = e -> { };
     
     public CompletableSubscription(Completable completable, DisposableContainer disposableContainer) {
-        this.completable         = completable;
+        this.completable         = completable == null ? null : completable.observeOn(observingScheduler);
         this.disposableContainer = disposableContainer;
     }
     
@@ -90,7 +90,6 @@ public class CompletableSubscription implements Subscription {
         disposableContainer.add(
                 completable
                         .subscribeOn(subscribingScheduler)
-                        .observeOn(observingScheduler)
                         .subscribe(onComplete, onError)
         );
     }

@@ -37,10 +37,10 @@ public interface AccountServiceClient {
     @POST("/api/login/google")
     Single<Response<LoginResponse>> googleLogin(@Body GoogleLoginRequest request);
     
-    @GET("/api/accounts/duplicate-check")
+    @GET("/api/accounts/duplicate-check/email")
     Single<Response<DuplicateCheckResponse>> checkForDuplicateEmail(@Query("email") String email);
     
-    @GET("/api/accounts/duplicate-check")
+    @GET("/api/accounts/duplicate-check/name")
     Single<Response<DuplicateCheckResponse>> checkForDuplicateNickname(@Query("name") String nickname);
     
     @GET("/api/accounts/email-verified-check")

@@ -64,9 +64,16 @@ public class AccountFragment extends Fragment {
             }
         });
         
-        binding.logout.setOnClickListener(v ->
-                signOut( )
-        );
+        binding.logout.setOnClickListener(v -> {
+            var accountType = viewModel.getAccount( ).getValue( ).getAccountType( );
+            if (accountType.equals("EMAIL")) {
+                signOut( );
+                return;
+            }
+            if (accountType.equals("GOOGLE")) {
+                googleSignOut( );
+            }
+        });
         
         binding.profileImage.setOnClickListener(v -> {
             var intent = new Intent(Intent.ACTION_PICK);
@@ -110,21 +117,20 @@ public class AccountFragment extends Fragment {
     }
     
     private void signOut( ) {
-        var googleSignInClient = GoogleSignInUtils.getGoogleSignInClient(getActivity( ));
-        googleSignInClient
-                .signOut( )
-                .addOnCompleteListener(getActivity( ), task -> {
-                    if (task.isSuccessful( )) {
-                        viewModel.logout( )
-                                 .onComplete(( ) -> {
-                                     var intent = new Intent(getActivity( ), LoginActivity.class)
-                                             .putExtra(ExtraKey.LOGOUT, true);
-                                     startActivity(intent);
-                                     getActivity( ).finish( );
-                                 })
-                                 .subscribe( );
-                    }
-                });
+        viewModel.logout( )
+                 .onComplete(( ) -> {
+                     var intent = new Intent(getActivity( ), LoginActivity.class)
+                             .putExtra(ExtraKey.LOGOUT, true);
+                     startActivity(intent);
+                     getActivity( ).finish( );
+                 })
+                 .subscribe( );
+    }
+    
+    private void googleSignOut( ) {
+        GoogleSignInUtils.getGoogleSignInClient(getActivity( ))
+                         .signOut( )
+                         .addOnSuccessListener(getActivity( ), unused -> signOut( ));
     }
     
     private void init(LayoutInflater inflater, ViewGroup container) {

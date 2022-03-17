@@ -35,6 +35,7 @@ import lombok.var;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -44,7 +45,8 @@ import static com.app.bitwit.util.livedata.LiveDataUtils.observe;
 import static com.app.bitwit.util.livedata.LiveDataUtils.observeAllNotNull;
 import static com.app.bitwit.util.livedata.LiveDataUtils.observeNotNull;
 
-@AndroidEntryPoint public class StockInfoActivity extends AppCompatActivity implements OnTouchListener {
+@AndroidEntryPoint
+public class StockInfoActivity extends AppCompatActivity implements OnTouchListener {
     
     public static final String CANDLE_STICK = "candleStick";
     public static final String LINE         = "line";
@@ -197,20 +199,20 @@ import static com.app.bitwit.util.livedata.LiveDataUtils.observeNotNull;
         binding.lineChart.setOnLongClickListener(v -> {
             chartLongClicked = true;
             if (VERSION.SDK_INT >= VERSION_CODES.O) {
-                Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
-                vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE));
+                var vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
+                vibrator.vibrate(VibrationEffect.createOneShot(50L, VibrationEffect.DEFAULT_AMPLITUDE));
             }
             lineDataSet.setHighLightColor(Colors.BLACK);
             binding.lineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener( ) {
                 @Override
                 public void onValueSelected(Entry entry, Highlight highlight) {
-                    binding.selectedCandlestickInfo.setVisibility(View.VISIBLE);
+                    binding.selectedLineInfo.setVisibility(View.VISIBLE);
                     viewModel.setSelectedCandlestick((int)entry.getX( ));
                 }
                 
                 @Override
                 public void onNothingSelected( ) {
-                    binding.selectedCandlestickInfo.setVisibility(View.INVISIBLE);
+                    binding.selectedLineInfo.setVisibility(View.INVISIBLE);
                 }
             });
             return false;
@@ -247,13 +249,13 @@ import static com.app.bitwit.util.livedata.LiveDataUtils.observeNotNull;
             binding.candleStickChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener( ) {
                 @Override
                 public void onValueSelected(Entry entry, Highlight highlight) {
-                    binding.selectedCandlestickInfo.setVisibility(View.VISIBLE);
+                    binding.selectedCandleInfo.setVisibility(View.VISIBLE);
                     viewModel.setSelectedCandlestick((int)entry.getX( ));
                 }
                 
                 @Override
                 public void onNothingSelected( ) {
-                    binding.selectedCandlestickInfo.setVisibility(View.INVISIBLE);
+                    binding.selectedCandleInfo.setVisibility(View.INVISIBLE);
                 }
             });
             return true;
@@ -337,10 +339,16 @@ import static com.app.bitwit.util.livedata.LiveDataUtils.observeNotNull;
                     
                     @Override
                     public void onAnimationEnd(Animation animation) {
-                        binding.selectedCandlestickInfo.setVisibility(View.INVISIBLE);
+                        binding.selectedLineInfo.setVisibility(View.INVISIBLE);
+                        binding.selectedCandleInfo.setVisibility(View.INVISIBLE);
                     }
                 });
-                binding.selectedCandlestickInfo.startAnimation(animation);
+                if (Objects.equals(viewModel.getChartType( ).getValue( ), LINE)) {
+                    binding.selectedLineInfo.startAnimation(animation);
+                }
+                else if (Objects.equals(viewModel.getChartType( ).getValue( ), CANDLE_STICK)) {
+                    binding.selectedCandleInfo.startAnimation(animation);
+                }
             }
         }
         return false;

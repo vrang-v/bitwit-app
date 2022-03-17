@@ -1,7 +1,6 @@
 package com.app.bitwit.data.source.remote.dto.response;
 
 import android.annotation.SuppressLint;
-import android.util.Log;
 import com.app.bitwit.data.source.local.entity.Candlestick;
 import com.google.gson.annotations.SerializedName;
 import lombok.Data;

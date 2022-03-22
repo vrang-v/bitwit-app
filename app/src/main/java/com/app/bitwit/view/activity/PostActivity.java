@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.app.bitwit.R;
 import com.app.bitwit.constant.ExtraKey;
 import com.app.bitwit.databinding.ActivityPostBinding;
-import com.app.bitwit.domain.Comment;
 import com.app.bitwit.dto.LoginAccount;
 import com.app.bitwit.view.adapter.CommentAdapter;
 import com.app.bitwit.view.adapter.TickerAdapter;
@@ -75,22 +74,22 @@ public class PostActivity extends AppCompatActivity {
         });
         
         observeAll(this, viewModel.getCommentContent( ), viewModel.getCommentType( ), (comment, type) -> {
-            Comment selected            = viewModel.getCommentSelected( ).getValue( );
-            boolean hasText             = hasText(comment);
-            String  blankCommentMessage = "공백 댓글은 작성할 수 없어요";
+            var selected        = viewModel.getCommentSelected( ).getValue( );
+            var hasText         = hasText(comment);
+            var blankCommentMsg = "공백 댓글은 작성할 수 없어요";
             switch (type) {
                 case COMMENT:
-                    viewModel.setCommentDetail(hasText ? "댓글을 작성하고 있어요" : blankCommentMessage);
+                    viewModel.setCommentDetail(hasText ? "댓글을 작성하고 있어요" : blankCommentMsg);
                     break;
                 case COMMENT_REPLY:
                 case REPLY_REPLY:
                     String toName = selected.getWriter( ).getName( );
                     String myName = viewModel.getAccount( ).getValue( ).getName( );
                     if (toName.equals(myName)) {
-                        viewModel.setCommentDetail(hasText ? "나에게 남길 답글을 작성하고 있어요" : blankCommentMessage);
+                        viewModel.setCommentDetail(hasText ? "나에게 남길 답글을 작성하고 있어요" : blankCommentMsg);
                     }
                     else {
-                        viewModel.setCommentDetail(hasText ? toName + " 님에게 남길 답글을 작성하고 있어요" : blankCommentMessage);
+                        viewModel.setCommentDetail(hasText ? toName + " 님에게 남길 답글을 작성하고 있어요" : blankCommentMsg);
                     }
                     break;
                 case EDIT:

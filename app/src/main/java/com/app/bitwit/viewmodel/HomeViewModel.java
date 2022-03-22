@@ -59,10 +59,11 @@ public class HomeViewModel extends RxJavaViewModelSupport implements SnackbarVie
         );
     }
     
-    public CompletableSubscription refreshVoteItemsSchedule(long refreshInterval) {
+    public CompletableSubscription refreshVoteItemsSchedule(long refreshIntervalMillis) {
         return subscribe(
-                Observable.interval(0L, refreshInterval, TimeUnit.SECONDS)
+                Observable.interval(0L, refreshIntervalMillis, TimeUnit.MILLISECONDS)
                           .flatMapCompletable(event -> voteRepository.refreshVoteItems( ))
+                          .retry( )
         );
     }
     

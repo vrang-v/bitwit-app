@@ -68,8 +68,10 @@ public class PostViewModel extends RxJavaViewModelSupport implements SnackbarVie
         return subscribe(
                 postRepository
                         .viewPost(postId)
+                        .cache( )
                         .doOnSuccess(post -> postFlattenComments(post.getComments( )))
                         .doOnSuccess(post::postValue)
+                        .retry( )
         );
     }
     

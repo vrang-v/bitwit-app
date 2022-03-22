@@ -162,9 +162,7 @@ public class HomeFragment extends Fragment implements OnNavigationItemReselected
         binding   = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false);
         viewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         viewModel.loadAccount( ).subscribe( );
-        viewModel.refreshVoteItemsSchedule(3L)
-                 .onError(e -> viewModel.setSnackbar("새로고침 도중 문제가 발생했어요"))
-                 .subscribe( );
+        viewModel.refreshVoteItemsSchedule(2500L).subscribe( );
         
         binding.setLifecycleOwner(this);
         binding.setViewModel(viewModel);

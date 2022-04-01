@@ -7,14 +7,19 @@ import com.app.bitwit.data.repository.PostRepository;
 import com.app.bitwit.data.repository.VoteRepository;
 import com.app.bitwit.data.source.local.entity.Candlestick;
 import com.app.bitwit.data.source.local.entity.VoteItem;
+import com.app.bitwit.data.source.storage.LocalStorage;
+import com.app.bitwit.data.source.storage.LocalStorageKey;
 import com.app.bitwit.domain.SelectedCandlestick;
 import com.app.bitwit.dto.PostPreviewItem;
-import com.app.bitwit.util.livedata.LiveDataObserver;
+import com.app.bitwit.util.livedata.LiveDataAdapter;
 import com.app.bitwit.util.livedata.MutableLiveList;
 import com.app.bitwit.util.subscription.CompletableSubscription;
 import com.app.bitwit.util.subscription.SingleSubscription;
+import com.app.bitwit.view.activity.StockInfoActivity;
 import com.app.bitwit.viewmodel.common.RxJavaViewModelSupport;
 import com.app.bitwit.viewmodel.common.SnackbarViewModel;
+import com.github.mikephil.charting.data.CandleEntry;
+import com.github.mikephil.charting.data.Entry;
 import dagger.hilt.android.lifecycle.HiltViewModel;
 import lombok.Getter;
 import lombok.var;
@@ -25,9 +30,8 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-
-import static com.app.bitwit.util.livedata.LiveDataUtils.observeUntilNotEmpty;
 
 @Getter
 @HiltViewModel
@@ -37,20 +41,34 @@ public class StockInfoViewModel extends RxJavaViewModelSupport implements Snackb
     private final CandlestickRepository candlestickRepository;
     private final PostRepository        postRepository;
     
-    private final LiveDataObserver<VoteItem> voteItem = new LiveDataObserver<>( );
+    private final LocalStorage localStorage;
     
     private final MutableLiveData<String>              ticker              = new MutableLiveData<>( );
     private final MutableLiveList<Candlestick>         chartData           = new MutableLiveList<>( );
+    private final MutableLiveData<List<Entry>>         lineEntries         = new MutableLiveData<>( );
+    private final MutableLiveData<List<CandleEntry>>   candleEntries       = new MutableLiveData<>( );
     private final MutableLiveData<String>              chartType           = new MutableLiveData<>( );
     private final MutableLiveData<String>              chartInterval       = new MutableLiveData<>( );
     private final MutableLiveData<SelectedCandlestick> selectedCandlestick = new MutableLiveData<>( );
     private final MutableLiveList<PostPreviewItem>     postPreviewItems    = new MutableLiveList<>( );
     
+    private final LiveDataAdapter<VoteItem>          voteItem    = new LiveDataAdapter<>( );
+    private final LiveDataAdapter<List<Candlestick>> candlestick = new LiveDataAdapter<>( );
+    
     @Inject
-    public StockInfoViewModel(VoteRepository voteRepository, CandlestickRepository candlestickRepository, PostRepository postRepository) {
+    public StockInfoViewModel(VoteRepository voteRepository, CandlestickRepository candlestickRepository, PostRepository postRepository, LocalStorage localStorage) {
         this.voteRepository        = voteRepository;
         this.candlestickRepository = candlestickRepository;
         this.postRepository        = postRepository;
+        this.localStorage          = localStorage;
+        loadChartType( );
+        loadChartInterval( );
+        observe(candlestick, candlesticks -> {
+            Collections.reverse(candlesticks);
+            chartData.postValue(candlesticks);
+            postLineEntries(candlesticks);
+            postCandleEntries(candlesticks);
+        });
     }
     
     public void loadVoteItem(String ticker) {
@@ -58,10 +76,46 @@ public class StockInfoViewModel extends RxJavaViewModelSupport implements Snackb
     }
     
     public void loadChartData(String ticker, String interval) {
-        observeUntilNotEmpty(candlestickRepository.loadCandlesticks(ticker, interval, 500), candlesticks -> {
-            Collections.reverse(candlesticks);
-            chartData.postValue(candlesticks);
-        });
+        candlestick.changeSource(candlestickRepository.loadCandlesticks(ticker, interval, 500));
+    }
+    
+    private void postLineEntries(List<Candlestick> chartData) {
+        var index = new AtomicInteger(0);
+        this.lineEntries.postValue(
+                chartData.stream( )
+                         .map(candlestick -> new Entry(index.getAndAdd(1),
+                                 candlestick.getClosingPrice( ).floatValue( ))
+                         )
+                         .collect(Collectors.toList( ))
+        );
+    }
+    
+    private void postCandleEntries(List<Candlestick> chartData) {
+        var index = new AtomicInteger(0);
+        this.candleEntries.postValue(
+                chartData.stream( )
+                         .map(candlestick -> new CandleEntry(index.getAndAdd(1),
+                                 candlestick.getHighPrice( ).floatValue( ),
+                                 candlestick.getLowPrice( ).floatValue( ),
+                                 candlestick.getOpenPrice( ).floatValue( ),
+                                 candlestick.getClosingPrice( ).floatValue( ))
+                         )
+                         .collect(Collectors.toList( ))
+        );
+    }
+    
+    public void loadChartType( ) {
+        this.chartType.postValue(
+                localStorage.load(LocalStorageKey.CHART_TYPE, String.class)
+                            .orElse(StockInfoActivity.CANDLE_STICK)
+        );
+    }
+    
+    public void loadChartInterval( ) {
+        this.chartInterval.postValue(
+                localStorage.load(LocalStorageKey.CHART_INTERVAL, String.class)
+                            .orElse("1m")
+        );
     }
     
     @SuppressLint("NewApi")
@@ -87,8 +141,8 @@ public class StockInfoViewModel extends RxJavaViewModelSupport implements Snackb
                                     return isOldData(localDateTime, 6L, ChronoUnit.HOURS);
                                 case "12h":
                                     return isOldData(localDateTime, 12L, ChronoUnit.HOURS);
-                                case "24h":
-                                    return isOldData(localDateTime, 24L, ChronoUnit.HOURS);
+                                case "1d":
+                                    return isOldData(localDateTime, 1L, ChronoUnit.DAYS);
                                 default:
                                     return false;
                             }
@@ -107,15 +161,17 @@ public class StockInfoViewModel extends RxJavaViewModelSupport implements Snackb
         );
     }
     
-    public void setChartType(String chartType) {
-        this.chartType.postValue(chartType);
-    }
-    
     public void setTicker(String ticker) {
         this.ticker.postValue(ticker);
     }
     
+    public void setChartType(String chartType) {
+        localStorage.save(LocalStorageKey.CHART_TYPE, chartType);
+        this.chartType.postValue(chartType);
+    }
+    
     public void setChartInterval(String chartInterval) {
+        localStorage.save(LocalStorageKey.CHART_INTERVAL, chartInterval);
         this.chartInterval.postValue(chartInterval);
     }
     
@@ -139,5 +195,6 @@ public class StockInfoViewModel extends RxJavaViewModelSupport implements Snackb
     @Override
     protected void onCleared( ) {
         voteItem.dispose( );
+        candlestick.dispose( );
     }
 }

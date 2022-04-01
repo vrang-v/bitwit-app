@@ -37,8 +37,7 @@ public class CandlestickRepository {
     }
     
     public LiveData<List<Candlestick>> loadCandlesticks(String ticker, String interval, int size) {
-        return candlestickDao
-                .loadByTickerAndInterval(ticker, interval, size);
+        return candlestickDao.loadByTickerAndInterval(ticker, interval, size);
     }
     
     @SuppressLint("NewApi")

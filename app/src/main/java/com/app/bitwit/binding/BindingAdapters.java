@@ -56,4 +56,9 @@ public class BindingAdapters {
             view.setTypeface(null, Typeface.NORMAL);
         }
     }
+    
+    @BindingAdapter("binding:selected")
+    public static void setSelected(View view, boolean selected) {
+        view.setSelected(selected);
+    }
 }

@@ -8,7 +8,7 @@ import com.app.bitwit.data.source.local.entity.VoteItem;
 import com.app.bitwit.data.source.remote.dto.request.CreateBallotRequest;
 import com.app.bitwit.domain.Ballot;
 import com.app.bitwit.dto.LoginAccount;
-import com.app.bitwit.util.livedata.LiveDataObserver;
+import com.app.bitwit.util.livedata.LiveDataAdapter;
 import com.app.bitwit.util.subscription.CompletableSubscription;
 import com.app.bitwit.util.subscription.SingleSubscription;
 import com.app.bitwit.viewmodel.common.RxJavaViewModelSupport;
@@ -42,7 +42,7 @@ public class HomeViewModel extends RxJavaViewModelSupport implements SnackbarVie
     private final MutableLiveData<Integer>      sortDirection     = new MutableLiveData<>(- 1);
     private final MutableLiveData<String>       sortStatus        = new MutableLiveData<>("");
     
-    private final LiveDataObserver<List<VoteItem>> voteItems = new LiveDataObserver<>( );
+    private final LiveDataAdapter<List<VoteItem>> voteItems = new LiveDataAdapter<>( );
     
     @Inject
     public HomeViewModel(VoteRepository voteRepository, AccountRepository accountRepository, BallotRepository ballotRepository) {

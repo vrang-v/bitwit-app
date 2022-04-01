@@ -20,7 +20,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import com.app.bitwit.R;
 import com.app.bitwit.constant.Colors;
-import com.app.bitwit.data.source.local.entity.Candlestick;
 import com.app.bitwit.databinding.ActivityStockInfoBinding;
 import com.app.bitwit.view.adapter.PostPreviewAdapter;
 import com.app.bitwit.viewmodel.StockInfoViewModel;
@@ -32,17 +31,14 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import dagger.hilt.android.AndroidEntryPoint;
 import lombok.var;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import static android.view.animation.AnimationUtils.loadAnimation;
 import static com.app.bitwit.constant.IntentKeys.STOCK_TICKER;
 import static com.app.bitwit.util.livedata.LiveDataUtils.observe;
 import static com.app.bitwit.util.livedata.LiveDataUtils.observeAllNotNull;
+import static com.app.bitwit.util.livedata.LiveDataUtils.observeNotEmpty;
 import static com.app.bitwit.util.livedata.LiveDataUtils.observeNotNull;
 
 @AndroidEntryPoint
@@ -51,14 +47,13 @@ public class StockInfoActivity extends AppCompatActivity implements OnTouchListe
     public static final String CANDLE_STICK = "candleStick";
     public static final String LINE         = "line";
     
-    private boolean chartLongClicked = false;
-    
     private ActivityStockInfoBinding binding;
     private StockInfoViewModel       viewModel;
     
-    private LineDataSet       lineDataSet;
-    private CandleDataSet     candleDataSet;
-    private Map<View, String> intervalMap;
+    private LineDataSet   lineDataSet;
+    private CandleDataSet candleDataSet;
+    
+    private boolean isChartSwiped = false;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +63,6 @@ public class StockInfoActivity extends AppCompatActivity implements OnTouchListe
         initLineDataSet( );
         initCandleStickChart( );
         initCandleDataSet( );
-        initIntervalMap( );
         
         observeNotNull(this, viewModel.getTicker( ), ticker -> {
             viewModel.loadVoteItem(ticker);
@@ -77,26 +71,10 @@ public class StockInfoActivity extends AppCompatActivity implements OnTouchListe
         });
         
         observe(this, viewModel.getVoteItem( ), voteItem -> {
-            binding.participantCount.startAnimation(loadAnimation(this, R.anim.anim_fade));
-            binding.currentPrice.startAnimation(loadAnimation(this, R.anim.anim_fade));
-            binding.currentFluctuateRate.startAnimation(loadAnimation(this, R.anim.anim_fade));
-        });
-        
-        observeAllNotNull(this, viewModel.getChartData( ), viewModel.getChartType( ), (chartData, chartType) -> {
-            if (chartData.isEmpty( )) {
-                return;
-            }
-            if (chartType.equals(LINE)) {
-                drawLineChart(chartData);
-                binding.lineChart.setVisibility(View.VISIBLE);
-                binding.candleStickChart.setVisibility(View.INVISIBLE);
-                return;
-            }
-            if (chartType.equals(CANDLE_STICK)) {
-                drawCandleStickChart(chartData);
-                binding.candleStickChart.setVisibility(View.VISIBLE);
-                binding.lineChart.setVisibility(View.INVISIBLE);
-            }
+            var fadeAnimation = loadAnimation(this, R.anim.anim_fade);
+            binding.participantCount.startAnimation(fadeAnimation);
+            binding.currentPrice.startAnimation(fadeAnimation);
+            binding.currentFluctuateRate.startAnimation(fadeAnimation);
         });
         
         observeAllNotNull(this, viewModel.getTicker( ), viewModel.getChartInterval( ), (ticker, interval) -> {
@@ -105,8 +83,21 @@ public class StockInfoActivity extends AppCompatActivity implements OnTouchListe
                      .subscribe( );
         });
         
+        observeNotEmpty(this, viewModel.getLineEntries( ), this::drawLineChart);
+        observeNotEmpty(this, viewModel.getCandleEntries( ), this::drawCandleStickChart);
+        
         binding.lineChartBtn.setOnClickListener(v -> viewModel.setChartType(LINE));
         binding.candleStickChartBtn.setOnClickListener(v -> viewModel.setChartType(CANDLE_STICK));
+        
+        binding.button1m.setOnClickListener(v -> viewModel.setChartInterval("1m"));
+        binding.button3m.setOnClickListener(v -> viewModel.setChartInterval("3m"));
+        binding.button5m.setOnClickListener(v -> viewModel.setChartInterval("5m"));
+        binding.button10m.setOnClickListener(v -> viewModel.setChartInterval("10m"));
+        binding.button30m.setOnClickListener(v -> viewModel.setChartInterval("30m"));
+        binding.button1h.setOnClickListener(v -> viewModel.setChartInterval("1h"));
+        binding.button6h.setOnClickListener(v -> viewModel.setChartInterval("6h"));
+        binding.button12h.setOnClickListener(v -> viewModel.setChartInterval("12h"));
+        binding.button1d.setOnClickListener(v -> viewModel.setChartInterval("1d"));
         
         var adapter = new PostPreviewAdapter( );
         adapter.addAdapterEventListener(this, event -> {
@@ -119,12 +110,7 @@ public class StockInfoActivity extends AppCompatActivity implements OnTouchListe
         binding.postRecyclerview.setLayoutManager(new LinearLayoutManager(this));
     }
     
-    private void drawLineChart(List<Candlestick> chartData) {
-        var index = new AtomicInteger(0);
-        var entries = chartData.stream( )
-                               .map(candlestick -> new Entry(index.getAndAdd(1),
-                                       candlestick.getClosingPrice( ).floatValue( )))
-                               .collect(Collectors.toList( ));
+    private void drawLineChart(List<Entry> entries) {
         float dy = entries.get(entries.size( ) - 1).getY( ) - entries.get(0).getY( );
         lineDataSet.setValues(entries);
         lineDataSet.setColor(dy >= 0 ? Colors.PRIMARY_RED : Colors.PRIMARY_BLUE);
@@ -133,43 +119,17 @@ public class StockInfoActivity extends AppCompatActivity implements OnTouchListe
         binding.lineChart.invalidate( );
     }
     
-    private void drawCandleStickChart(List<Candlestick> chartData) {
-        var index = new AtomicInteger(0);
-        var candleEntries = chartData.stream( )
-                                     .map(candlestick -> new CandleEntry(index.getAndAdd(1),
-                                             candlestick.getHighPrice( ).floatValue( ),
-                                             candlestick.getLowPrice( ).floatValue( ),
-                                             candlestick.getOpenPrice( ).floatValue( ),
-                                             candlestick.getClosingPrice( ).floatValue( )))
-                                     .collect(Collectors.toList( ));
+    private void drawCandleStickChart(List<CandleEntry> candleEntries) {
         candleDataSet.setValues(candleEntries);
         binding.candleStickChart.setData(new CandleData(candleDataSet));
         binding.candleStickChart.invalidate( );
-    }
-    
-    public void onChartIntervalBtnClick(View view) {
-        binding.button1m.setSelected(false);
-        binding.button3m.setSelected(false);
-        binding.button5m.setSelected(false);
-        binding.button10m.setSelected(false);
-        binding.button30m.setSelected(false);
-        binding.button1h.setSelected(false);
-        binding.button6h.setSelected(false);
-        binding.button12h.setSelected(false);
-        binding.button24h.setSelected(false);
-        view.setSelected(true);
-        var interval = intervalMap.get(view);
-        viewModel.setChartInterval(interval);
     }
     
     private void init( ) {
         binding   = DataBindingUtil.setContentView(this, R.layout.activity_stock_info);
         viewModel = new ViewModelProvider(this).get(StockInfoViewModel.class);
         viewModel.setTicker(getIntent( ).getStringExtra(STOCK_TICKER));
-        viewModel.setChartType(CANDLE_STICK);
-        viewModel.setChartInterval("1m");
         
-        binding.button1m.setSelected(true);
         binding.setActivity(this);
         binding.setLifecycleOwner(this);
         binding.setViewModel(viewModel);
@@ -197,17 +157,16 @@ public class StockInfoActivity extends AppCompatActivity implements OnTouchListe
         binding.lineChart.setNoDataTextColor(Colors.BLACK);
         binding.lineChart.setOnTouchListener(this);
         binding.lineChart.setOnLongClickListener(v -> {
-            chartLongClicked = true;
-            if (VERSION.SDK_INT >= VERSION_CODES.O) {
-                var vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
-                vibrator.vibrate(VibrationEffect.createOneShot(50L, VibrationEffect.DEFAULT_AMPLITUDE));
-            }
+            vibrate(50L, 100);
             lineDataSet.setHighLightColor(Colors.BLACK);
             binding.lineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener( ) {
                 @Override
                 public void onValueSelected(Entry entry, Highlight highlight) {
-                    binding.selectedLineInfo.setVisibility(View.VISIBLE);
-                    viewModel.setSelectedCandlestick((int)entry.getX( ));
+                    if (isChartSwiped) {
+                        binding.selectedLineInfo.setVisibility(View.VISIBLE);
+                        viewModel.setSelectedCandlestick((int)entry.getX( ));
+                    }
+                    isChartSwiped = true;
                 }
                 
                 @Override
@@ -240,17 +199,16 @@ public class StockInfoActivity extends AppCompatActivity implements OnTouchListe
         binding.candleStickChart.setNoDataTextColor(Colors.BLACK);
         binding.candleStickChart.setOnTouchListener(this);
         binding.candleStickChart.setOnLongClickListener(v -> {
-            chartLongClicked = true;
-            if (VERSION.SDK_INT >= VERSION_CODES.O) {
-                Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
-                vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE));
-            }
+            vibrate(50L, 100);
             candleDataSet.setHighLightColor(Colors.BLACK);
             binding.candleStickChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener( ) {
                 @Override
                 public void onValueSelected(Entry entry, Highlight highlight) {
-                    binding.selectedCandleInfo.setVisibility(View.VISIBLE);
-                    viewModel.setSelectedCandlestick((int)entry.getX( ));
+                    if (isChartSwiped) {
+                        binding.selectedCandleInfo.setVisibility(View.VISIBLE);
+                        viewModel.setSelectedCandlestick((int)entry.getX( ));
+                    }
+                    isChartSwiped = true;
                 }
                 
                 @Override
@@ -293,17 +251,17 @@ public class StockInfoActivity extends AppCompatActivity implements OnTouchListe
         candleDataSet.setNeutralColor(Colors.GRAY);
     }
     
-    private void initIntervalMap( ) {
-        intervalMap = new HashMap<>( );
-        intervalMap.put(binding.button1m, "1m");
-        intervalMap.put(binding.button3m, "3m");
-        intervalMap.put(binding.button5m, "5m");
-        intervalMap.put(binding.button10m, "10m");
-        intervalMap.put(binding.button30m, "30m");
-        intervalMap.put(binding.button1h, "1h");
-        intervalMap.put(binding.button6h, "6h");
-        intervalMap.put(binding.button12h, "12h");
-        intervalMap.put(binding.button24h, "24h");
+    private void vibrate(long time, int strength) {
+        var vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
+        if (vibrator == null) {
+            return;
+        }
+        if (VERSION.SDK_INT >= VERSION_CODES.O) {
+            vibrator.vibrate(VibrationEffect.createOneShot(time, strength));
+        }
+        else {
+            vibrator.vibrate(time);
+        }
     }
     
     @Override
@@ -329,10 +287,10 @@ public class StockInfoActivity extends AppCompatActivity implements OnTouchListe
             candleDataSet.setHighLightColor(Color.TRANSPARENT);
             binding.lineChart.setOnChartValueSelectedListener(null);
             binding.candleStickChart.setOnChartValueSelectedListener(null);
-            if (chartLongClicked) {
-                chartLongClicked = false;
-                var animation = loadAnimation(this, R.anim.anim_fade_out_fast);
-                animation.setAnimationListener(new AnimationListener( ) {
+            if (isChartSwiped) {
+                isChartSwiped = false;
+                var fadeOutAnimation = loadAnimation(this, R.anim.anim_fade_out_fast);
+                fadeOutAnimation.setAnimationListener(new AnimationListener( ) {
                     public void onAnimationStart(Animation animation) { }
                     
                     public void onAnimationRepeat(Animation animation) { }
@@ -344,10 +302,10 @@ public class StockInfoActivity extends AppCompatActivity implements OnTouchListe
                     }
                 });
                 if (Objects.equals(viewModel.getChartType( ).getValue( ), LINE)) {
-                    binding.selectedLineInfo.startAnimation(animation);
+                    binding.selectedLineInfo.startAnimation(fadeOutAnimation);
                 }
                 else if (Objects.equals(viewModel.getChartType( ).getValue( ), CANDLE_STICK)) {
-                    binding.selectedCandleInfo.startAnimation(animation);
+                    binding.selectedCandleInfo.startAnimation(fadeOutAnimation);
                 }
             }
         }
